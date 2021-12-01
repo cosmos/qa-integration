@@ -39,10 +39,10 @@ else
   sudo apt-get -y upgrade
   sudo apt install build-essential jq -y
 
-  wget https://dl.google.com/go/go1.16.8.linux-amd64.tar.gz
-  tar -xvf go1.16.8.linux-amd64.tar.gz
+  wget https://dl.google.com/go/go1.17.3.linux-amd64.tar.gz
+  tar -xvf go1.17.3.linux-amd64.tar.gz
   sudo mv go /usr/local
-  rm go1.16.8.linux-amd64.tar.gz
+  rm go1.17.3.linux-amd64.tar.gz
 
   echo "------ Update bashrc ---------------"
   export GOPATH=$HOME/go
@@ -63,8 +63,13 @@ else
   go version
 fi
 
+echo "--------- Install cosmovisor-------"
+go install github.com/cosmos/cosmos-sdk/cosmovisor/cmd/cosmovisor@v1.0.0
+strings $(which cosmovisor) | egrep -e "mod\s+github.com/cosmos/cosmos-sdk/cosmovisor"
+
+export REPO=$(basename $GH_URL .git)
 echo "--------- Install $DAEMON ---------"
-git clone $GH_URL && cd $(basename $_ .git)
+git clone $GH_URL && cd $REPO
 git fetch && git checkout $CHAIN_VERSION
 make install
 
@@ -95,6 +100,8 @@ for (( a=1; a<=$NODES; a++ ))
 do
     echo "****** create dir :: $DAEMON_HOME-$a ********"
     mkdir -p "$DAEMON_HOME-$a"
+    mkdir -p "$DAEMON_HOME-$a"/cosmovisor/genesis/bin
+    cp $(which $DAEMON) "$DAEMON_HOME-$a"/cosmovisor/genesis/bin/
 done
 
 echo "--------Start initializing the chain ($CHAINID)---------"
@@ -263,9 +270,14 @@ do
     Description=${DAEMON} daemon
     After=network.target
     [Service]
+    Environment="DAEMON_HOME=$DAEMON_HOME-$a"
+	Environment="DAEMON_NAME=$DAEMON"
+	Environment="DAEMON_ALLOW_DOWNLOAD_BINARIES=false"
+	Environment="DAEMON_RESTART_AFTER_UPGRADE=true"
+	Environment="UNSAFE_SKIP_BACKUP=false"
     Type=simple
     User=$USER
-    ExecStart=$(which $DAEMON) start --home $DAEMON_HOME-$a
+    ExecStart=$(which cosmovisor) start --home $DAEMON_HOME-$a
     Restart=on-failure
     RestartSec=3
     LimitNOFILE=4096
