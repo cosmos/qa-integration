@@ -12,6 +12,8 @@ export DENOM=<denom of your token>
 export GH_URL=<github url of the repository to clone>
 export CHAIN_VERSION=<git tag to build>
 export DAEMON=<binary name>
+export UPGRADE_NAME=<upgrade name in handler>
+export UPGRADE_VERSION=<git tag or branch name with upgrade handler>
 ```
 For eg:- 
 ```
@@ -19,8 +21,10 @@ export DAEMON_HOME=~/.gaiad
 export CHAINID=test
 export DENOM=uatom
 export GH_URL=https://github.com/cosmos/gaia
-export CHAIN_VERSION=v6.0.0-rc1
+export CHAIN_VERSION=v6.0.0
 export DAEMON=gaiad
+export UPGRADE_NAME=v7.0-upgrade
+export UPGRADE_VERSION=v7.0.0
 ```
 
 ### Scripts:-
@@ -104,4 +108,13 @@ Usage:-
  chmod +x query_load.sh
  ./query_load.sh
  ```
+ 10) `setup_upgrade.sh`:- This script creates the necessary folders for cosmovisor. It also builds and places the binaries in the folders depending on the upgrade
+name.
+     Usage:-
+ ```
+ chmod +x setup_upgrade.sh
+ ./setup_upgrade.sh 5
+
+```
+This script takes one argument from the user which specifies the number of nodes on which the setup needs to be completed.
 
