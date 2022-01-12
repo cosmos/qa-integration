@@ -6,10 +6,8 @@ then
     NODES=1
 fi
 
-echo "**** Number of nodes to be check for the status: $NODES ****"
-
+echo "**** Number of nodes for status checks: $NODES ****"
 IP="$(dig +short myip.opendns.com @resolver1.opendns.com)"
-echo "Public IP address: ${IP}"
 
 if [ -z $IP ]
 then
@@ -17,13 +15,11 @@ then
 fi
 
 echo "------- Query node status ---------"
-
 for (( a=1; a<=$NODES; a++ ))
 do
     DIFF=`expr $a - 1`
     INC=`expr $DIFF \* 2`
-    PORT=`expr 16657 + $INC` #get ports
-
+    PORT=`expr 16657 + $INC` 
     RPC="http://${IP}:${PORT}/status?"
     result=$(curl -s "${RPC}")
     height=$(echo "${result}" | jq -r '.result.sync_info.latest_block_height')
