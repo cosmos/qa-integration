@@ -26,7 +26,9 @@ RPC="http://${IP}:${PORT}"
 acc1=$($DAEMON keys show account$FROM -a --home $DAEMON_HOME-1 --keyring-backend test)
 acc2=$($DAEMON keys show account$TO -a --home $DAEMON_HOME-1 --keyring-backend test)
 seq1=$("${DAEMON}" q account "${acc1}" --node $RPC --output json)
+seq2=$("${DAEMON}" q account "${acc2}" --node $RPC --output json)
 seq1no=$(echo "${seq1}" | jq -r '.sequence')
+seq2no=$(echo "${seq2}" | jq -r '.sequence')
 bound=`expr 10000 + $seq1no`
 for (( a=$seq1no; a<$bound; a++ ))
 do
