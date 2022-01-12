@@ -27,6 +27,7 @@ acc1=$($DAEMON keys show account$FROM -a --home $DAEMON_HOME-1 --keyring-backend
 acc2=$($DAEMON keys show account$TO -a --home $DAEMON_HOME-1 --keyring-backend test)
 seq1=$("${DAEMON}" q account "${acc1}" --node $RPC --output json)
 seq1no=$(echo "${seq1}" | jq -r '.sequence')
+bound=`expr 10000 + $seq1no`
 for (( a=$seq1no; a<$bound; a++ ))
 do
     sTx=$("${DAEMON}" tx bank send "${acc1}" "${acc2}" 1000000"${DENOM}" --chain-id "${CHAINID}" --keyring-backend test --home $DAEMON_HOME-1 --node $RPC --output json -y --sequence $a) 
