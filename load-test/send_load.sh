@@ -29,6 +29,12 @@ seq1=$("${DAEMON}" q account "${acc1}" --node $RPC --output json)
 seq2=$("${DAEMON}" q account "${acc2}" --node $RPC --output json)
 seq1no=$(echo "${seq1}" | jq -r '.sequence')
 seq2no=$(echo "${seq2}" | jq -r '.sequence')
+balance1=$("${DAEMON}" q bank balances "${acc1}" --node $RPC --output json)
+balance1res=$(echo "${balance1}" | jq -r '.balances')
+echo "** Balance of Account 1 before send_load :: $balance1res **"
+balance2=$("${DAEMON}" q bank balances "${acc2}" --node $RPC --output json)
+balance2res=$(echo "${balance1}" | jq -r '.balances')
+echo "** Balance of Account 2 before send_load :: $balance2res **"
 bound=`expr 10000 + $seq1no`
 for (( a=$seq1no; a<$bound; a++ ))
 do
@@ -36,3 +42,10 @@ do
     sTxHash=$(echo "${sTx}" | jq -r '.txhash')
     echo "** TX HASH :: $sTxHash **"
 done
+
+balance1=$("${DAEMON}" q bank balances "${acc1}" --node $RPC --output json)
+balance1res=$(echo "${balance1}" | jq -r '.balances')
+echo "** Balance of Account 1 after send_load :: $balance1res **"
+balance2=$("${DAEMON}" q bank balances "${acc2}" --node $RPC --output json)
+balance2res=$(echo "${balance1}" | jq -r '.balances')
+echo "** Balance of Account 2 after send_load :: $balance2res **"
