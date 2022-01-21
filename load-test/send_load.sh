@@ -40,7 +40,8 @@ do
 		unsignedTxres=$(echo "${unsignedTx}")
 		for (( b=0; b<$num_msgs; b++))
 		do
-    		cat unsigned.json | jq '.body.messages |= . + [.[-1]]' > unsigned.json.bk && mv unsigned.json.bk unsigned.json 
+    		cat unsigned.json | jq '.body.messages |= . + [.[-1]]' > unsigned.json.bk
+            mv unsigned.json.bk unsigned.json 
 		done
 		seq1=$("${DAEMON}" q account "${acc1}" --node $RPC --output json)
 		seq1no=$(echo "${seq1}" | jq -r '.sequence')
