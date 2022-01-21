@@ -22,17 +22,21 @@ then
     PORT=16657
 fi
 
+balace_query() {
+balance=$("${DAEMON}" q bank balances $1 --node $RPC --output json)
+balanceres=$(echo "${balance}" | jq -r '.balances')
+return "$balanceres"
+}
+
 RPC="http://${IP}:${PORT}"
 num_txs=35
 num_msgs=30
 acc1=$($DAEMON keys show account$FROM -a --home $DAEMON_HOME-1 --keyring-backend test)
 acc2=$($DAEMON keys show account$TO -a --home $DAEMON_HOME-1 --keyring-backend test)
-balance1=$("${DAEMON}" q bank balances "${acc1}" --node $RPC --output json)
-balance1res=$(echo "${balance1}" | jq -r '.balances')
-echo "** Balance of Account 1 before send_load :: $balance1res **"
-balance2=$("${DAEMON}" q bank balances "${acc2}" --node $RPC --output json)
-balance2res=$(echo "${balance2}" | jq -r '.balances')
-echo "** Balance of Account 2 before send_load :: $balance2res **"
+echo "** Balance of Account 1 before send_load :: **"
+balace_query "$acc1"
+echo "** Balance of Account 2 before send_load :: **"
+balace_query "$acc2"
 cd ~/
 for (( a=0; a<$num_txs; a++ ))
 do
@@ -52,11 +56,11 @@ do
 		echo $broadcastRes
 done
 
-for (( a=0; a<35; a++ ))
+for (( a=0; a<$num_txs; a++ ))
 do
 		unsignedTx=$("${DAEMON}" tx bank send "${acc2}" "${acc1}" 1000000"${DENOM}" --chain-id "${CHAINID}" --output json --generate-only --gas 500000 > unsigned.json)
 		unsignedTxres=$(echo "${unsignedTx}")
-		for (( b=0; b<30; b++))
+		for (( b=0; b<$num_msgs; b++))
 		do
     		cat unsigned.json | jq '.body.messages |= . + [.[-1]]' > unsigned.json.bk && mv unsigned.json.bk unsigned.json 
 		done
@@ -70,9 +74,7 @@ do
 done
 
 sleep 7s
-balance1=$("${DAEMON}" q bank balances "${acc1}" --node $RPC --output json)
-balance1res=$(echo "${balance1}" | jq -r '.balances')
-echo "** Balance of Account 1 after send_load :: $balance1res **"
-balance2=$("${DAEMON}" q bank balances "${acc2}" --node $RPC --output json)
-balance2res=$(echo "${balance2}" | jq -r '.balances')
-echo "** Balance of Account 2 after send_load :: $balance2res **"
+echo "** Balance of Account 1 after send_load :: **"
+balace_query $acc1
+echo "** Balance of Account 2 after send_load ::  **"
+balace_query $acc2
