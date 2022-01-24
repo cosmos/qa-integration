@@ -23,9 +23,9 @@ then
 fi
 
 balance_query() {
-balance=$("${DAEMON}" q bank balances $1 --node $RPC --output json)
-balanceres=$(echo "${balance}" | jq -r '.balances')
-return "$balanceres"
+    balance=$("${DAEMON}" q bank balances $1 --node $RPC --output json)
+    balanceres=$(echo "${balance}" | jq -r '.balances')
+    return "$balanceres"
 }
 
 RPC="http://${IP}:${PORT}"
