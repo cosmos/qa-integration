@@ -22,7 +22,7 @@ then
     PORT=16657
 fi
 
-balace_query() {
+balance_query() {
 balance=$("${DAEMON}" q bank balances $1 --node $RPC --output json)
 balanceres=$(echo "${balance}" | jq -r '.balances')
 return "$balanceres"
@@ -34,9 +34,9 @@ num_msgs=30
 acc1=$($DAEMON keys show account$FROM -a --home $DAEMON_HOME-1 --keyring-backend test)
 acc2=$($DAEMON keys show account$TO -a --home $DAEMON_HOME-1 --keyring-backend test)
 echo "** Balance of Account 1 before send_load :: **"
-balace_query "$acc1"
+balance_query "$acc1"
 echo "** Balance of Account 2 before send_load :: **"
-balace_query "$acc2"
+balance_query "$acc2"
 cd ~/
 for (( a=0; a<$num_txs; a++ ))
 do
@@ -75,6 +75,6 @@ done
 
 sleep 7s
 echo "** Balance of Account 1 after send_load :: **"
-balace_query $acc1
+balance_query $acc1
 echo "** Balance of Account 2 after send_load ::  **"
-balace_query $acc2
+balance_query $acc2
