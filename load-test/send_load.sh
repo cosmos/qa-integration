@@ -40,38 +40,34 @@ balance_query "$acc2"
 cd ~/
 for (( a=0; a<$num_txs; a++ ))
 do
-		unsignedTx=$("${DAEMON}" tx bank send "${acc1}" "${acc2}" 1000000"${DENOM}" --chain-id "${CHAINID}" --output json --generate-only --gas 500000 > unsigned.json)
-		unsignedTxres=$(echo "${unsignedTx}")
+		unsignedTxto=$("${DAEMON}" tx bank send "${acc1}" "${acc2}" 1000000"${DENOM}" --chain-id "${CHAINID}" --output json --generate-only --gas 500000 > unsignedto.json)
+		unsignedTxtores=$(echo "${unsignedTxto}")
+		unsignedTxfrom=$("${DAEMON}" tx bank send "${acc2}" "${acc1}" 1000000"${DENOM}" --chain-id "${CHAINID}" --output json --generate-only --gas 500000 > unsignedfrom.json)
+		unsignedTxfromres=$(echo "${unsignedTxfrom}")
 		for (( b=0; b<$num_msgs; b++))
 		do
-    		cat unsigned.json | jq '.body.messages |= . + [.[-1]]' > unsigned.json.bk
-            mv unsigned.json.bk unsigned.json 
+    		cat unsignedto.json | jq '.body.messages |= . + [.[-1]]' > unsignedto.json.bk
+            mv unsignedto.json.bk unsignedto.json 
+    		cat unsignedfrom.json | jq '.body.messages |= . + [.[-1]]' > unsignedfrom.json.bk
+            mv unsignedfrom.json.bk unsignedfrom.json
 		done
 		seq1=$("${DAEMON}" q account "${acc1}" --node $RPC --output json)
 		seq1no=$(echo "${seq1}" | jq -r '.sequence')
-		signTx=$("${DAEMON}" tx sign unsigned.json --from "${acc1}" --chain-id "${CHAINID}" --keyring-backend test --home $DAEMON_HOME-1 --node $RPC --signature-only=false --sequence $seq1no --gas 500000 > signed.json)
-		signTxres=$(echo "${signTx}")
-		broadcast=$("${DAEMON}" tx broadcast signed.json --output json --chain-id "${CHAINID}" --gas 500000 --node $RPC --broadcast-mode async)
-		broadcastRes=$(echo "${broadcast}" | jq .txhash)
-		echo $broadcastRes
-done
+		signTxto=$("${DAEMON}" tx sign unsignedto.json --from "${acc1}" --chain-id "${CHAINID}" --keyring-backend test --home $DAEMON_HOME-1 --node $RPC --signature-only=false --sequence $seq1no --gas 500000 > signedto.json)
+		signTxtores=$(echo "${signTxto}")
+		broadcastto=$("${DAEMON}" tx broadcast signedto.json --output json --chain-id "${CHAINID}" --gas 500000 --node $RPC --broadcast-mode async)
+		broadcasttoRes=$(echo "${broadcastto}" | jq .txhash)
+		echo $broadcasttoRes
 
-for (( a=0; a<$num_txs; a++ ))
-do
-		unsignedTx=$("${DAEMON}" tx bank send "${acc2}" "${acc1}" 1000000"${DENOM}" --chain-id "${CHAINID}" --output json --generate-only --gas 500000 > unsigned.json)
-		unsignedTxres=$(echo "${unsignedTx}")
-		for (( b=0; b<$num_msgs; b++))
-		do
-    		cat unsigned.json | jq '.body.messages |= . + [.[-1]]' > unsigned.json.bk && mv unsigned.json.bk unsigned.json 
-		done
 		seq2=$("${DAEMON}" q account "${acc2}" --node $RPC --output json)
 		seq2no=$(echo "${seq2}" | jq -r '.sequence')
-		signTx=$("${DAEMON}" tx sign unsigned.json --from "${acc2}" --chain-id "${CHAINID}" --keyring-backend test --home $DAEMON_HOME-1 --node $RPC --signature-only=false --sequence $seq1no --gas 500000 > signed.json)
-		signTxres=$(echo "${signTx}")
-		broadcast=$("${DAEMON}" tx broadcast signed.json --output json --chain-id "${CHAINID}" --gas 500000 --node $RPC --broadcast-mode async)
-		broadcastRes=$(echo "${broadcast}" | jq .txhash)
-		echo $broadcastRes
+		signTxfrom=$("${DAEMON}" tx sign unsignedfrom.json --from "${acc2}" --chain-id "${CHAINID}" --keyring-backend test --home $DAEMON_HOME-1 --node $RPC --signature-only=false --sequence $seq2no --gas 500000 > signedfrom.json)
+		signTxfromres=$(echo "${signTxfrom}")
+		broadcastfrom=$("${DAEMON}" tx broadcast signedfrom.json --output json --chain-id "${CHAINID}" --gas 500000 --node $RPC --broadcast-mode async)
+		broadcastfromRes=$(echo "${broadcastfrom}" | jq .txhash)
+		echo $broadcastfromRes
 done
+
 
 sleep 7s
 echo "** Balance of Account 1 after send_load :: **"
