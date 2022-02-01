@@ -1,5 +1,8 @@
 #/bin/sh
 
+## This script creates the necessary folders for cosmovisor. It also builds and places
+## the binaries in the folders depending on the upgrade name.
+
 # read no.of nodes to be upgraded
 NODES=$1
 if [ -z $NODES ]

@@ -1,5 +1,8 @@
 #/bin/sh
 
+## This script executes distribuition module transactions like withdraw-rewards,
+## withdraw-commission and withdraw-all-rewards.
+
 NODES=$1
 if [ -z $NODES ]
 then

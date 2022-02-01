@@ -1,5 +1,7 @@
 #/bin/sh
 
+## This script pauses the systemd process of the nodes.
+
 NODES=$1
 if [ -z $NODES ]
 then

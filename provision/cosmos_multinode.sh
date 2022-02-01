@@ -1,5 +1,8 @@
 #/bin/sh
 
+## This script sets up a multinode network and generates multilple addresses with 
+## balance for testing purposes. 
+
 # read no.of nodes to be setup
 NODES=$1
 if [ -z $NODES ]

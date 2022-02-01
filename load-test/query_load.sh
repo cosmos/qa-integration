@@ -1,5 +1,8 @@
 #/bin/sh
 
+## This script sends out a collection of balance queries, delegation queries
+## and staking queries on the network.
+
 ACC=$1
 if [ -z $ACC ]
 then

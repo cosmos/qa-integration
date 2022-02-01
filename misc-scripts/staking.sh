@@ -1,5 +1,7 @@
 #/bin/sh
 
+## This script executes staking module txs like delegate, redelegate and unbond.
+
 NODES=$1
 if [ -z $NODES ]
 then
