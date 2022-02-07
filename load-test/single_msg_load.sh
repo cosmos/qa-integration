@@ -43,14 +43,14 @@ seq2=$("${DAEMON}" q account "${acc2}" --node $RPC --output json)
 seq2no=$(echo "${seq2}" | jq -r '.sequence')
 for (( a=0; a<$num_txs; a++ ))
 do
-	seqto=$(expr $seq1no + $a)
-	seqfrom=$(expr $seq2no + $a)
-    sTx=$("${DAEMON}" tx bank send "${acc1}" "${acc2}" 1000000"${DENOM}" --chain-id "${CHAINID}" --keyring-backend test --home $DAEMON_HOME-1 --node $RPC --output json -y --sequence $seqto) 
-    sTxHash=$(echo "${sTx}" | jq -r '.txhash')
-    echo "** TX HASH :: $sTxHash **"
-	sTx=$("${DAEMON}" tx bank send "${acc2}" "${acc1}" 1000000"${DENOM}" --chain-id "${CHAINID}" --keyring-backend test --home $DAEMON_HOME-1 --node $RPC --output json -y --sequence $seqfrom) 
-    sTxHash=$(echo "${sTx}" | jq -r '.txhash')
-    echo "** TX HASH :: $sTxHash **"
+    seqto=$(expr $seq1no + $a)
+    seqfrom=$(expr $seq2no + $a)
+    sTxto=$("${DAEMON}" tx bank send "${acc1}" "${acc2}" 1000000"${DENOM}" --chain-id "${CHAINID}" --keyring-backend test --home $DAEMON_HOME-1 --node $RPC --output json -y --sequence $seqto) 
+    sTxtoHash=$(echo "${sTxto}" | jq -r '.txhash')
+    echo "** TX HASH :: $sTxtoHash **"
+    sTxfrom=$("${DAEMON}" tx bank send "${acc2}" "${acc1}" 1000000"${DENOM}" --chain-id "${CHAINID}" --keyring-backend test --home $DAEMON_HOME-1 --node $RPC --output json -y --sequence $seqfrom) 
+    sTxfromHash=$(echo "${sTxfrom}" | jq -r '.txhash')
+    echo "** TX HASH :: $sTxfromHash **"
 done
 
 balance1=$("${DAEMON}" q bank balances "${acc1}" --node $RPC --output json)
