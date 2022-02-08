@@ -12,23 +12,13 @@ then
     TO=2
 fi
 
-IP="$(dig +short myip.opendns.com @resolver1.opendns.com)"
-echo "Public IP address: ${IP}"
-PORT=16657
-
-if [ -z $IP ]
-then
-    IP=127.0.0.1
-    PORT=16657
-fi
-
 balance_query() {
     balance=$("${DAEMON}" q bank balances $1 --node $RPC --output json)
     balanceres=$(echo "${balance}" | jq -r '.balances')
     return "$balanceres"
 }
 
-RPC="http://${IP}:${PORT}"
+RPC="http://127.0.0.1:16657"
 num_txs=1000
 acc1=$($DAEMON keys show account$FROM -a --home $DAEMON_HOME-1 --keyring-backend test)
 acc2=$($DAEMON keys show account$TO -a --home $DAEMON_HOME-1 --keyring-backend test)
