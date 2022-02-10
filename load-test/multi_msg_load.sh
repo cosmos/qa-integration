@@ -13,7 +13,7 @@ then
 fi
 
 if [ -z $NUM_TXS ] ; then 
-		num_txs=1000
+	num_txs=1000
 else
 	num_txs=$NUM_TXS
 fi
