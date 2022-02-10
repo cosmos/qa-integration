@@ -15,7 +15,7 @@ fi
 if [ -z $NUM_TXS ] ; then 
     num_txs=1000
 else
-		num_txs=$NUM_TXS
+	num_txs=$NUM_TXS
 fi
 
 
