@@ -1,5 +1,10 @@
 This repo contains python scripts which can be used for quickly setting up a local test environment for any Cosmos based network with *n* number of nodes and *m* number of accounts. It installs **go** if it's not already installed on the system and also installs all the dependencies along with it.
 
+## Clone the cosmos/qa-integration REPO.
+```bash
+git clone https://github.com/cosmos/qa-integration.git && cd qa-integration/python-qa-tools/
+```
+
 ## Install Python development environment on your system
 
 ```bash
@@ -17,18 +22,17 @@ python3 -m venv --system-site-packages ./venv
 source ./venv/bin/activate # When the virtual environment is active, your shell prompt is prefixed with (venv)
 ```
 
-## Install packages and dependencies within a virtual environment without affecting the host system setup. Start by upgrading pip:
-
-```bash
-pip install --upgrade pip
-git clone https://github.com/cosmos/qa-integration.git && cd qa-integration 
-pip install -r requirements.txt
-```
-
 ## To exit the virtual environment later:
 
 ```bash
 deactivate  # don't exit until you're done using dependencies.
+```
+
+## Install packages and dependencies within a virtual environment without affecting the host system setup. Start by upgrading pip:
+
+```bash
+pip install --upgrade pip 
+pip install -r requirements.txt
 ```
 
 ## Update env values in .env file
@@ -50,7 +54,7 @@ UPGRADE_VERSION='v0.46.0-alpha4'
 ```
 
 ## Before running the scripts make sure to set the PYTHONPATH
-> Note: $HOME/cosmos-qa-tools is customised.
+> Note: $HOME/qa-integration/python-qa-tools is customised.
 ```bash
 echo 'export PYTHONPATH=$PYTHONPATH:$HOME/qa-integration/python-qa-tools' >> ~/.bashrc
 source ~/.bashrc
