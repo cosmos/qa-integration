@@ -3,4 +3,6 @@ node_modules
 coverage
 coverage.json
 typechain
-
+venv/
+.env
+__pycache__
