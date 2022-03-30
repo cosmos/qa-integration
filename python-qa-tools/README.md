@@ -68,10 +68,39 @@ Usage:-
 python3 deps/prereq.py
 ```
 
-2. `cosmos_multinode.py` :- This script sets up the environment. It takes two arguments from the user. First argument is the number of nodes that need to be setup and the second argument is the number of additional accounts that need to be created.
+2. `env_check.py` :- 
+
+Usage:-
+```bash
+python3 deps/env_check.py
+```
+
+3. `multi_msg_load.py` :-
+
+Usage:-
+```bash
+python3 deps/multi_msg_load.py --help
+```
+
+4. `single_msg_load.py` :-
+
+Usage:-
+```bash
+python3 deps/single_msg_load.py --help
+```
+
+5. `cosmos_multinode.py` :- This script sets up the environment. It takes two arguments from the user. First argument is the number of nodes that need to be setup and the second argument is the number of additional accounts that need to be created.
 
 Usage:-
 
 ```bash
 python3 provision/cosmos_multinode.py --help
+```
+
+6. `setup_upgrade.py` :- 
+
+Usage:-
+
+```bash
+python3 provision/setup_upgrade.py --help
 ```
