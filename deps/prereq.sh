@@ -1,4 +1,5 @@
 #/bin/sh
+
 command_exists () {
     type "$1" &> /dev/null ;
 }
@@ -31,3 +32,10 @@ else
   mkdir -p $GOPATH/src/github.com
   go version
 fi
+
+sudo apt install python3-dev python3-pip python3-venv
+pip install --upgrade pip 
+pip install python-dotenv
+echo "" >> ~/.bashrc
+echo 'export PYTHONPATH=$PYTHONPATH:$HOME/qa-integration:$HOME/qa-integration/python-qa-tools' >> ~/.bashrc
+source ~/.bashrc

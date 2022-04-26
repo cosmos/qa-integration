@@ -1,16 +1,13 @@
 import argparse, os, sys, json, time
-from dotenv import dotenv_values
 from utils.bank import balance_query, print_balance_deductions
 from utils.commands import command_processor
-from utils.keys import fetch_bech_address
+from utils.keys import fetch_account_address
 from utils.types import account_type, num_txs_type
 
-### Fetch env values
-config = dotenv_values(".env")
-DAEMON = config['DAEMON']
-DENOM = config['DENOM']
-CHAINID = config['CHAINID']
-DAEMON_HOME = config['DAEMON_HOME']
+DAEMON = os.getenv('DAEMON')
+DENOM = os.getenv('DENOM')
+CHAINID = os.getenv('CHAINID')
+DAEMON_HOME = os.getenv('DAEMON_HOME')
 HOME = os.getenv('HOME')
 
 parser = argparse.ArgumentParser(description='This program takes inputs for intializing multi message load test.')
@@ -26,11 +23,11 @@ if FROM == TO:
 RPC = "http://127.0.0.1:16657"
 
 #### Fetching Bech addresses ######
-acc1, acc1err = fetch_bech_address(f"account{FROM}")
+acc1, acc1err = fetch_account_address(f"account{FROM}")
 if len(acc1err):
     sys.exit(acc1err)
 
-acc2, acc2err = fetch_bech_address(f"account{TO}")
+acc2, acc2err = fetch_account_address(f"account{TO}")
 if len(acc2err):
     sys.exit(acc2err)
 

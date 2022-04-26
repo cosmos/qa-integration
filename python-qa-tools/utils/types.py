@@ -1,8 +1,14 @@
 import argparse, json
-from utils.keys import fetch_bech_address
+from utils.keys import fetch_account_address, fetch_validator_address
 
 def account_type(x):
-    _stdout, stderr = fetch_bech_address(f"account{x}")
+    _stdout, stderr = fetch_account_address(f"account{x}")
+    if len(stderr):
+        raise argparse.ArgumentTypeError(stderr)
+    return int(x)
+
+def validator_account_type(x):
+    _stdout, stderr = fetch_validator_address(f"validator{x}")
     if len(stderr):
         raise argparse.ArgumentTypeError(stderr)
     return int(x)
