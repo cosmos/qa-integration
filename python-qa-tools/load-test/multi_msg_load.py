@@ -2,7 +2,8 @@ import argparse, os, sys, json, time
 from utils.bank import balance_query, print_balance_deductions
 from utils.commands import command_processor
 from utils.keys import fetch_account_address
-from utils.types import account_type, num_txs_type, write_json
+from utils.txs import fetch_seq_no, signed_tx, unsigned_tx, write_json
+from utils.types import account_type, num_txs_type
 
 DAEMON = os.getenv('DAEMON')
 DENOM = os.getenv('DENOM')
@@ -20,7 +21,6 @@ FROM, TO, NUM_TXS = int(args.FROM), int(args.TO), int(args.NUM_TXS)
 
 if FROM == TO:
     sys.exit('Error: The values of arguments "TO" and "FROM" are equal make sure to set different values')
-
 
 RPC, num_msgs = "http://127.0.0.1:16657", 30
 
@@ -44,77 +44,42 @@ if len(before_acc2_balanceerr):
 
 #### Sequences ####
 os.chdir(os.path.expanduser(HOME))
-command = f"{DAEMON} q account {acc1} --node {RPC} --output json"
-seq1, seq1err = command_processor(command)
-seq1 = json.loads(seq1)
-if len(seq1err):
-    sys.exit(seq1err)
-seq1no = int(seq1['sequence'])
+status, seq1no = fetch_seq_no(acc1, RPC)
+if not status:
+    sys.exit(seq1no)
 
-command = f"{DAEMON} q account {acc2} --node {RPC} --output json"
-seq2, seq2err = command_processor(command)
-if len(seq2err):
-    sys.exit(seq2err)
-seq2 = json.loads(seq2)
-seq2no = int(seq2['sequence'])
+status, seq2no = fetch_seq_no(acc2, RPC)
+if not status:
+    sys.exit(seq2no)
 
 for i in range(0, int(NUM_TXS)):
-    unsignedTxto_command = f"{DAEMON} tx bank send {acc1} {acc2} 1000000{DENOM} --chain-id {CHAINID} --output json --generate-only --gas 500000"
-    unsignedTxto, unsignedTxtoerr = command_processor(unsignedTxto_command)
-    if len(unsignedTxtoerr):
-        sys.exit(unsignedTxtoerr) 
-
-    with open('unsignedto.json', 'w') as outfile:
-        json.dump(json.loads(unsignedTxto), outfile)
+    status, unsignedTxto = unsigned_tx(acc1, acc2, 'unsignedto.json')
+    if not status:
+        print(unsignedTxto)
     
-    unsignedTxfrom_command = f"{DAEMON} tx bank send {acc2} {acc1} 1000000{DENOM} --chain-id {CHAINID} --output json --generate-only --gas 500000"
-    unsignedTxfrom, unsignedTxfromerr = command_processor(unsignedTxfrom_command)
-    if len(unsignedTxfromerr):
-        sys.exit(unsignedTxfromerr)
-    with open('unsignedfrom.json', 'w') as outfile:
-        json.dump(json.loads(unsignedTxfrom), outfile)
-    
+    status, unsignedTxfrom = unsigned_tx(acc2, acc1, 'unsignedfrom.json')
+    if not status:
+        print(unsignedTxfrom)
+        
     for j in range(0, int(num_msgs)):
         write_json('unsignedto.json')
         write_json('unsignedfrom.json')
 
     ### seqto ###
     seqto = seq1no + i
-    signTxto_command = f"{DAEMON} tx sign unsignedto.json --from {acc1} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --signature-only=false --sequence {seqto} --gas 500000"
-    signTxto, signTxtoerr = command_processor(signTxto_command)
-    
-    if len(signTxtoerr):
-        sys.exit(signTxtoerr)
-        
-    with open('signedto.json', 'w') as outfile:
-        json.dump(json.loads(signTxto), outfile)
-
-    broadcastto_command = f"{DAEMON} tx broadcast signedto.json --output json --chain-id {CHAINID} --gas 500000 --node {RPC} --broadcast-mode async"
-    broadcastto, broadcasttoerr = command_processor(broadcastto_command)
-    
-    if len(broadcasttoerr):
-        sys.exit(broadcasttoerr)
-    broadcastto = json.loads(broadcastto)
-    print(f"broadcasttoTxhash: {broadcastto['txhash']}")
+    status, txHash = signed_tx('unsignedto.json', 'signedto.json', acc1, seqto, RPC)
+    if not status:
+        print(txHash)
+    else:
+        print(f"broadcasttoTxhash: {txHash}")
 
     ### seqfrom ###
     seqfrom = seq2no + i
-    signTxfrom_command = f"{DAEMON} tx sign unsignedfrom.json --from {acc2} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --signature-only=false --sequence {seqfrom} --gas 500000"
-    signTxfrom, signTxfromerr = command_processor(signTxfrom_command)
-    
-    if len(signTxfromerr):
-        sys.exit(signTxfromerr)
-        
-    with open('signedfrom.json', 'w') as outfile:
-        json.dump(json.loads(signTxfrom), outfile)
-        
-    broadcastfrom_command = f"{DAEMON} tx broadcast signedfrom.json --output json --chain-id {CHAINID} --gas 500000 --node {RPC} --broadcast-mode async"
-    broadcastfrom, broadcastfromerr = command_processor(broadcastfrom_command)
-    
-    if len(broadcastfromerr):
-        sys.exit(broadcastfromerr)
-    broadcastfrom = json.loads(broadcastfrom)
-    print(f"broadcastfromTxhash: {broadcastfrom['txhash']}")
+    status, txHash = signed_tx('unsignedfrom.json', 'signedfrom.json', acc2, seqfrom, RPC)
+    if not status:
+        print(txHash)
+    else:
+        print(f"broadcastfromTxhash: {txHash}")
 
 print('##### Sleeping for 7s #####')
 time.sleep(7)

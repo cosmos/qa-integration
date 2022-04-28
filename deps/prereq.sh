@@ -7,7 +7,7 @@ command_exists () {
 cd $HOME
 
 if command_exists go ; then
-    echo "Golang is already installed"
+  echo "Golang is already installed"
 else
   echo "Install dependencies"
   sudo apt update
@@ -33,7 +33,27 @@ else
   go version
 fi
 
-sudo apt install python3-dev python3-pip python3-venv
+if command_exists python3-dev ; then
+  echo "python3-dev is already installed"
+else
+  echo "Installing python3-dev"
+  sudo apt install python3-dev
+fi
+
+if command_exists python3-pip ; then
+  echo "python3-pip is already installed"
+else
+  echo "Installing python3-pip"
+  sudo apt install python3-pip
+fi
+
+if command_exits python3-venv ; then
+  echo "python3-venv is already installed"
+else
+  echo "Installing python3-venv"
+  sudo apt install python3-venv
+fi
+
 pip install --upgrade pip 
 pip install python-dotenv
 echo "" >> ~/.bashrc

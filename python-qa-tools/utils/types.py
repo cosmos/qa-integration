@@ -1,4 +1,4 @@
-import argparse, json
+import argparse, json, os
 from utils.keys import fetch_account_address, fetch_validator_address
 
 def account_type(x):
@@ -17,14 +17,6 @@ def num_txs_type(x):
     if int(x) < 1000:
         raise argparse.ArgumentTypeError('The argument NUM_TXS should be 1000 or more')
     return int(x)
-
-def write_json(file_name):
-    with open(file_name, 'r+') as file:
-            file_data = json.load(file)
-            new_data = file_data["body"]["messages"][-1]
-            file_data["body"]["messages"].append(new_data)
-            file.seek(0)
-            json.dump(file_data, file, indent = 4)
 
 def node_type(x):
     x = int(x)

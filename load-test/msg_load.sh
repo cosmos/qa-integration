@@ -18,4 +18,10 @@ else
 	num_txs=$NUM_TXS
 fi
 
-python3 $HOME/qa-integration/python-qa-tools/load-test/single_msg_load.py $FROM $TO $num_txs
+while getopts multi: flag
+do
+    case "${flag}" in
+        multi) multi=${OPTARG};
+    esac
+done
+echo "multi: $multi";
