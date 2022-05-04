@@ -1,8 +1,11 @@
 import argparse, os, sys, json, time
-from utils.bank import balance_query, print_balance_deductions
-from utils.commands import command_processor
+from modules.bank.query import query_balances
+from utils.bank import print_balance_deductions
+from utils.commands import exec_command
 from utils.keys import fetch_account_address
+from utils.txs import fetch_seq_no
 from utils.types import account_type, num_txs_type
+
 
 DAEMON = os.getenv('DAEMON')
 DENOM = os.getenv('DENOM')
@@ -32,42 +35,37 @@ if len(acc2err):
     sys.exit(acc2err)
 
 #### Fetch Balances from acc1 acc2 ####
-before_acc1_balance, before_acc1_balanceerr = balance_query(acc1, RPC)
+before_acc1_balance, before_acc1_balanceerr = query_balances(acc1, RPC, amount = True)
 if len(before_acc1_balanceerr):
     sys.exit(before_acc1_balanceerr)
 
-before_acc2_balance, before_acc2_balanceerr = balance_query(acc2, RPC)
+before_acc2_balance, before_acc2_balanceerr = query_balances(acc2, RPC, amount = True)
 if len(before_acc2_balanceerr):
     sys.exit(before_acc2_balanceerr)
 
 #### Sequences ####
 os.chdir(os.path.expanduser(HOME))
 command = f"{DAEMON} q account {acc1} --node {RPC} --output json"
-seq1, seq1err = command_processor(command)
-seq1 = json.loads(seq1)
-if len(seq1err):
-    sys.exit(seq1err)
-seq1no = int(seq1['sequence'])
+status, seq1no = fetch_seq_no(acc1, RPC)
+if not status:
+    sys.exit(seq1no)
 
-command = f"{DAEMON} q account {acc2} --node {RPC} --output json"
-seq2, seq2err = command_processor(command)
-if len(seq2err):
-    sys.exit(seq2err)
-seq2 = json.loads(seq2)
-seq2no = int(seq2['sequence'])
+status, seq2no = fetch_seq_no(acc2, RPC)
+if not status:
+    sys.exit(seq2no)
 
 for i in range(0, NUM_TXS):
     seqto = seq1no + i
     seqfrom = seq2no + i
     sTxto= f"{DAEMON} tx bank send {acc1} {acc2} 1000000{DENOM} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --sequence {seqto}" 
-    sTxto, sTxtoerr = command_processor(sTxto)
+    sTxto, sTxtoerr = exec_command(sTxto)
     if len(sTxtoerr):
         sys.exit(sTxtoerr)
     sTxto = json.loads(sTxto)
     print(f"** TX HASH :: {sTxto['txhash']} **")
     
     sTxfrom = f"{DAEMON} tx bank send {acc2} {acc1} 1000000{DENOM} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --sequence {seqfrom}"
-    sTxfrom, sTxfromerr = command_processor(sTxfrom)
+    sTxfrom, sTxfromerr = exec_command(sTxfrom)
     if len(sTxfromerr):
         sys.exit(sTxfromerr)
     sTxfrom = json.loads(sTxfrom)
@@ -77,11 +75,11 @@ print('##### Sleeping for 7s #####')
 time.sleep(7)
 
 #### Print Balances ####
-after_acc1_balance, after_acc1_balanceerr = balance_query(acc1, RPC)
+after_acc1_balance, after_acc1_balanceerr = query_balances(acc1, RPC, amount = True)
 if len(after_acc1_balanceerr):
     sys.exit(after_acc1_balanceerr)
 
-after_acc2_balance, after_acc2_balanceerr = balance_query(acc2, RPC)
+after_acc2_balance, after_acc2_balanceerr = query_balances(acc2, RPC, amount = True)
 if len(after_acc2_balanceerr):
     sys.exit(after_acc2_balanceerr)
 

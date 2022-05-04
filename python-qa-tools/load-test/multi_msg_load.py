@@ -1,6 +1,7 @@
-import argparse, os, sys, json, time
-from utils.bank import balance_query, print_balance_deductions
-from utils.commands import command_processor
+import argparse, os, sys, time
+from modules.bank.query import query_balances
+from utils.bank import print_balance_deductions
+from utils.commands import exec_command
 from utils.keys import fetch_account_address
 from utils.txs import fetch_seq_no, signed_tx, unsigned_tx, write_json
 from utils.types import account_type, num_txs_type
@@ -25,6 +26,7 @@ if FROM == TO:
 RPC, num_msgs = "http://127.0.0.1:16657", 30
 
 #### Fetching Bech addresses ######
+
 acc1, acc1err = fetch_account_address(f"account{FROM}")
 if len(acc1err):
     sys.exit(acc1err)
@@ -34,11 +36,11 @@ if len(acc2err):
     sys.exit(acc2err)
 
 #### Fetch Balances from acc1 acc2 ####
-before_acc1_balance, before_acc1_balanceerr = balance_query(acc1, RPC)
+before_acc1_balance, before_acc1_balanceerr = query_balances(acc1, RPC, amount = True)
 if len(before_acc1_balanceerr):
     sys.exit(before_acc1_balanceerr)
 
-before_acc2_balance, before_acc2_balanceerr = balance_query(acc2, RPC)
+before_acc2_balance, before_acc2_balanceerr = query_balances(acc2, RPC, amount = True)
 if len(before_acc2_balanceerr):
     sys.exit(before_acc2_balanceerr)
 
@@ -85,11 +87,11 @@ print('##### Sleeping for 7s #####')
 time.sleep(7)
 
 #### Print Balances ####
-after_acc1_balance, after_acc1_balanceerr = balance_query(acc1, RPC)
+after_acc1_balance, after_acc1_balanceerr = query_balances(acc1, RPC, amount = True)
 if len(after_acc1_balanceerr):
     sys.exit(after_acc1_balanceerr)
 
-after_acc2_balance, after_acc2_balanceerr = balance_query(acc2, RPC)
+after_acc2_balance, after_acc2_balanceerr = query_balances(acc2, RPC, amount = True)
 if len(after_acc2_balanceerr):
     sys.exit(after_acc2_balanceerr)
 

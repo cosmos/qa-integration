@@ -2,7 +2,7 @@ import argparse, os
 import json
 import sys
 from utils.bank import query_account
-from utils.commands import command_processor
+from utils.commands import exec_command
 from utils.keys import fetch_account_address
 from utils.types import account_type
 
@@ -44,7 +44,7 @@ bound = 10000 + seq1no
 print(f"seq1no : {seq1no}")
 for i in range(seq1no, bound):
     sTxcommad = f"{DAEMON} tx bank send {acc1} {acc2} 1000000{DENOM} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --sequence {i}"
-    sTx, sTxerr = command_processor(sTxcommad)
+    sTx, sTxerr = exec_command(sTxcommad)
     if len(sTxerr):
         print(f"sTxerr : {sTxerr}")
     sTx = json.loads(sTx)

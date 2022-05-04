@@ -1,6 +1,6 @@
 import argparse, os, sys
-from utils.bank import fetch_balance_json
-from utils.keys import fetch_validator_address
+from modules.bank.query import query_balances
+from utils.keys import fetch_account_address
 from utils.staking import fetch_staking_delegations, fetch_staking_validators
 from utils.types import validator_account_type
 
@@ -20,17 +20,17 @@ IP = "127.0.0.1"
 PORT = "16657"
 RPC = f"http://{IP}:{PORT}"
 
-acc1, acc1err = fetch_validator_address(f"validator{ACC}")
+acc1, acc1err = fetch_account_address(f"validator{ACC}")
 if len(acc1err):
     sys.exit(acc1err)
 
-val1, val1err = fetch_validator_address(f"validator{ACC}", "bech")
+val1, val1err = fetch_account_address(f"validator{ACC}", "bech32")
 if len(val1err):
     sys.exit(val1err)
 
 for i in range(1, 10000):
     # Fetch balance of acc1
-    bTx, bTxerr = fetch_balance_json(acc1, RPC)
+    bTx, bTxerr = query_balances(acc1, RPC)
     if len(bTxerr):
         print(bTxerr)
     else:

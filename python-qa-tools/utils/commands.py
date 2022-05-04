@@ -1,6 +1,6 @@
 import subprocess
 
-def command_processor(command):
+def exec_command(command):
     stdout, stderr = subprocess.Popen(command.split(),
                                     stdout = subprocess.PIPE,
                                     stderr = subprocess.PIPE).communicate()
