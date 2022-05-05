@@ -1,13 +1,13 @@
 #/bin/sh
 
-# read no.of nodes to be setup
+# read no.of nodes to be setup passed as the first argument
 NODES=$1
 if [ -z $NODES ]
 then
     NODES=2
 fi
 
-# read no of accounts to be setup
+# read no of accounts to be setup passed as the second argument
 ACCOUNTS=$2
 echo " ** Number of nodes : $NODES and accounts : $ACCOUNTS to be setup **"
 echo "**** Number of nodes to be setup: $NODES ****"
@@ -29,14 +29,13 @@ do
     export DAEMON_HOME_$a=$DAEMON_HOME-$a
     echo "Deamon path :: $DAEMON_HOME-$a"
     $DAEMON unsafe-reset-all  --home $DAEMON_HOME-$a
-    echo "****** here command $DAEMON unsafe-reset-all  --home $DAEMON_HOME-$a ******"
 done
-# remove daemon home directories if it already exists
+# remove home directories if they already exist
 for (( a=1; a<=$NODES; a++ ))
 do
     rm -rf $DAEMON_HOME-$a
 done
-echo "-----Creating daemon home directories------"
+echo "-----Creating home directories------"
 for (( a=1; a<=$NODES; a++ ))
 do
     echo "****** create dir :: $DAEMON_HOME-$a ********"
@@ -57,7 +56,7 @@ do
     $DAEMON keys add "validator${a}" --keyring-backend test --home $DAEMON_HOME-${a}
 done
 
-# add accounts if second argument is passed
+# create accounts if second argument is passed
 if [ -z $ACCOUNTS ] || [ "$ACCOUNTS" -eq 0 ]
 then
     echo "----- Argument for accounts is not present, not creating any additional accounts --------"
@@ -70,6 +69,7 @@ else
 fi
 
 echo "----------Genesis creation---------"
+echo "----------Adding validator accounts to genesis---------"
 for (( a=1; a<=$NODES; a++ ))
 do
     if [ $a == 1 ]
@@ -81,25 +81,23 @@ do
     $DAEMON --home $DAEMON_HOME-$a add-genesis-account validator$a 1000000000000$DENOM  --keyring-backend test
     $DAEMON --home $DAEMON_HOME-1 add-genesis-account $($DAEMON keys show validator$a -a --home $DAEMON_HOME-$a --keyring-backend test) 1000000000000$DENOM
 done
-echo "----------Genesis creation for accounts---------"
-
+echo "----------Adding additional accounts to genesis---------"
 if [ -z $ACCOUNTS ]
 then
-    echo "Second argument was empty, so not setting up any account\n"
+    echo "Second argument was empty, not setting up additional account\n"
 else
     for (( a=1; a<=$ACCOUNTS; a++ ))
     do
-        echo "cmd ::$DAEMON --home $DAEMON_HOME-1 add-genesis-account $($DAEMON keys show account$a -a --home $DAEMON_HOME-1 --keyring-backend test) 1000000000000$DENOM"
         $DAEMON --home $DAEMON_HOME-1 add-genesis-account $($DAEMON keys show account$a -a --home $DAEMON_HOME-1 --keyring-backend test) 1000000000000$DENOM
     done
 fi
 
-echo "--------Gentx--------"
+echo "--------Creating gentxs--------"
 for (( a=1; a<=$NODES; a++ ))
 do
     $DAEMON gentx validator$a 90000000000$DENOM --chain-id $CHAINID  --keyring-backend test --home $DAEMON_HOME-$a
 done
-echo "---------Copy all gentxs to $DAEMON_HOME-1----------"
+echo "---------Copying all gentxs to $DAEMON_HOME-1----------"
 for (( a=2; a<=$NODES; a++ ))
 do
     cp $DAEMON_HOME-$a/config/gentx/*.json $DAEMON_HOME-1/config/gentx/
@@ -128,7 +126,7 @@ do
     DIFF=`expr $a - 1`
     INC=`expr $DIFF \* 2`
     LADDR=`expr 16656 + $INC` 
-    echo "----------Get node-id of $DAEMON_HOME-$a ---------"
+    echo "----------Getting node-id of $DAEMON_HOME-$a ---------"
     nodeID=$("${DAEMON}" tendermint show-node-id --home $DAEMON_HOME-$a)
     echo "** Node ID :: $nodeID **"
     PR="$nodeID@$IP:$LADDR"
@@ -159,7 +157,7 @@ do
     sed -i '/max_num_inbound_peers =/c\max_num_inbound_peers = 140' $DAEMON_HOME-$a/config/config.toml
     sed -i '/max_num_outbound_peers =/c\max_num_outbound_peers = 110' $DAEMON_HOME-$a/config/config.toml
 done
-#create system services
+#create systemd files
 for (( a=1; a<=$NODES; a++ ))
 do
     DIFF=`expr $a - 1`
