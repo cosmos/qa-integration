@@ -24,7 +24,7 @@ acc1, acc1err = fetch_account_address(f"validator{ACC}")
 if len(acc1err):
     sys.exit(acc1err)
 
-val1, val1err = fetch_account_address(f"validator{ACC}", "bech32")
+val1, val1err = fetch_account_address(f"validator{ACC}", "validator")
 if len(val1err):
     sys.exit(val1err)
 

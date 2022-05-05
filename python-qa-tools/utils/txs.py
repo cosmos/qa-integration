@@ -1,5 +1,5 @@
 import os,json, sys
-from modules.bank.tx import tx_send
+from modules.bank.tx import tx_send, tx_sign
 from utils.commands import exec_command
 
 DAEMON = os.getenv('DAEMON')
@@ -18,7 +18,7 @@ def fetch_seq_no(address, RPC):
 
 def unsigned_tx(from_address, to_address, file_name):
     try:
-        status, unsignedTx = tx_send(from_address, to_address)
+        status, unsignedTx = tx_send(from_address, to_address, gas = 500000, unsigned = True, output = "json")
         if not status:
             return status, unsignedTx 
         with open(f"{HOME}/{file_name}", 'w') as outfile:
@@ -38,10 +38,9 @@ def write_json(file_name):
 
 def signed_tx(unsigned_file, signed_file, from_address, sequence, RPC):
     try:
-        command = f"{DAEMON} tx sign {HOME}/{unsigned_file} --from {from_address} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --signature-only=false --sequence {sequence} --gas 500000"
-        signTx, signTxerr = exec_command(command)
-        if len(signTxerr):
-            return False, signTxerr
+        status, signTx = tx_sign(unsigned_file, from_address, RPC, sequence, gas = 500000)
+        if not status:
+            return status, signTx
         with open(f'{HOME}/{signed_file}', 'w') as outfile:
             json.dump(json.loads(signTx), outfile)
             

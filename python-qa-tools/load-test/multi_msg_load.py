@@ -44,7 +44,7 @@ before_acc2_balance, before_acc2_balanceerr = query_balances(acc2, RPC, amount =
 if len(before_acc2_balanceerr):
     sys.exit(before_acc2_balanceerr)
 
-#### Sequences ####
+#### Create sequence numbers  for accounts to make unsigned transactions####
 os.chdir(os.path.expanduser(HOME))
 status, seq1no = fetch_seq_no(acc1, RPC)
 if not status:
@@ -67,7 +67,7 @@ for i in range(0, int(NUM_TXS)):
         write_json('unsignedto.json')
         write_json('unsignedfrom.json')
 
-    ### seqto ###
+    ### Broadcasting the unsigned transactions from acc1 to acc2 ###
     seqto = seq1no + i
     status, txHash = signed_tx('unsignedto.json', 'signedto.json', acc1, seqto, RPC)
     if not status:
@@ -75,7 +75,7 @@ for i in range(0, int(NUM_TXS)):
     else:
         print(f"broadcasttoTxhash: {txHash}")
 
-    ### seqfrom ###
+    ###  Broadcasting the unsigned transactions from acc2 to acc1 ###
     seqfrom = seq2no + i
     status, txHash = signed_tx('unsignedfrom.json', 'signedfrom.json', acc2, seqfrom, RPC)
     if not status:
@@ -86,7 +86,7 @@ for i in range(0, int(NUM_TXS)):
 print('##### Sleeping for 7s #####')
 time.sleep(7)
 
-#### Print Balances ####
+#### Verifying the balance deductions ####
 after_acc1_balance, after_acc1_balanceerr = query_balances(acc1, RPC, amount = True)
 if len(after_acc1_balanceerr):
     sys.exit(after_acc1_balanceerr)
