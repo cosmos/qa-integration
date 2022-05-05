@@ -25,7 +25,7 @@ if FROM == TO:
 
 RPC, num_msgs = "http://127.0.0.1:16657", 30
 
-#### Fetching Bech addresses ######
+#### Fetching Bech32 addresses ######
 
 acc1, acc1err = fetch_account_address(f"account{FROM}")
 if len(acc1err):
@@ -35,7 +35,7 @@ acc2, acc2err = fetch_account_address(f"account{TO}")
 if len(acc2err):
     sys.exit(acc2err)
 
-#### Fetch Balances from acc1 acc2 ####
+#### Fetch Balances of acc1 acc2 before execting the load test ####
 before_acc1_balance, before_acc1_balanceerr = query_balances(acc1, RPC, amount = True)
 if len(before_acc1_balanceerr):
     sys.exit(before_acc1_balanceerr)
@@ -44,7 +44,7 @@ before_acc2_balance, before_acc2_balanceerr = query_balances(acc2, RPC, amount =
 if len(before_acc2_balanceerr):
     sys.exit(before_acc2_balanceerr)
 
-#### Create sequence numbers  for accounts to make unsigned transactions####
+#### Fetching sequence numbers of to and from accounts
 os.chdir(os.path.expanduser(HOME))
 status, seq1no = fetch_seq_no(acc1, RPC)
 if not status:
@@ -54,6 +54,7 @@ status, seq2no = fetch_seq_no(acc2, RPC)
 if not status:
     sys.exit(seq2no)
 
+#### Generating unsigned transactions with a single transfer message 
 for i in range(0, int(NUM_TXS)):
     status, unsignedTxto = unsigned_tx(acc1, acc2, 'unsignedto.json')
     if not status:
@@ -62,12 +63,12 @@ for i in range(0, int(NUM_TXS)):
     status, unsignedTxfrom = unsigned_tx(acc2, acc1, 'unsignedfrom.json')
     if not status:
         print(unsignedTxfrom)
-        
+#### Duplicating and appending transfer message in the existing array to create a multi-msg transaction        
     for j in range(0, int(num_msgs)):
         write_json('unsignedto.json')
         write_json('unsignedfrom.json')
 
-    ### Broadcasting the unsigned transactions from acc1 to acc2 ###
+    ### Signing and broadcasting the unsigned transactions from acc1 to acc2 ###
     seqto = seq1no + i
     status, txHash = signed_tx('unsignedto.json', 'signedto.json', acc1, seqto, RPC)
     if not status:
@@ -75,7 +76,7 @@ for i in range(0, int(NUM_TXS)):
     else:
         print(f"broadcasttoTxhash: {txHash}")
 
-    ###  Broadcasting the unsigned transactions from acc2 to acc1 ###
+    ### Signing and broadcasting the unsigned transactions from acc2 to acc1 ###
     seqfrom = seq2no + i
     status, txHash = signed_tx('unsignedfrom.json', 'signedfrom.json', acc2, seqfrom, RPC)
     if not status:
