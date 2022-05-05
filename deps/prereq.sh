@@ -13,10 +13,10 @@ else
   sudo apt update
   sudo apt-get -y upgrade
   sudo apt install build-essential jq -y
-  wget https://dl.google.com/go/go1.17.3.linux-amd64.tar.gz
-  tar -xvf go1.17.3.linux-amd64.tar.gz
+  wget https://dl.google.com/go/go1.18.1.linux-amd64.tar.gz
+  tar -xvf go1.18.1.linux-amd64.tar.gz
   sudo mv go /usr/local
-  rm go1.17.3.linux-amd64.tar.gz
+  rm go1.18.1.linux-amd64.tar.gz
   echo "------ Update bashrc ---------------"
   export GOPATH=$HOME/go
   export GOROOT=/usr/local/go
