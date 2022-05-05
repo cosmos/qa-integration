@@ -17,5 +17,5 @@ for (( a=1; a<=$NODES; a++ ))
 do
     export DAEMON_HOME_$a=$DAEMON_HOME-$a
     mkdir -p "$DAEMON_HOME-$a"/cosmovisor/upgrades/$UPGRADE_NAME/bin
-	cp ~/$REPO/build/$DAEMON "$DAEMON_HOME-$a"/cosmovisor/upgrades/$UPGRADE_NAME/bin/
+    cp ~/$REPO/build/$DAEMON "$DAEMON_HOME-$a"/cosmovisor/upgrades/$UPGRADE_NAME/bin/
 done
