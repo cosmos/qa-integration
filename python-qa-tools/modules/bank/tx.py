@@ -6,21 +6,24 @@ CHAINID = os.getenv('DENOM')
 HOME = os.getenv('HOME')
 DAEMON_HOME = os.getenv('DAEMON_HOME')
 
-def tx_send(from_address, to, gas, unsigned = False, output = None):
-    if not output or output == "json":
+def tx_send(from_address, to_address, gas, unsigned = False, output = None, sequence = None, node = None):
+    if not output:
         output = "json"
     elif output != "text" and output != "json":
         return False, {
             "Error": "output must be given either \"json\" or \"text\""
         }    
-    if not unsigned:
-        command = f"{DAEMON} tx bank send {from_address} {to} 1000000{DENOM} --chain-id {CHAINID} --output {output} --generate-only --gas {gas}"
+    if unsigned:
+        command = f"{DAEMON} tx bank send {from_address} {to_address} 1000000{DENOM} --keyring-backend test --chain-id {CHAINID} --output {output} --generate-only --gas {gas}"
     else:
-        command = f"{DAEMON} tx bank send {from_address} {to} 1000000{DENOM} --chain-id {CHAINID} --output {output} --gas {gas}"
-    unsignedTx, unsignedTxerr = exec_command(command)
-    if len(unsignedTxerr):
-        return False, unsignedTxerr
-    return True, unsignedTx
+        if sequence:
+            command = f"{DAEMON} tx bank send {from_address} {to_address} 1000000{DENOM} --home {DAEMON_HOME}-1 --keyring-backend test --chain-id {CHAINID} --sequence {sequence} --node {node}--output {output} -y"
+        else:
+            command = f"{DAEMON} tx bank send {from_address} {to_address} 1000000{DENOM} --home {DAEMON_HOME}-1 --keyring-backend test --chain-id {CHAINID} --node {node} --output {output} -y"
+    Tx, Txerr = exec_command(command)
+    if len(Txerr):
+        return False, Txerr
+    return True, Tx
 
 
 def tx_sign(unsigned_file_name, from_address, node, sequence, gas):
