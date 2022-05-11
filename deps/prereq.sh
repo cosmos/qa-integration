@@ -13,10 +13,11 @@ else
   sudo apt update
   sudo apt-get -y upgrade
   sudo apt install build-essential jq -y
-  wget https://dl.google.com/go/go1.18.1.linux-amd64.tar.gz
-  tar -xvf go1.18.1.linux-amd64.tar.gz
+  source ../env
+  wget https://dl.google.com/go/go$goversion.linux-amd64.tar.gz
+  tar -xvf go$goversion.linux-amd64.tar.gz
   sudo mv go /usr/local
-  rm go1.18.1.linux-amd64.tar.gz
+  rm go$goversion.linux-amd64.tar.gz
   echo "------ Update bashrc ---------------"
   export GOPATH=$HOME/go
   export GOROOT=/usr/local/go
@@ -40,22 +41,6 @@ else
   sudo apt install python3-dev
 fi
 
-if command_exists python3-pip ; then
-  echo "python3-pip is already installed"
-else
-  echo "Installing python3-pip"
-  sudo apt install python3-pip
-fi
-
-if command_exits python3-venv ; then
-  echo "python3-venv is already installed"
-else
-  echo "Installing python3-venv"
-  sudo apt install python3-venv
-fi
-
-pip install --upgrade pip 
-pip install python-dotenv
 echo "" >> ~/.bashrc
 echo 'export PYTHONPATH=$PYTHONPATH:$HOME/qa-integration:$HOME/qa-integration/python-qa-tools' >> ~/.bashrc
 source ~/.bashrc

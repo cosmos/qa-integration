@@ -1,85 +1,78 @@
-import argparse, os, sys, json, time
+import argparse, os, sys, time
+from core.keys import keys_show
+from modules.auth.query import query_account
 from modules.bank.query import query_balances
 from modules.bank.tx import tx_send
 from utils.bank import print_balance_deductions
-from utils.commands import exec_command
-from utils.keys import fetch_account_address
-from utils.txs import fetch_seq_no
 from utils.types import account_type, num_txs_type
 
-
-DAEMON = os.getenv('DAEMON')
-DENOM = os.getenv('DENOM')
 CHAINID = os.getenv('CHAINID')
+DAEMON = os.getenv('DAEMON')
 DAEMON_HOME = os.getenv('DAEMON_HOME')
+DENOM = os.getenv('DENOM')
 HOME = os.getenv('HOME')
 
 parser = argparse.ArgumentParser(description='This program takes inputs for intializing multi message load test.')
-parser.add_argument('FROM', type= account_type, help= 'From which account the transaction should be intialized')
-parser.add_argument('TO', type= account_type, help= 'Reciever account number.')
-parser.add_argument('NUM_TXS', type = num_txs_type, help= 'Number of transactions to be made, Min. should be 1000')
-
+parser.add_argument('-s', '--sender', type = account_type, default = keys_show("account1")[1]['address'], help = 'Sender bech32 address')
+parser.add_argument('-r', '--reciever', type= account_type, default = keys_show("account2")[1]['address'], help= 'Reciever bech32 address')
+parser.add_argument('-n', '--num_txs', type = num_txs_type, default = 10000, help= 'Number of transactions to be made, Min. should be 1000')
 args = parser.parse_args()
-FROM, TO, NUM_TXS = int(args.FROM), int(args.TO), int(args.NUM_TXS)
+FROM, TO, NUM_TXS = args.sender, args.reciever, int(args.num_txs)
+
 if FROM == TO:
     sys.exit('Error: The values of arguments "TO" and "FROM" are equal make sure to set different values')
-
-RPC = "http://127.0.0.1:16657"
-
-#### Fetching Bech addresses ######
-acc1, acc1err = fetch_account_address(f"account{FROM}")
-if len(acc1err):
-    sys.exit(acc1err)
-
-acc2, acc2err = fetch_account_address(f"account{TO}")
-if len(acc2err):
-    sys.exit(acc2err)
+ 
+acc1, acc2 = FROM, TO
 
 #### Fetch Balances from acc1 acc2 ####
-before_acc1_balance, before_acc1_balanceerr = query_balances(acc1, RPC, amount = True)
-if len(before_acc1_balanceerr):
-    sys.exit(before_acc1_balanceerr)
+status, before_acc1_balance= query_balances(acc1)
+if not status:
+    sys.exit(before_acc1_balance)
+before_acc1_balance = before_acc1_balance['balances'][0]['amount']
 
-before_acc2_balance, before_acc2_balanceerr = query_balances(acc2, RPC, amount = True)
-if len(before_acc2_balanceerr):
-    sys.exit(before_acc2_balanceerr)
+status, before_acc2_balance = query_balances(acc2)
+if not status:
+    sys.exit(before_acc2_balance)
+before_acc2_balance = before_acc2_balance['balances'][0]['amount']
 
-#### Sequences ####
+#### Fetching sequence numbers of to and from accounts
 os.chdir(os.path.expanduser(HOME))
-status, seq1no = fetch_seq_no(acc1, RPC)
+status, seq1_response = query_account(acc1)
 if not status:
-    sys.exit(seq1no)
+    sys.exit(seq1_response)
 
-status, seq2no = fetch_seq_no(acc2, RPC)
+status, seq2_response = query_account(acc2)
 if not status:
-    sys.exit(seq2no)
+    sys.exit(seq2_response)
+
+seq1no, seq2no = int(seq1_response['sequence']), int(seq2_response['sequence'])
 
 for i in range(0, NUM_TXS):
     seqto = seq1no + i
     seqfrom = seq2no + i
-    status, sTxto = tx_send(acc1, acc2, gas = None, sequence = seqto, node = RPC)
+    status, sTxto = tx_send(acc1, acc2, amount = 100000, gas = 200000, sequence = seqto)
     if not status:
         print(f"Error : {sTxto}")
-    sTxto = json.loads(sTxto)
     print(f"** TX HASH :: {sTxto['txhash']} **")
     
-    status, sTxfrom = tx_send(acc2, acc1, gas = None, sequence = seqfrom, node = RPC)
+    status, sTxfrom = tx_send(acc2, acc1, amount = 100000, gas = 200000, sequence = seqfrom)
     if not status:
         print(f"Error : {sTxfrom}")
-    sTxfrom = json.loads(sTxfrom)
     print(f"** TX HASH :: {sTxfrom['txhash']} **")
 
 print('##### Sleeping for 7s #####')
 time.sleep(7)
 
 #### Print Balances ####
-after_acc1_balance, after_acc1_balanceerr = query_balances(acc1, RPC, amount = True)
-if len(after_acc1_balanceerr):
-    sys.exit(after_acc1_balanceerr)
+status, after_acc1_balance = query_balances(acc1)
+if not status:
+    sys.exit(after_acc1_balance)
+after_acc1_balance = after_acc1_balance['balances'][0]['amount']
 
-after_acc2_balance, after_acc2_balanceerr = query_balances(acc2, RPC, amount = True)
-if len(after_acc2_balanceerr):
-    sys.exit(after_acc2_balanceerr)
+status, after_acc2_balance = query_balances(acc2)
+if not status:
+    sys.exit(after_acc2_balance)
+after_acc2_balance = after_acc2_balance['balances'][0]['amount']
 
 acc1_diff = int(before_acc1_balance) - int(after_acc1_balance)
 acc2_diff = int(before_acc2_balance) - int(after_acc2_balance)

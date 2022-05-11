@@ -1,17 +1,12 @@
 import argparse
-from utils.keys import fetch_account_address
+from core.keys import keys_show
+from modules.auth.query import query_account
 
-def account_type(x):
-    _stdout, stderr = fetch_account_address(f"account{x}")
-    if len(stderr):
-        raise argparse.ArgumentTypeError(stderr)
-    return int(x)
-
-def validator_account_type(x):
-    _stdout, stderr = fetch_account_address(f"validator{x}")
-    if len(stderr):
-        raise argparse.ArgumentTypeError(stderr)
-    return int(x)
+def account_type(address):
+    status, response = query_account(address)
+    if not status:
+        raise argparse.ArgumentTypeError(response)
+    return address
 
 def num_txs_type(x):
     if int(x) < 1000:
