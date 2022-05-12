@@ -32,5 +32,6 @@ for i in range(seq1no, bound):
     status, sTx = tx_send(acc1, acc2, 1000000, 200000, sequence= i)
     if not status:
         print(sTx)
-    sTxHash=sTx['txhash']
-    print(f"** TX HASH :: {sTxHash} **")
+    else:
+        sTxHash=sTx['txhash']
+        print(f"** TX HASH :: {sTxHash} **")

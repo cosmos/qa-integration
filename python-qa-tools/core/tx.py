@@ -13,7 +13,7 @@ def tx_sign(unsigned_file_name, from_address, sequence, gas):
         signTx, signTxerr = exec_command(command)
         if len(signTxerr):
             return False, signTxerr
-        return True, json.loads(signTx)
+        return True, json.loads(signTx) 
     except Exception as e:
         return False, e
     

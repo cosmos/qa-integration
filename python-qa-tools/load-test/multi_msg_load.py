@@ -4,7 +4,7 @@ from core.keys import keys_show
 from modules.auth.query import query_account
 from modules.bank.query import query_balances
 from utils.bank import print_balance_deductions
-from utils.txs import signed_tx, unsigned_tx, write_json
+from utils.txs import create_signed_txs, create_unsigned_txs, create_multi_messages
 from utils.types import account_type, num_txs_type
 
 CHAINID = os.getenv('CHAINID')
@@ -16,7 +16,7 @@ HOME = os.getenv('HOME')
 parser = argparse.ArgumentParser(description='This program takes inputs for intializing multi message load test.')
 parser.add_argument('-s', '--sender', type = account_type, default = keys_show("account1")[1]['address'], help = 'Sender bech32 address')
 parser.add_argument('-r', '--reciever', type= account_type, default = keys_show("account2")[1]['address'], help= 'Reciever bech32 address')
-parser.add_argument('-n', '--num_txs', type = num_txs_type, default = 1000, help= 'Number of transactions to be made, Min. should be 1000')
+parser.add_argument('-n', '--num_txs', type = int, default = 1000, help= 'Number of transactions to be made, Min. should be 1000')
 args = parser.parse_args()
 FROM, TO, NUM_TXS = args.sender, args.reciever, int(args.num_txs)
 
@@ -50,22 +50,23 @@ seq1no, seq2no = int(seq1_response['sequence']), int(seq2_response['sequence'])
 
 
 #### Generating unsigned transactions with a single transfer message 
-for i in range(0, int(NUM_TXS)):
-    status, unsignedTxto = unsigned_tx(acc1, acc2, 'unsignedto.json')
+for i in range(NUM_TXS):
+    status, unsignedTxto = create_unsigned_txs(acc1, acc2, 'unsignedto.json')
     if not status:
         print(unsignedTxto)
     
-    status, unsignedTxfrom = unsigned_tx(acc2, acc1, 'unsignedfrom.json')
+    status, unsignedTxfrom = create_unsigned_txs(acc2, acc1, 'unsignedfrom.json')
     if not status:
         print(unsignedTxfrom)
+        
 #### Duplicating and appending transfer message in the existing array to create a multi-msg transaction        
-    for j in range(0, int(num_msgs)):
-        write_json('unsignedto.json')
-        write_json('unsignedfrom.json')
+    for j in range(num_msgs):
+        create_multi_messages('unsignedto.json')
+        create_multi_messages('unsignedfrom.json')
 
     ### Signing and broadcasting the unsigned transactions from acc1 to acc2 ###
     seqto = seq1no + i
-    status, txHash = signed_tx('unsignedto.json', 'signedto.json', acc1, seqto)
+    status, txHash = create_signed_txs('unsignedto.json', 'signedto.json', acc1, seqto)
     if not status:
         print(txHash)
     else:
@@ -73,7 +74,7 @@ for i in range(0, int(NUM_TXS)):
 
     ### Signing and broadcasting the unsigned transactions from acc2 to acc1 ###
     seqfrom = seq2no + i
-    status, txHash = signed_tx('unsignedfrom.json', 'signedfrom.json', acc2, seqfrom)
+    status, txHash = create_signed_txs('unsignedfrom.json', 'signedfrom.json', acc2, seqfrom)
     if not status:
         print(txHash)
     else:

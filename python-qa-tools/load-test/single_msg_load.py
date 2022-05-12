@@ -6,6 +6,7 @@ from modules.bank.tx import tx_send
 from utils.bank import print_balance_deductions
 from utils.types import account_type, num_txs_type
 
+
 CHAINID = os.getenv('CHAINID')
 DAEMON = os.getenv('DAEMON')
 DAEMON_HOME = os.getenv('DAEMON_HOME')
@@ -47,18 +48,20 @@ if not status:
 
 seq1no, seq2no = int(seq1_response['sequence']), int(seq2_response['sequence'])
 
-for i in range(0, NUM_TXS):
+for i in range(NUM_TXS):
     seqto = seq1no + i
     seqfrom = seq2no + i
-    status, sTxto = tx_send(acc1, acc2, amount = 100000, gas = 200000, sequence = seqto)
+    status, sTxto = tx_send(acc1, acc2, 1000000, None, False, seqto)
     if not status:
         print(f"Error : {sTxto}")
-    print(f"** TX HASH :: {sTxto['txhash']} **")
+    else:
+        print(f"** TX HASH to :: {sTxto['txhash']} **")
     
-    status, sTxfrom = tx_send(acc2, acc1, amount = 100000, gas = 200000, sequence = seqfrom)
+    status, sTxfrom = tx_send(acc2, acc1, 1000000, None, False, seqfrom)
     if not status:
         print(f"Error : {sTxfrom}")
-    print(f"** TX HASH :: {sTxfrom['txhash']} **")
+    else:
+        print(f"** TX HASH to :: {sTxto['txhash']} **")
 
 print('##### Sleeping for 7s #####')
 time.sleep(7)

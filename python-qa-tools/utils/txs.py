@@ -10,7 +10,7 @@ DENOM = os.getenv('DENOM')
 HOME = os.getenv('HOME')
 RPC = os.getenv('RPC')
 
-def unsigned_tx(from_address, to_address, file_name):
+def create_unsigned_txs(from_address, to_address, file_name):
     try:
         status, unsignedTx = tx_send(from_address, to_address, amount = 1000000, gas = 500000, unsigned = True)
         if not status:
@@ -21,7 +21,7 @@ def unsigned_tx(from_address, to_address, file_name):
     except Exception as e:
         return False, e
     
-def write_json(file_name):
+def create_multi_messages(file_name):
     with open(f"{HOME}/{file_name}", 'r+') as file:
             file_data = json.load(file)
             new_data = file_data["body"]["messages"][-1]
@@ -30,7 +30,7 @@ def write_json(file_name):
             json.dump(file_data, file, indent = 4)
             
 
-def signed_tx(unsigned_file, signed_file, from_address, sequence):
+def create_signed_txs(unsigned_file, signed_file, from_address, sequence):
     try:
         status, signTx = tx_sign(unsigned_file, from_address, sequence, 500000)
         if not status:
