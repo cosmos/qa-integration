@@ -1,4 +1,4 @@
-import argparse, os, sys, time
+import argparse, os, sys, time, logging
 from core.keys import keys_show
 from modules.auth.query import query_account
 from modules.bank.query import query_balances
@@ -12,6 +12,9 @@ DAEMON = os.getenv('DAEMON')
 DAEMON_HOME = os.getenv('DAEMON_HOME')
 DENOM = os.getenv('DENOM')
 HOME = os.getenv('HOME')
+logging.basicConfig(format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                    datefmt='%H:%M:%S',
+                    level=logging.DEBUG)
 
 parser = argparse.ArgumentParser(description='This program takes inputs for intializing multi message load test.')
 parser.add_argument('-s', '--sender', type = account_type, default = keys_show("account1")[1]['address'], help = 'Sender bech32 address')
@@ -53,17 +56,17 @@ for i in range(NUM_TXS):
     seqfrom = seq2no + i
     status, sTxto = tx_send(acc1, acc2, 1000000, None, False, seqto)
     if not status:
-        print(f"Error : {sTxto}")
+        logging.error(f"{sTxto}")
     else:
-        print(f"** TX HASH to :: {sTxto['txhash']} **")
+        logging.info(f"TX HASH to :: {sTxto['txhash']}")
     
     status, sTxfrom = tx_send(acc2, acc1, 1000000, None, False, seqfrom)
     if not status:
-        print(f"Error : {sTxfrom}")
+        logging.error(f"{sTxfrom}")
     else:
-        print(f"** TX HASH to :: {sTxto['txhash']} **")
+        logging.info(f"TX HASH from :: {sTxto['txhash']}")
 
-print('##### Sleeping for 7s #####')
+logging.info('Sleeping for 7s')
 time.sleep(7)
 
 #### Print Balances ####

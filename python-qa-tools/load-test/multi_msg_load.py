@@ -5,13 +5,17 @@ from modules.auth.query import query_account
 from modules.bank.query import query_balances
 from utils.bank import print_balance_deductions
 from utils.txs import create_signed_txs, create_unsigned_txs, create_multi_messages
-from utils.types import account_type, num_txs_type
+from utils.types import account_type
 
 CHAINID = os.getenv('CHAINID')
 DAEMON = os.getenv('DAEMON')
 DAEMON_HOME = os.getenv('DAEMON_HOME')
 DENOM = os.getenv('DENOM')
 HOME = os.getenv('HOME')
+NUM_MSGS = os.getenv('NUM_MSGS')
+logging.basicConfig(format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                    datefmt='%H:%M:%S',
+                    level=logging.DEBUG)
 
 parser = argparse.ArgumentParser(description='This program takes inputs for intializing multi message load test.')
 parser.add_argument('-s', '--sender', type = account_type, default = keys_show("account1")[1]['address'], help = 'Sender bech32 address')
@@ -23,7 +27,7 @@ FROM, TO, NUM_TXS = args.sender, args.reciever, int(args.num_txs)
 if FROM == TO:
     sys.exit('Error: The values of arguments "TO" and "FROM" are equal make sure to set different values')
  
-acc1, acc2, num_msgs = FROM, TO, 30
+acc1, acc2, num_msgs = FROM, TO, NUM_MSGS
 
 #### Fetch Balances of acc1 acc2 before execting the load test ####
 status, before_acc1_balance= query_balances(acc1)
@@ -53,11 +57,11 @@ seq1no, seq2no = int(seq1_response['sequence']), int(seq2_response['sequence'])
 for i in range(NUM_TXS):
     status, unsignedTxto = create_unsigned_txs(acc1, acc2, 'unsignedto.json')
     if not status:
-        print(unsignedTxto)
+        logging.error(unsignedTxto)
     
     status, unsignedTxfrom = create_unsigned_txs(acc2, acc1, 'unsignedfrom.json')
     if not status:
-        print(unsignedTxfrom)
+        logging.error(unsignedTxfrom)
         
 #### Duplicating and appending transfer message in the existing array to create a multi-msg transaction        
     for j in range(num_msgs):
@@ -68,19 +72,19 @@ for i in range(NUM_TXS):
     seqto = seq1no + i
     status, txHash = create_signed_txs('unsignedto.json', 'signedto.json', acc1, seqto)
     if not status:
-        print(txHash)
+        logging.error(txHash)
     else:
-        print(f"broadcasttoTxhash: {txHash}")
+        logging.info(f"broadcasttoTxhash: {txHash}")
 
     ### Signing and broadcasting the unsigned transactions from acc2 to acc1 ###
     seqfrom = seq2no + i
     status, txHash = create_signed_txs('unsignedfrom.json', 'signedfrom.json', acc2, seqfrom)
     if not status:
-        print(txHash)
+        logging.error(txHash)
     else:
-        print(f"broadcastfromTxhash: {txHash}")
+        logging.info(f"broadcastfromTxhash: {txHash}")
 
-print('##### Sleeping for 7s #####')
+logging.info('##### Sleeping for 7s #####')
 time.sleep(7)
 
 #### Verifying the balance deductions ####

@@ -1,4 +1,4 @@
-import argparse, os, sys
+import argparse, os, sys, logging
 from core.keys import keys_show
 from modules.bank.query import query_balances
 from modules.staking.query import query_staking_delegations, query_staking_validators
@@ -10,6 +10,9 @@ CHAINID = os.getenv('CHAINID')
 DAEMON_HOME = os.getenv('DAEMON_HOME')
 HOME = os.getenv('HOME')
 RPC = os.getenv('RPC')
+logging.basicConfig(format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
+                    datefmt='%H:%M:%S',
+                    level=logging.DEBUG)
 
 parser = argparse.ArgumentParser(description='This program takes inputs for intializing tx query load test.')
 parser.add_argument('-s', '--sender', type= account_type, default = keys_show("validator1")[1]['address'], help= 'From which account the transaction should be intialized')
@@ -27,24 +30,24 @@ for i in range(0, num_txs):
     # Fetch balance of acc1
     status, bTx = query_balances(acc1)
     if not status:
-        print(bTx)
+        logging.error(bTx)
     else:
         bTxres = bTx["balances"][0]
-        print(f"** Balance :: {bTxres} **")
+        logging.info(f"Balance :: {bTxres}")
 
     # Fetch staking validators
     status, sTx = query_staking_validators()
     if not status:
-        print(sTx)    
+        logging.error(sTx)    
     else:
         monikers = ""
         for validator in sTx['validators']:
             monikers += f"{validator['description']['moniker']} "
-        print(f"** Monikers :: {monikers} **")
+        logging.info(f"Monikers :: {monikers}")
 
     # Fetch staking delegations
     status, dTx = query_staking_delegations(acc1, val1)
     if not status:
-        print(dTx)
+        logging.error(dTx)
     else:
-        print(f"** Delegations :: {dTx['delegation']['shares']} **")
+        logging.info(f"Delegations :: {dTx['delegation']['shares']}")

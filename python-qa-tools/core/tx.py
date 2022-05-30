@@ -21,8 +21,11 @@ def tx_broadcast(signed_file, gas, broadcast_mode = "sync"):
     try:
         command = f"{DAEMON} tx broadcast {HOME}/{signed_file} --output json --chain-id {CHAINID} --gas {gas} --node {RPC} --broadcast-mode {broadcast_mode} --output json"
         broadcastTx, broadcasterr = exec_command(command)
+        broadcastTx = json.loads(broadcastTx)
         if len(broadcasterr):
             return False, broadcasterr
-        return True, json.loads(broadcastTx)
+        elif broadcastTx['code'] != 0:
+            return False, broadcastTx
+        return True, 
     except Exception as e:
         return False, e
