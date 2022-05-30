@@ -15,10 +15,10 @@ logging.basicConfig(format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(messa
 
 parser = argparse.ArgumentParser(description='This program takes inputs for intializing multi message load test.')
 parser.add_argument('-s', '--sender', type= account_type, default = keys_show("account1")[1]['address'],help= 'From which account the transaction should be intialized')
-parser.add_argument('-r','reciever', type= account_type, default = keys_show("account1")[1]['address'], help= 'Reciever account number.')
+parser.add_argument('-r','receiver', type= account_type, default = keys_show("account1")[1]['address'], help= 'Receiver account number.')
 args = parser.parse_args()
 
-acc1, acc2 = args.sender, args.reciever
+acc1, acc2 = args.sender, args.receiver
 
 # query account sequence
 status, account = query_account(acc1)

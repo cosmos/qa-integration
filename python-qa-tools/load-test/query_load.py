@@ -16,7 +16,7 @@ logging.basicConfig(format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(messa
 
 parser = argparse.ArgumentParser(description='This program takes inputs for intializing tx query load test.')
 parser.add_argument('-s', '--sender', type= account_type, default = keys_show("validator1")[1]['address'], help= 'From which account the transaction should be intialized')
-parser.add_argument('-n', '--num_txs', type = num_txs_type, default = 1000, help= 'Number of transactions to be made, Min. should be 1000')
+parser.add_argument('-n', '--num_txs', type = num_txs_type, default = 1000, help= 'Number of transactions to be made, atleast should be 1000')
 args = parser.parse_args()
 
 acc1, num_txs = args.sender, int(args.num_txs)

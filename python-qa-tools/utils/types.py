@@ -16,5 +16,5 @@ def num_txs_type(x):
 def node_type(x):
     x = int(x)
     if x < 2:
-        raise argparse.ArgumentTypeError(f"The number of nodes should be Min. 2, you have entered {x}")
+        raise argparse.ArgumentTypeError(f"The number of nodes should be atleast 2, you have entered {x}")
     return x

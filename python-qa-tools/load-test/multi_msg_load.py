@@ -19,10 +19,10 @@ logging.basicConfig(format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(messa
 
 parser = argparse.ArgumentParser(description='This program takes inputs for intializing multi message load test.')
 parser.add_argument('-s', '--sender', type = account_type, default = keys_show("account1")[1]['address'], help = 'Sender bech32 address')
-parser.add_argument('-r', '--reciever', type= account_type, default = keys_show("account2")[1]['address'], help= 'Reciever bech32 address')
-parser.add_argument('-n', '--num_txs', type = int, default = 1000, help= 'Number of transactions to be made, Min. should be 1000')
+parser.add_argument('-r', '--receiver', type= account_type, default = keys_show("account2")[1]['address'], help= 'Receiver bech32 address')
+parser.add_argument('-n', '--num_txs', type = int, default = 1000, help= 'Number of transactions to be made, atleast should be 1000')
 args = parser.parse_args()
-FROM, TO, NUM_TXS = args.sender, args.reciever, int(args.num_txs)
+FROM, TO, NUM_TXS = args.sender, args.receiver, int(args.num_txs)
 
 if FROM == TO:
     sys.exit('Error: The values of arguments "TO" and "FROM" are equal make sure to set different values')
