@@ -66,7 +66,7 @@ for i in range(NUM_TXS):
     else:
         logging.info(f"TX HASH from :: {sTxto['txhash']}")
 
-logging.info('Sleeping for 7s')
+logging.info('waiting for tx confirmation, avg time is 7s.')
 time.sleep(7)
 
 #### Print Balances ####

@@ -72,7 +72,7 @@ for i in range(NUM_TXS):
     seqto = seq1no + i
     status, txHash = create_signed_txs('unsignedto.json', 'signedto.json', acc1, seqto)
     if not status:
-        logging.error(txHash)
+        logging.error(f"sign_and_broadcast_tx failed : {txHash}")
     else:
         logging.info(f"broadcasttoTxhash: {txHash}")
 
@@ -80,11 +80,11 @@ for i in range(NUM_TXS):
     seqfrom = seq2no + i
     status, txHash = create_signed_txs('unsignedfrom.json', 'signedfrom.json', acc2, seqfrom)
     if not status:
-        logging.error(txHash)
+        logging.error(f"sign_and_broadcast_tx failed : {txHash}")
     else:
         logging.info(f"broadcastfromTxhash: {txHash}")
 
-logging.info('##### Sleeping for 7s #####')
+logging.info('waiting for tx confirmation, avg time is 7s.')
 time.sleep(7)
 
 #### Verifying the balance deductions ####
