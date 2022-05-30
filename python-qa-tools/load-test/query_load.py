@@ -1,15 +1,9 @@
-import argparse, os, sys, logging
+import argparse, sys, logging
 from core.keys import keys_show
 from modules.bank.query import query_balances
 from modules.staking.query import query_staking_delegations, query_staking_validators
 from utils.types import account_type, num_txs_type
 
-DAEMON = os.getenv('DAEMON')
-DENOM = os.getenv('DENOM')
-CHAINID = os.getenv('CHAINID')
-DAEMON_HOME = os.getenv('DAEMON_HOME')
-HOME = os.getenv('HOME')
-RPC = os.getenv('RPC')
 logging.basicConfig(format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
                     datefmt='%H:%M:%S',
                     level=logging.DEBUG)
@@ -19,16 +13,16 @@ parser.add_argument('-s', '--sender', type= account_type, default = keys_show("v
 parser.add_argument('-n', '--num_txs', type = num_txs_type, default = 1000, help= 'Number of transactions to be made, atleast should be 1000')
 args = parser.parse_args()
 
-acc1, num_txs = args.sender, int(args.num_txs)
+sender, num_txs = args.sender, int(args.num_txs)
 
-status, val1 = keys_show(acc1, "val")
+status, val1 = keys_show(sender, "val")
 if not status:
     sys.exit(val1)
 val1 = val1['address']
 
 for i in range(0, num_txs):
-    # Fetch balance of acc1
-    status, bTx = query_balances(acc1)
+    # Fetch balance of sender
+    status, bTx = query_balances(sender)
     if not status:
         logging.error(bTx)
     else:
@@ -46,7 +40,7 @@ for i in range(0, num_txs):
         logging.info(f"Monikers :: {monikers}")
 
     # Fetch staking delegations
-    status, dTx = query_staking_delegations(acc1, val1)
+    status, dTx = query_staking_delegations(sender, val1)
     if not status:
         logging.error(dTx)
     else:

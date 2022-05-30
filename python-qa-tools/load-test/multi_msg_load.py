@@ -7,12 +7,9 @@ from utils.bank import print_balance_deductions
 from utils.txs import create_signed_txs, create_unsigned_txs, create_multi_messages
 from utils.types import account_type
 
-CHAINID = os.getenv('CHAINID')
-DAEMON = os.getenv('DAEMON')
-DAEMON_HOME = os.getenv('DAEMON_HOME')
-DENOM = os.getenv('DENOM')
 HOME = os.getenv('HOME')
-NUM_MSGS = os.getenv('NUM_MSGS')
+NUM_MSGS = os.getenv('NUM_MSGS') if os.getenv('NUM_MSGS') else 30
+ 
 logging.basicConfig(format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
                     datefmt='%H:%M:%S',
                     level=logging.DEBUG)
@@ -27,26 +24,26 @@ FROM, TO, NUM_TXS = args.sender, args.receiver, int(args.num_txs)
 if FROM == TO:
     sys.exit('Error: The values of arguments "TO" and "FROM" are equal make sure to set different values')
  
-acc1, acc2, num_msgs = FROM, TO, NUM_MSGS
+sender, receiver, num_msgs = FROM, TO, NUM_MSGS
 
-#### Fetch Balances of acc1 acc2 before execting the load test ####
-status, before_acc1_balance= query_balances(acc1)
+#### Fetch Balances of sender receiver before execting the load test ####
+status, before_sender_balance= query_balances(sender)
 if not status:
-    sys.exit(before_acc1_balance)
-before_acc1_balance = before_acc1_balance['balances'][0]['amount']
+    sys.exit(before_sender_balance)
+before_sender_balance = before_sender_balance['balances'][0]['amount']
 
-status, before_acc2_balance = query_balances(acc2)
+status, before_receiver_balance = query_balances(receiver)
 if not status:
-    sys.exit(before_acc2_balance)
-before_acc2_balance = before_acc2_balance['balances'][0]['amount']
+    sys.exit(before_receiver_balance)
+before_receiver_balance = before_receiver_balance['balances'][0]['amount']
 
 #### Fetching sequence numbers of to and from accounts
 os.chdir(os.path.expanduser(HOME))
-status, seq1_response = query_account(acc1)
+status, seq1_response = query_account(sender)
 if not status:
     sys.exit(seq1_response)
 
-status, seq2_response = query_account(acc2)
+status, seq2_response = query_account(receiver)
 if not status:
     sys.exit(seq2_response)
 
@@ -55,11 +52,11 @@ seq1no, seq2no = int(seq1_response['sequence']), int(seq2_response['sequence'])
 
 #### Generating unsigned transactions with a single transfer message 
 for i in range(NUM_TXS):
-    status, unsignedTxto = create_unsigned_txs(acc1, acc2, 'unsignedto.json')
+    status, unsignedTxto = create_unsigned_txs(sender, receiver, 'unsignedto.json')
     if not status:
         logging.error(unsignedTxto)
     
-    status, unsignedTxfrom = create_unsigned_txs(acc2, acc1, 'unsignedfrom.json')
+    status, unsignedTxfrom = create_unsigned_txs(receiver, sender, 'unsignedfrom.json')
     if not status:
         logging.error(unsignedTxfrom)
         
@@ -68,17 +65,17 @@ for i in range(NUM_TXS):
         create_multi_messages('unsignedto.json')
         create_multi_messages('unsignedfrom.json')
 
-    ### Signing and broadcasting the unsigned transactions from acc1 to acc2 ###
+    ### Signing and broadcasting the unsigned transactions from sender to receiver ###
     seqto = seq1no + i
-    status, txHash = create_signed_txs('unsignedto.json', 'signedto.json', acc1, seqto)
+    status, txHash = create_signed_txs('unsignedto.json', 'signedto.json', sender, seqto)
     if not status:
         logging.error(f"sign_and_broadcast_tx failed : {txHash}")
     else:
         logging.info(f"broadcasttoTxhash: {txHash}")
 
-    ### Signing and broadcasting the unsigned transactions from acc2 to acc1 ###
+    ### Signing and broadcasting the unsigned transactions from receiver to sender ###
     seqfrom = seq2no + i
-    status, txHash = create_signed_txs('unsignedfrom.json', 'signedfrom.json', acc2, seqfrom)
+    status, txHash = create_signed_txs('unsignedfrom.json', 'signedfrom.json', receiver, seqfrom)
     if not status:
         logging.error(f"sign_and_broadcast_tx failed : {txHash}")
     else:
@@ -88,18 +85,18 @@ logging.info('waiting for tx confirmation, avg time is 7s.')
 time.sleep(7)
 
 #### Verifying the balance deductions ####
-status, after_acc1_balance = query_balances(acc1)
+status, after_sender_balance = query_balances(sender)
 if not status:
-    sys.exit(after_acc1_balance)
-after_acc1_balance = after_acc1_balance['balances'][0]['amount']
+    sys.exit(after_sender_balance)
+after_sender_balance = after_sender_balance['balances'][0]['amount']
 
-status, after_acc2_balance = query_balances(acc2)
+status, after_receiver_balance = query_balances(receiver)
 if not status:
-    sys.exit(after_acc2_balance)
-after_acc2_balance = after_acc2_balance['balances'][0]['amount']
+    sys.exit(after_receiver_balance)
+after_receiver_balance = after_receiver_balance['balances'][0]['amount']
 
-acc1_diff = int(before_acc1_balance) - int(after_acc1_balance)
-acc2_diff = int(before_acc2_balance) - int(after_acc2_balance)
+sender_diff = int(before_sender_balance) - int(after_sender_balance)
+receiver_diff = int(before_receiver_balance) - int(after_receiver_balance)
 
-print_balance_deductions('account1', acc1_diff)
-print_balance_deductions('account2', acc2_diff)
+print_balance_deductions('account1', sender_diff)
+print_balance_deductions('account2', receiver_diff)
