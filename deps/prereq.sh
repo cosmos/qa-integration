@@ -42,5 +42,4 @@ else
 fi
 
 echo "" >> ~/.bashrc
-echo 'export PYTHONPATH=$PYTHONPATH:$HOME/qa-integration:$HOME/qa-integration/python-qa-tools' >> ~/.bashrc
 source ~/.bashrc
