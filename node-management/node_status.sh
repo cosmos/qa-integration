@@ -1,5 +1,7 @@
 #/bin/sh
 
+## This script displays the latest block height and sync status of the nodes
+
 NODES=$1
 if [ -z $NODES ]
 then

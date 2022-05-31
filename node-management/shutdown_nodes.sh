@@ -1,5 +1,7 @@
 #/bin/sh
 
+## This script stops the systemd process of the nodes and removes their data directories.
+
 NODES=$1
 if [ -z $NODES ]
 then

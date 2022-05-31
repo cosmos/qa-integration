@@ -1,5 +1,7 @@
 #/bin/sh
 
+## This script generates and broadcasts 1000 transfers to and fro between two accounts.
+
 FROM=$1
 if [ -z $FROM ]
 then
