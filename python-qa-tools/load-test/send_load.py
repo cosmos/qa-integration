@@ -1,12 +1,11 @@
 import argparse, os,sys, logging
 from core.keys import keys_show
-from modules.auth.query import query_account
+from modules.auth.query import account_type, query_account
 from modules.bank.tx import tx_send
-from utils.types import account_type
+
 
 # import env values
-logging.basicConfig(format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
-                    datefmt='%H:%M:%S',
+logging.basicConfig(format='%(message)s',
                     level=logging.DEBUG)
 
 parser = argparse.ArgumentParser(description='This program takes inputs for intializing multi message load test.')

@@ -1,5 +1,6 @@
 import os, json
-from utils.commands import exec_command
+
+from utils import exec_command
 
 DAEMON = os.getenv('DAEMON')
 RPC = os.getenv('RPC')

@@ -1,1 +1,11 @@
 goversion="1.18.1"
+DAEMON=simd
+DENOM=stake
+CHAINID=test
+DAEMON_HOME=${HOME}/.simd
+GH_URL=https://github.com/cosmos/cosmos-sdk
+CHAIN_VERSION='v0.45.1'
+UPGRADE_NAME=test
+UPGRADE_VERSION='v0.46.0-alpha4'
+NUM_MSGS=30
+RPC="http://localhost:16657"

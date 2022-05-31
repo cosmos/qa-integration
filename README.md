@@ -29,13 +29,14 @@ export UPGRADE_VERSION=v7.0.0
 
 ### Scripts:-
 
-1) `comsos_multinode.sh`:- This script sets up the environment. It takes two arguments from the user.
+1) `start_chain.sh`:- This script sets up the environment. It takes two arguments from the user.
 First argument is the number of nodes that need to be setup and the second argument is the number of additional accounts that need to be created. 
 Usage:-
  ```
+ cd $HOME
  git clone https://github.com/cosmos/qa-integration.git
- cd scripts
- chmod +x comsos_multinode.sh
+ cd qa-integration
+ chmod +x provision/start_chain.sh
  ./cosmos_multinode.sh 20 100
  ```
  This will create a network with 20 validators and 100 additional accounts. If the second argument is not passed, no new additional accounts are created. 

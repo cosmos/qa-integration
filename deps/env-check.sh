@@ -1,10 +1,5 @@
 #/bin/sh
 
-cd $1
-set -a
-source ../python-qa-tools/.env
-set +a
-
 display_usage() {
     printf "** Please export all the necessary env variables  :: **\n Daemon : $DAEMON\n Denom : $DENOM\n ChainID : $CHAINID\n DaemonHome : $DAEMON_HOME\n \n Github URL : $GH_URL\n Chain Version : $CHAIN_VERSION\n"
     exit 1

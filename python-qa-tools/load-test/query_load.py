@@ -1,11 +1,12 @@
 import argparse, sys, logging
 from core.keys import keys_show
+from modules.auth.query import account_type
 from modules.bank.query import query_balances
 from modules.staking.query import query_staking_delegations, query_staking_validators
-from utils.types import account_type, num_txs_type
+from utils import num_txs_type
 
-logging.basicConfig(format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
-                    datefmt='%H:%M:%S',
+
+logging.basicConfig(format='%(message)s',
                     level=logging.DEBUG)
 
 parser = argparse.ArgumentParser(description='This program takes inputs for intializing tx query load test.')
@@ -22,26 +23,26 @@ val1 = val1['address']
 
 for i in range(0, num_txs):
     # Fetch balance of sender
-    status, bTx = query_balances(sender)
+    status, balance_query_response = query_balances(sender)
     if not status:
-        logging.error(bTx)
+        logging.error(balance_query_response)
     else:
-        bTxres = bTx["balances"][0]
-        logging.info(f"Balance :: {bTxres}")
+        balance = balance_query_response["balances"][0]
+        logging.info(f"Balance :: {balance}")
 
     # Fetch staking validators
-    status, sTx = query_staking_validators()
+    status, validators_response = query_staking_validators()
     if not status:
-        logging.error(sTx)    
+        logging.error(validators_response)    
     else:
         monikers = ""
-        for validator in sTx['validators']:
+        for validator in validators_response['validators']:
             monikers += f"{validator['description']['moniker']} "
         logging.info(f"Monikers :: {monikers}")
 
     # Fetch staking delegations
-    status, dTx = query_staking_delegations(sender, val1)
+    status, delegations_response = query_staking_delegations(sender, val1)
     if not status:
-        logging.error(dTx)
+        logging.error(delegations_response)
     else:
-        logging.info(f"Delegations :: {dTx['delegation']['shares']}")
+        logging.info(f"Delegations :: {delegations_response['delegation']['shares']}")

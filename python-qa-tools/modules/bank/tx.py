@@ -1,26 +1,56 @@
 import json, os
-from utils.commands import exec_command
+from core.tx import tx_broadcast, tx_sign
+from utils import exec_command
+
 DAEMON = os.getenv('DAEMON')
 DENOM = os.getenv('DENOM')
 CHAINID = os.getenv('CHAINID')
 HOME = os.getenv('HOME')
 DAEMON_HOME = os.getenv('DAEMON_HOME')
 RPC = os.getenv('RPC')
+DEAFULT_GAS = 2000000
 
-def tx_send(from_address, to_address, amount, gas, unsigned = False, sequence = None):
+def create_unsigned_txs(from_address, to_address, file_name):
+    try:
+        status, unsignedTx = tx_send(from_address, to_address, amount = 1000000, gas = DEAFULT_GAS, unsigned = True)
+        if not status:
+            return status, unsignedTx 
+        with open(f"{HOME}/{file_name}", 'w') as outfile:
+            json.dump(unsignedTx, outfile)
+        return True, unsignedTx
+    except Exception as e:
+        return False, e
+
+def create_signed_txs(unsigned_file, signed_file, from_address, sequence):
+    try:
+        status, signTx = tx_sign(unsigned_file, from_address, sequence, DEAFULT_GAS)
+        if not status:
+            return status, signTx
+        with open(f'{HOME}/{signed_file}', 'w') as outfile:
+            json.dump(signTx, outfile)
+            
+        status, broadcast_response = tx_broadcast(signed_file, DEAFULT_GAS, 'block')
+        if not status:
+            return status, broadcast_response
+        return status, broadcast_response['txhash']
+    except Exception as e:
+        return False, e
+
+def tx_send(from_address, to_address, amount, gas="auto", unsigned = False, sequence = None):
     try:    
         if unsigned:
-            command = f"{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} --chain-id {CHAINID} --output json --generate-only --gas {gas}"
+            command = f"{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} --chain-id {CHAINID} --output json --node {RPC} --generate-only --gas {gas}"
             Tx, Txerr = exec_command(command)
             if len(Txerr):
+                print("Entered")
                 return False, Txerr
             return True, json.loads(Tx)
         else:
             if sequence != None:
-                command = f"{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --sequence {sequence}"
+                command = f"{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --sequence {sequence} --gas auto --gas-adjustment 1.5"
                 
             else:
-                command = f"{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y"
+                command = f"{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas auto --gas-adjustment 1.5"
             Tx, Txerr = exec_command(command)
             Tx = json.loads(Tx)
             if len(Txerr):

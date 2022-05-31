@@ -1,17 +1,15 @@
 import argparse, os, sys, time
 import logging
 from core.keys import keys_show
-from modules.auth.query import query_account
+from modules.auth.query import account_type, query_account
 from modules.bank.query import query_balances
-from utils.bank import print_balance_deductions
-from utils.txs import create_signed_txs, create_unsigned_txs, create_multi_messages
-from utils.types import account_type
+from modules.bank.tx import create_signed_txs, create_unsigned_txs
+from utils import create_multi_messages, print_balance_deductions
 
 HOME = os.getenv('HOME')
-NUM_MSGS = os.getenv('NUM_MSGS') if os.getenv('NUM_MSGS') else 30
+NUM_MSGS = int(os.getenv('NUM_MSGS'))
  
-logging.basicConfig(format='%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s',
-                    datefmt='%H:%M:%S',
+logging.basicConfig(format='%(message)s',
                     level=logging.DEBUG)
 
 parser = argparse.ArgumentParser(description='This program takes inputs for intializing multi message load test.')
@@ -69,7 +67,7 @@ for i in range(NUM_TXS):
     seqto = seq1no + i
     status, txHash = create_signed_txs('unsignedto.json', 'signedto.json', sender, seqto)
     if not status:
-        logging.error(f"sign_and_broadcast_tx failed : {txHash}")
+        logging.error(f"sign_and_broadcast_tx to failed : {txHash}")
     else:
         logging.info(f"broadcasttoTxhash: {txHash}")
 
@@ -77,7 +75,7 @@ for i in range(NUM_TXS):
     seqfrom = seq2no + i
     status, txHash = create_signed_txs('unsignedfrom.json', 'signedfrom.json', receiver, seqfrom)
     if not status:
-        logging.error(f"sign_and_broadcast_tx failed : {txHash}")
+        logging.error(f"sign_and_broadcast_tx from failed : {txHash}")
     else:
         logging.info(f"broadcastfromTxhash: {txHash}")
 

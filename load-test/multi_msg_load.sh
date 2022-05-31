@@ -5,6 +5,11 @@ set -e
 CURPATH=`dirname $(realpath "$0")`
 cd $CURPATH
 
+# set environment with env config.
+set -a
+source ../env
+set +a
+
 # set pythonpath environment
 cd ..
 export PYTHONPATH=$PWD:$PWD/python-qa-tools
