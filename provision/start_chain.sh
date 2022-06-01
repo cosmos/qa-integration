@@ -1,5 +1,20 @@
 #/bin/sh
 
+set -e
+
+# get absolute parent directory path of current file
+CURPATH=`dirname $(realpath "$0")`
+echo $CURPATH
+cd $CURPATH
+
+# set environment with env config.
+set -a
+source ../env
+set +a
+
+# check environment variables are set
+bash ../deps/env-check.sh $CURPATH
+
 # read no.of nodes to be setup passed as the first argument
 NODES=$1
 if [ -z $NODES ]
@@ -17,9 +32,18 @@ go install github.com/cosmos/cosmos-sdk/cosmovisor/cmd/cosmovisor@v1.0.0
 strings $(which cosmovisor) | egrep -e "mod\s+github.com/cosmos/cosmos-sdk/cosmovisor"
 export REPO=$(basename $GH_URL .git)
 echo "--------- Install $DAEMON ---------"
-git clone $GH_URL && cd $REPO
-git fetch && git checkout $CHAIN_VERSION
-make install
+
+CURR_VERSION='v'$($DAEMON version)
+if [ $CURR_VERSION != $CHAIN_VERSION ]
+then
+    if [ ! -d $REPO ]
+    then
+        git clone $GH_URL
+    fi
+    cd $REPO
+    git fetch && git checkout $CHAIN_VERSION
+    make install
+fi
 cd $HOME
 # check version
 $DAEMON version --long
@@ -28,7 +52,6 @@ for (( a=1; a<=$NODES; a++ ))
 do
     export DAEMON_HOME_$a=$DAEMON_HOME-$a
     echo "Deamon path :: $DAEMON_HOME-$a"
-    $DAEMON unsafe-reset-all  --home $DAEMON_HOME-$a
 done
 # remove home directories if they already exist
 for (( a=1; a<=$NODES; a++ ))

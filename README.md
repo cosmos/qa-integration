@@ -33,7 +33,6 @@ export UPGRADE_VERSION=v7.0.0
 First argument is the number of nodes that need to be setup and the second argument is the number of additional accounts that need to be created. 
 Usage:-
  ```
- cd $HOME
  git clone https://github.com/cosmos/qa-integration.git
  cd qa-integration
  chmod +x provision/start_chain.sh
