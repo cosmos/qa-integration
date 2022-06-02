@@ -9,11 +9,13 @@ HOME = os.getenv('HOME')
 
 def print_balance_deductions(wallet, diff):
     if diff > 0:
+        logging.error('Some of the transactions failed')
         logging.info(f"Balance in the {wallet} increased by {diff}")
     elif diff < 0:
+        logging.error('Some of the transactions failed')
         logging.info(f"Balance in the {wallet} decreased by {-1 * diff}")
     else:
-        logging.info(f"No deduction from {wallet} balance")
+        logging.info(f"All transaction went successfully, No deduction from {wallet} balance")
         
 
 # This function is called for executing commands.
