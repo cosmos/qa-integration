@@ -3,7 +3,7 @@ import logging
 from core.keys import keys_show
 from modules.auth.query import account_type, query_account
 from modules.bank.query import query_balances
-from modules.bank.tx import create_signed_txs, create_unsigned_txs
+from modules.bank.tx import sign_and_broadcast_txs, create_unsigned_txs
 from utils import create_multi_messages, print_balance_deductions
 
 HOME = os.getenv('HOME')
@@ -69,7 +69,7 @@ for i in range(NUM_TXS):
 
     ### Signing and broadcasting the unsigned transactions from sender to receiver ###
     seqto = seq1no + i
-    status, txHash = create_signed_txs('unsignedto.json', 'signedto.json', sender, seqto)
+    status, txHash = sign_and_broadcast_txs('unsignedto.json', 'signedto.json', sender, seqto)
     if not status:
         logging.error(f"sign_and_broadcast_tx from sender to receiver failed : {txHash}")
     else:
@@ -77,7 +77,7 @@ for i in range(NUM_TXS):
 
     ### Signing and broadcasting the unsigned transactions from receiver to sender ###
     seqfrom = seq2no + i
-    status, txHash = create_signed_txs('unsignedfrom.json', 'signedfrom.json', receiver, seqfrom)
+    status, txHash = sign_and_broadcast_txs('unsignedfrom.json', 'signedfrom.json', receiver, seqfrom)
     if not status: # if the txn is unsuccessful
         logging.error(f"sign_and_broadcast_tx from receiver to sender failed : {txHash}")
     else:

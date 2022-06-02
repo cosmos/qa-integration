@@ -21,7 +21,7 @@ def create_unsigned_txs(from_address, to_address, amount, file_name):
     except Exception as e:
         return False, e
 
-def create_signed_txs(unsigned_file, signed_file, from_address, sequence):
+def sign_and_broadcast_txs(unsigned_file, signed_file, from_address, sequence):
     try:
         status, signTx = tx_sign(unsigned_file, from_address, sequence, DEFAULT_GAS)
         if not status:
