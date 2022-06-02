@@ -36,7 +36,7 @@ Usage:-
  git clone https://github.com/cosmos/qa-integration.git
  cd qa-integration
  chmod +x provision/start_chain.sh
- ./cosmos_multinode.sh 20 100
+ ./provision/start_chain.sh 2 2
  ```
  This will create a network with 20 validators and 100 additional accounts. If the second argument is not passed, no new additional accounts are created. 
  If no arguments are passed it creates a two node network by default.

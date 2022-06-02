@@ -14,12 +14,11 @@ parser.add_argument('-s', '--sender', type = account_type, default = keys_show("
 parser.add_argument('-r', '--receiver', type= account_type, default = keys_show("account2")[1]['address'], help= 'Receiver bech32 address')
 parser.add_argument('-n', '--num_txs', type = num_txs_type, default = 10000, help= 'Number of transactions to be made, atleast should be 1000')
 args = parser.parse_args()
-FROM, TO, NUM_TXS = args.sender, args.receiver, int(args.num_txs)
+sender, receiver, NUM_TXS, amount_to_be_sent = args.sender, args.receiver, int(args.num_txs), 1000000
 
-if FROM == TO:
-    sys.exit('Error: The values of arguments "TO" and "FROM" are equal make sure to set different values')
- 
-sender, receiver = FROM, TO
+if sender == receiver:
+    sys.exit('Error: The values of arguments "sender" and "receiver" are equal make sure to set different values')
+
 
 #### Fetch Balances from sender receiver ####
 status, before_sender_balance= query_balances(sender)
@@ -47,13 +46,13 @@ seq1no, seq2no = int(seq1_response['sequence']), int(seq2_response['sequence'])
 for i in range(NUM_TXS):
     seqto = seq1no + i
     seqfrom = seq2no + i
-    status, sTxto = tx_send(sender, receiver, 1000000, None, False, seqto)
+    status, sTxto = tx_send(sender, receiver, amount_to_be_sent, None, False, seqto)
     if not status:
         logging.error(f"{sTxto}")
     else:
         logging.info(f"TX HASH to :: {sTxto['txhash']}")
     
-    status, sTxfrom = tx_send(receiver, sender, 1000000, None, False, seqfrom)
+    status, sTxfrom = tx_send(receiver, sender, amount_to_be_sent , None, False, seqfrom)
     if not status:
         logging.error(f"{sTxfrom}")
     else:
