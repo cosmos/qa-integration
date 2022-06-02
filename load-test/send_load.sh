@@ -1,5 +1,7 @@
 #/bin/sh
 
+## This script generates and broadcasts 1000 transfers to and fro between two accounts.
+
 set -e
 
 # get absolute parent directory path of current file

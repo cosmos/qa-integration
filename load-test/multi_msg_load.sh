@@ -1,4 +1,5 @@
 #/bin/sh
+
 set -e
 
 # get absolute parent directory path of current file
