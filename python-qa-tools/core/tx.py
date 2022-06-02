@@ -25,7 +25,6 @@ def tx_broadcast(signed_file, gas, broadcast_mode = "sync"):
         if broadcast_mode == "block":
             logging.info('Waiting for transaction for being broadcasted')
         command = f"{DAEMON} tx broadcast {HOME}/{signed_file} --output json --chain-id {CHAINID} --gas {gas} --node {RPC} --broadcast-mode {broadcast_mode}"
-        print(f"command : {command}")
         broadcastTx, broadcasterr = exec_command(command)
         broadcastTx = json.loads(broadcastTx)
         if len(broadcasterr):

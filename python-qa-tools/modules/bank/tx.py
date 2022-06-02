@@ -10,9 +10,9 @@ DAEMON_HOME = os.getenv('DAEMON_HOME')
 RPC = os.getenv('RPC')
 DEAFULT_GAS = 2000000
 
-def create_unsigned_txs(from_address, to_address, file_name):
+def create_unsigned_txs(from_address, to_address, amount, file_name):
     try:
-        status, unsignedTx = tx_send(from_address, to_address, amount = 1000000, gas = DEAFULT_GAS, unsigned = True)
+        status, unsignedTx = tx_send(from_address, to_address, amount, gas = DEAFULT_GAS, unsigned = True)
         if not status:
             return status, unsignedTx 
         with open(f"{HOME}/{file_name}", 'w') as outfile:

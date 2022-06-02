@@ -22,7 +22,7 @@ FROM, TO, NUM_TXS = args.sender, args.receiver, int(args.num_txs)
 if FROM == TO:
     sys.exit('Error: The values of arguments "TO" and "FROM" are equal make sure to set different values')
  
-sender, receiver, num_msgs = FROM, TO, NUM_MSGS
+sender, receiver= FROM, TO
 
 #### Fetch Balances of sender receiver before execting the load test ####
 status, before_sender_balance= query_balances(sender)
@@ -49,19 +49,19 @@ seq1no, seq2no = int(seq1_response['sequence']), int(seq2_response['sequence'])
 
 
 #### Generating unsigned transactions with a single transfer message 
+status, unsignedTxto = create_unsigned_txs(sender, receiver, 1000000, 'unsignedto.json')
+if not status:
+    logging.error(unsignedTxto)
+
+status, unsignedTxfrom = create_unsigned_txs(receiver, sender, 1000000, 'unsignedfrom.json')
+if not status:
+    logging.error(unsignedTxfrom)
+        
 for i in range(NUM_TXS):
-    status, unsignedTxto = create_unsigned_txs(sender, receiver, 'unsignedto.json')
-    if not status:
-        logging.error(unsignedTxto)
-    
-    status, unsignedTxfrom = create_unsigned_txs(receiver, sender, 'unsignedfrom.json')
-    if not status:
-        logging.error(unsignedTxfrom)
         
 #### Duplicating and appending transfer message in the existing array to create a multi-msg transaction        
-    for j in range(num_msgs):
-        create_multi_messages('unsignedto.json')
-        create_multi_messages('unsignedfrom.json')
+    create_multi_messages(NUM_MSGS, 'unsignedto.json')
+    create_multi_messages(NUM_MSGS, 'unsignedfrom.json')
 
     ### Signing and broadcasting the unsigned transactions from sender to receiver ###
     seqto = seq1no + i

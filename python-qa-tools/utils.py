@@ -40,10 +40,19 @@ def node_type(x):
         raise argparse.ArgumentTypeError(f"The number of nodes should be atleast 2, you have entered {x}")
     return x
 
-def create_multi_messages(file_name):
+def create_multi_messages(num_msgs, file_name):
+    messages = []
     with open(f"{HOME}/{file_name}", 'r+') as file:
-            file_data = json.load(file)
-            new_data = file_data["body"]["messages"][-1]
-            file_data["body"]["messages"].append(new_data)
-            file.seek(0)
-            json.dump(file_data, file, indent = 4)
+        file_data = json.load(file)
+        messages.append(file_data["body"]["messages"][-1])
+    for i in range(num_msgs):
+        messages.append(messages[-1])
+        
+    with open(f"{HOME}/{file_name}", 'r+') as file:
+        file_data = json.load(file)
+        file_data["body"]["messages"] = messages
+        file.seek(0)
+        json.dump(file_data, file, indent = 4)
+        
+        
+        
