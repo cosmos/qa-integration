@@ -1,5 +1,9 @@
 #/bin/sh
 
+## This script installs the basic apt packages and also checks if go is installed on the system or
+## not. If go is not installed on the system then go1.17.3 is installed by the script. Env variables
+## related to go are also exported to bashrc. 
+
 command_exists () {
     type "$1" &> /dev/null ;
 }

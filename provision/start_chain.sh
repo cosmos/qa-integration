@@ -1,10 +1,12 @@
 #/bin/sh
 
+## This script sets up a multinode network and generates multilple addresses with 
+## balance for testing purposes.
+
 set -e
 
 # get absolute parent directory path of current file
 CURPATH=`dirname $(realpath "$0")`
-echo $CURPATH
 cd $CURPATH
 
 # set environment with env config.
@@ -15,24 +17,24 @@ set +a
 # check environment variables are set
 bash ../deps/env-check.sh $CURPATH
 
-# read no.of nodes to be setup passed as the first argument
-NODES=$1
-if [ -z $NODES ]
+# NUM_VALS represents number of validator nodes to bootstrap the network.
+NUM_VALS=$1
+if [ -z $NUM_VALS ]
 then
-    NODES=2
+    NUM_VALS=2
 fi
 
-# read no of accounts to be setup passed as the second argument
-ACCOUNTS=$2
-echo " ** Number of nodes : $NODES and accounts : $ACCOUNTS to be setup **"
-echo "**** Number of nodes to be setup: $NODES ****"
+# NUM_ACCOUNTS represents number of accounts to initialize while bootstropping the chain. 
+# These are the additional accounts along with the validator accounts.
+NUM_ACCOUNTS=$2
+echo "INFO: Setting up $NUM_NODES validator nodes and $NUM_ACCOUNTS accounts"
 cd $HOME
-echo "--------- Install cosmovisor-------"
+echo "INFO: Installing cosmovisor"
 go install github.com/cosmos/cosmos-sdk/cosmovisor/cmd/cosmovisor@v1.0.0
 strings $(which cosmovisor) | egrep -e "mod\s+github.com/cosmos/cosmos-sdk/cosmovisor"
 export REPO=$(basename $GH_URL .git)
-echo "--------- Install $DAEMON ---------"
 
+echo "INFO: Installing $DAEMON"
 CURR_VERSION='v'$($DAEMON version)
 if [ $CURR_VERSION != $CHAIN_VERSION ]
 then
@@ -41,117 +43,114 @@ then
         git clone $GH_URL
     fi
     cd $REPO
-    git fetch && git checkout $CHAIN_VERSION
+    git fetch --all && git checkout $CHAIN_VERSION
     make install
 fi
 cd $HOME
 # check version
 $DAEMON version --long
 # export daemon home paths
-for (( a=1; a<=$NODES; a++ ))
+for (( a=1; a<=$NUM_VALS; a++ ))
 do
     export DAEMON_HOME_$a=$DAEMON_HOME-$a
-    echo "Deamon path :: $DAEMON_HOME-$a"
 done
-# remove home directories if they already exist
-for (( a=1; a<=$NODES; a++ ))
+# remove validator daemon home directories if they already exist
+for (( a=1; a<=$NUM_VALS; a++ ))
 do
     rm -rf $DAEMON_HOME-$a
 done
-echo "-----Creating home directories------"
-for (( a=1; a<=$NODES; a++ ))
+echo "INFO: Setting up validator home directories"
+for (( a=1; a<=$NUM_VALS; a++ ))
 do
-    echo "****** create dir :: $DAEMON_HOME-$a ********"
+    echo "INFO: Creating validator-$a home directory :: $DAEMON_HOME-$a"
     mkdir -p "$DAEMON_HOME-$a"
     mkdir -p "$DAEMON_HOME-$a"/cosmovisor/genesis/bin
     cp $(which $DAEMON) "$DAEMON_HOME-$a"/cosmovisor/genesis/bin/
 done
-echo "--------Start initializing the chain ($CHAINID)---------"
-for (( a=1; a<=$NODES; a++ ))
+echo "INFO: Initializing the chain ($CHAINID)"
+for (( a=1; a<=$NUM_VALS; a++ ))
 do
-    echo "-------Init chain ${a}--------"
-    echo "Deamon home :: $DAEMON_HOME-${a}"
-    $DAEMON init --chain-id $CHAINID $DAEMON_HOME-${a} --home $DAEMON_HOME-${a}
+    echo "INFO: Initializing validator-${a} configuration files"
+    $DAEMON init --chain-id $CHAINID validator-${a} --home $DAEMON_HOME-${a}
 done
-echo "---------Creating $NODES keys-------------"
-for (( a=1; a<=$NODES; a++ ))
+echo "---------Creating $NUM_VALS keys-------------"
+for (( a=1; a<=$NUM_VALS; a++ ))
 do
     $DAEMON keys add "validator${a}" --keyring-backend test --home $DAEMON_HOME-${a}
 done
 
 # create accounts if second argument is passed
-if [ -z $ACCOUNTS ] || [ "$ACCOUNTS" -eq 0 ]
+if [ -z $NUM_ACCOUNTS ] || [ "$NUM_ACCOUNTS" -eq 0 ]
 then
-    echo "----- Argument for accounts is not present, not creating any additional accounts --------"
+    echo "INFO: Second argument was empty, not setting up additional account"
 else
-    echo "---------Creating $ACCOUNTS accounts-------------"
-    for (( a=1; a<=$ACCOUNTS; a++ ))
+    echo "INFO: Creating $NUM_ACCOUNTS additional accounts"
+    for (( a=1; a<=$NUM_ACCOUNTS; a++ ))
     do
         $DAEMON keys add "account${a}" --keyring-backend test --home $DAEMON_HOME-1
     done
 fi
 
-echo "----------Genesis creation---------"
-echo "----------Adding validator accounts to genesis---------"
-for (( a=1; a<=$NODES; a++ ))
+echo "INFO: Setting up genesis"
+echo "INFO: Adding validator accounts to genesis"
+for (( a=1; a<=$NUM_VALS; a++ ))
 do
     if [ $a == 1 ]
     then
         $DAEMON --home $DAEMON_HOME-$a add-genesis-account validator$a 1000000000000$DENOM  --keyring-backend test
-        echo "done $DAEMON_HOME-$a genesis creation "
+        echo "INFO: Done $DAEMON_HOME-$a genesis creation "
         continue
     fi
     $DAEMON --home $DAEMON_HOME-$a add-genesis-account validator$a 1000000000000$DENOM  --keyring-backend test
     $DAEMON --home $DAEMON_HOME-1 add-genesis-account $($DAEMON keys show validator$a -a --home $DAEMON_HOME-$a --keyring-backend test) 1000000000000$DENOM
 done
-echo "----------Adding additional accounts to genesis---------"
-if [ -z $ACCOUNTS ]
+echo "INFO: Adding additional accounts to genesis"
+if [ -z $NUM_ACCOUNTS ]
 then
-    echo "Second argument was empty, not setting up additional account\n"
+    echo "INFO: Second argument was empty, not setting up additional account"
 else
-    for (( a=1; a<=$ACCOUNTS; a++ ))
+    for (( a=1; a<=$NUM_ACCOUNTS; a++ ))
     do
         $DAEMON --home $DAEMON_HOME-1 add-genesis-account $($DAEMON keys show account$a -a --home $DAEMON_HOME-1 --keyring-backend test) 1000000000000$DENOM
     done
 fi
 
-echo "--------Creating gentxs--------"
-for (( a=1; a<=$NODES; a++ ))
+echo "INFO: Generating gentxs for validator accounts"
+for (( a=1; a<=$NUM_VALS; a++ ))
 do
     $DAEMON gentx validator$a 90000000000$DENOM --chain-id $CHAINID  --keyring-backend test --home $DAEMON_HOME-$a
 done
-echo "---------Copying all gentxs to $DAEMON_HOME-1----------"
-for (( a=2; a<=$NODES; a++ ))
+echo "INFO: Copying all gentxs to $DAEMON_HOME-1"
+for (( a=2; a<=$NUM_VALS; a++ ))
 do
     cp $DAEMON_HOME-$a/config/gentx/*.json $DAEMON_HOME-1/config/gentx/
 done
-echo "----------collect-gentxs------------"
+echo "INFO: Collecting gentxs"
 $DAEMON collect-gentxs --home $DAEMON_HOME-1
-echo "---------Updating $DAEMON_HOME-1 genesis.json ------------"
+echo "INFO: Updating genesis values"
 sed -i "s/172800000000000/600000000000/g" $DAEMON_HOME-1/config/genesis.json
 sed -i "s/172800s/600s/g" $DAEMON_HOME-1/config/genesis.json
 sed -i "s/stake/$DENOM/g" $DAEMON_HOME-1/config/genesis.json
-echo "---------Distribute genesis.json of $DAEMON_HOME-1 to remaining nodes-------"
-for (( a=2; a<=$NODES; a++ ))
+echo "INFO: Distribute genesis.json of validator-1 to remaining nodes"
+for (( a=2; a<=$NUM_VALS; a++ ))
 do
     cp $DAEMON_HOME-1/config/genesis.json $DAEMON_HOME-$a/config/
 done
-echo "---------Getting public IP address-----------"
-IP="$(dig +short myip.opendns.com @resolver1.opendns.com)"
 
+echo "INFO: Getting public IP address to configure peers"
+IP="$(dig +short myip.opendns.com @resolver1.opendns.com)"
 if [ -z $IP ]
 then
     IP=127.0.0.1
 fi
 
-for (( a=1; a<=$NODES; a++ ))
+for (( a=1; a<=$NUM_VALS; a++ ))
 do
     DIFF=$(($a - 1))
     INC=$(($DIFF * 2))
     LADDR=$((16656 + $INC))
-    echo "----------Getting node-id of $DAEMON_HOME-$a ---------"
+    echo "INFO: Getting node-id of validator-$a"
     nodeID=$("${DAEMON}" tendermint show-node-id --home $DAEMON_HOME-$a)
-    echo "** Node ID :: $nodeID **"
     PR="$nodeID@$IP:$LADDR"
     if [ $a == 1 ]
     then
@@ -160,8 +159,8 @@ do
     fi
     PERSISTENT_PEERS="${PERSISTENT_PEERS},${PR}"
 done
-#updating config.toml
-for (( a=1; a<=$NODES; a++ ))
+# updating config.toml
+for (( a=1; a<=$NUM_VALS; a++ ))
 do
     DIFF=$(($a - 1))
     INC=$(($DIFF * 2))
@@ -169,7 +168,7 @@ do
     LADDR=$((16656 + $INC)) #increment laddr ports
     GRPC=$((9090 + $INC)) #increment grpc poprt
     WGRPC=$((9091 + $INC)) #increment web grpc port
-    echo "----------Updating $DAEMON_HOME-$a chain config-----------"
+    echo "INFO: Updating validator-$a chain config"
     sed -i 's#tcp://127.0.0.1:26657#tcp://0.0.0.0:'${RPC}'#g' $DAEMON_HOME-$a/config/config.toml
     sed -i 's#tcp://0.0.0.0:26656#tcp://0.0.0.0:'${LADDR}'#g' $DAEMON_HOME-$a/config/config.toml
     sed -i '/persistent_peers =/c\persistent_peers = "'"$PERSISTENT_PEERS"'"' $DAEMON_HOME-$a/config/config.toml
@@ -180,13 +179,13 @@ do
     sed -i '/max_num_inbound_peers =/c\max_num_inbound_peers = 140' $DAEMON_HOME-$a/config/config.toml
     sed -i '/max_num_outbound_peers =/c\max_num_outbound_peers = 110' $DAEMON_HOME-$a/config/config.toml
 done
-#create systemd files
-for (( a=1; a<=$NODES; a++ ))
+# create systemd service files
+for (( a=1; a<=$NUM_VALS; a++ ))
 do
     DIFF=$(($a - 1))
     INC=$(($DIFF * 2))
     RPC=$((16657 + $INC))
-    echo "---------Creating $DAEMON_HOME-$a system file---------"
+    echo "INFO: Creating $DAEMON-$a systemd service file"
     echo "[Unit]
     Description=${DAEMON} daemon
     After=network.target
@@ -204,10 +203,10 @@ do
     LimitNOFILE=4096
     [Install]
     WantedBy=multi-user.target" | sudo tee "/lib/systemd/system/$DAEMON-${a}.service"
-    echo "-------Starting $DAEMON-${a} service-------"
+    echo "INFO: Starting $DAEMON-${a} service"
     sudo -S systemctl daemon-reload
     sudo -S systemctl start $DAEMON-${a}.service
     sleep 1s
-    echo "Checking $DAEMON_HOME-${a} chain status"
+    echo "INFO: Checking $DAEMON_HOME-${a} chain status"
     $DAEMON status --node tcp://localhost:${RPC}
 done

@@ -21,15 +21,15 @@ if sender == receiver:
 
 
 #### Fetch Balances from sender receiver ####
-status, before_sender_balance= query_balances(sender)
+status, sender_balance_old= query_balances(sender)
 if not status:
-    sys.exit(before_sender_balance)
-before_sender_balance = before_sender_balance['balances'][0]['amount']
+    sys.exit(sender_balance_old)
+sender_balance_old = sender_balance_old['balances'][0]['amount']
 
-status, before_receiver_balance = query_balances(receiver)
+status, receiver_balance_old = query_balances(receiver)
 if not status:
-    sys.exit(before_receiver_balance)
-before_receiver_balance = before_receiver_balance['balances'][0]['amount']
+    sys.exit(receiver_balance_old)
+receiver_balance_old = receiver_balance_old['balances'][0]['amount']
 
 #### Fetching sequence numbers of to and from accounts
 os.chdir(os.path.expanduser(HOME))
@@ -62,18 +62,18 @@ logging.info('waiting for tx confirmation, avg time is 7s.')
 time.sleep(7)
 
 #### Print Balances ####
-status, after_sender_balance = query_balances(sender)
+status, sender_balance_updated = query_balances(sender)
 if not status:
-    sys.exit(after_sender_balance)
-after_sender_balance = after_sender_balance['balances'][0]['amount']
+    sys.exit(sender_balance_updated)
+sender_balance_updated = sender_balance_updated['balances'][0]['amount']
 
-status, after_receiver_balance = query_balances(receiver)
+status, receiver_balance_updated = query_balances(receiver)
 if not status:
-    sys.exit(after_receiver_balance)
-after_receiver_balance = after_receiver_balance['balances'][0]['amount']
+    sys.exit(receiver_balance_updated)
+receiver_balance_updated = receiver_balance_updated['balances'][0]['amount']
 
-sender_diff = int(before_sender_balance) - int(after_sender_balance)
-receiver_diff = int(before_receiver_balance) - int(after_receiver_balance)
+sender_diff = int(sender_balance_old) - int(sender_balance_updated)
+receiver_diff = int(receiver_balance_old) - int(receiver_balance_updated)
 
-print_balance_deductions('account1', sender_diff)
-print_balance_deductions('account2', receiver_diff)
+print_balance_deductions('sender', sender_diff)
+print_balance_deductions('receiver', receiver_diff)

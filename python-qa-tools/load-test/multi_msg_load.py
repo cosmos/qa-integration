@@ -23,25 +23,24 @@ if sender == receiver:
     sys.exit('Error: The values of arguments "sender" and "receiver" are equal make sure to set different values')
 
 
-#### Fetch Balances of sender executing the load test ####
-status, sender_pre_txn_balance= query_balances(sender)
+#### Fetch balances of sender and receiver accounts before executing the load test ####
+status, sender_balance_old= query_balances(sender)
 if not status:
-    sys.exit(sender_pre_txn_balance)
-sender_pre_txn_balance = int(sender_pre_txn_balance['balances'][0]['amount'])
+    sys.exit(sender_balance_old)
+sender_balance_old = int(sender_balance_old['balances'][0]['amount'])
 
 #### Fetch Balances of receiver executing the load test ####
-status, receiver_pre_txn_balance = query_balances(receiver)
+status, receiver_balance_old = query_balances(receiver)
 if not status:
-    sys.exit(receiver_pre_txn_balance)
-receiver_pre_txn_balance = int(receiver_pre_txn_balance['balances'][0]['amount'])
+    sys.exit(receiver_balance_old)
+receiver_balance_old = int(receiver_balance_old['balances'][0]['amount'])
 
 ### Fetch Sender's expected balance after load test #####
-sender_expected_balance = sender_pre_txn_balance - amount_to_be_sent    
+sender_expected_balance = sender_balance_old - amount_to_be_sent    
 ### Fetch Receiver's expected balance after load test###
 
 
 #### Fetching sequence numbers of to and from accounts
-os.chdir(os.path.expanduser(HOME))
 status, seq1_response = query_account(sender)
 if not status:
     sys.exit(seq1_response)
@@ -72,35 +71,35 @@ for i in range(NUM_TXS):
     seqto = seq1no + i
     status, txHash = create_signed_txs('unsignedto.json', 'signedto.json', sender, seqto)
     if not status:
-        logging.error(f"sign_and_broadcast_tx to failed : {txHash}")
+        logging.error(f"sign_and_broadcast_tx from sender to receiver failed : {txHash}")
     else:
-        logging.info(f"broadcasttoTxhash: {txHash}")
+        logging.info(f"broadcasted txhash: {txHash}")
 
     ### Signing and broadcasting the unsigned transactions from receiver to sender ###
     seqfrom = seq2no + i
     status, txHash = create_signed_txs('unsignedfrom.json', 'signedfrom.json', receiver, seqfrom)
-    if not status:
-        logging.error(f"sign_and_broadcast_tx from failed : {txHash}")
+    if not status: # if the txn is unsuccessful
+        logging.error(f"sign_and_broadcast_tx from receiver to sender failed : {txHash}")
     else:
-        logging.info(f"broadcastfromTxhash: {txHash}")
+        logging.info(f"broadcasted txhash: {txHash}")
 
 logging.info('waiting for tx confirmation, avg time is 7s.')
 time.sleep(7)
 
 #### Verifying the balance deductions ####
-status, sender_post_txn_balance = query_balances(sender)
+status, sender_balance_updated = query_balances(sender)
 if not status:
-    sys.exit(sender_post_txn_balance)
-sender_post_txn_balance = sender_post_txn_balance['balances'][0]['amount']
+    sys.exit(sender_balance_updated)
+sender_balance_updated = sender_balance_updated['balances'][0]['amount']
 
-status, receiver_post_txn_balance = query_balances(receiver)
+status, receiver_balance_updated = query_balances(receiver)
 if not status:
-    sys.exit(receiver_post_txn_balance)
-receiver_post_txn_balance = receiver_post_txn_balance['balances'][0]['amount']
+    sys.exit(receiver_balance_updated)
+receiver_balance_updated = receiver_balance_updated['balances'][0]['amount']
 
-sender_diff = int(sender_pre_txn_balance) - int(sender_post_txn_balance)
-receiver_diff = int(receiver_pre_txn_balance) - int(receiver_post_txn_balance)
+sender_diff = int(sender_balance_old) - int(sender_balance_updated)
+receiver_diff = int(receiver_balance_old) - int(receiver_balance_updated)
 
-print_balance_deductions('account1', sender_diff)
-print_balance_deductions('account2', receiver_diff)
+print_balance_deductions('sender', sender_diff)
+print_balance_deductions('receiver', receiver_diff)
 

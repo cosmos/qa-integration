@@ -1,5 +1,8 @@
 #/bin/sh
 
+## This script sends out a collection of balance queries, delegation queries
+## and staking queries on the network.
+
 set -e
 
 # get absolute parent directory path of current file
