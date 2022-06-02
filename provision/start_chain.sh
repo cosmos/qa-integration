@@ -146,9 +146,9 @@ fi
 
 for (( a=1; a<=$NODES; a++ ))
 do
-    DIFF=`expr $a - 1`
-    INC=`expr $DIFF \* 2`
-    LADDR=`expr 16656 + $INC` 
+    DIFF=$(($a - 1))
+    INC=$(($DIFF * 2))
+    LADDR=$((16656 + $INC))
     echo "----------Getting node-id of $DAEMON_HOME-$a ---------"
     nodeID=$("${DAEMON}" tendermint show-node-id --home $DAEMON_HOME-$a)
     echo "** Node ID :: $nodeID **"
@@ -163,12 +163,12 @@ done
 #updating config.toml
 for (( a=1; a<=$NODES; a++ ))
 do
-    DIFF=`expr $a - 1`
-    INC=`expr $DIFF \* 2`
-    RPC=`expr 16657 + $INC` #increment rpc ports
-    LADDR=`expr 16656 + $INC` #increment laddr ports
-    GRPC=`expr 9090 + $INC` #increment grpc poprt
-    WGRPC=`expr 9091 + $INC` #increment web grpc port
+    DIFF=$(($a - 1))
+    INC=$(($DIFF * 2))
+    RPC=$((16657 + $INC)) #increment rpc ports
+    LADDR=$((16656 + $INC)) #increment laddr ports
+    GRPC=$((9090 + $INC)) #increment grpc poprt
+    WGRPC=$((9091 + $INC)) #increment web grpc port
     echo "----------Updating $DAEMON_HOME-$a chain config-----------"
     sed -i 's#tcp://127.0.0.1:26657#tcp://0.0.0.0:'${RPC}'#g' $DAEMON_HOME-$a/config/config.toml
     sed -i 's#tcp://0.0.0.0:26656#tcp://0.0.0.0:'${LADDR}'#g' $DAEMON_HOME-$a/config/config.toml
@@ -183,9 +183,9 @@ done
 #create systemd files
 for (( a=1; a<=$NODES; a++ ))
 do
-    DIFF=`expr $a - 1`
-    INC=`expr $DIFF \* 2`
-    RPC=`expr 16657 + $INC`
+    DIFF=$(($a - 1))
+    INC=$(($DIFF * 2))
+    RPC=$((16657 + $INC))
     echo "---------Creating $DAEMON_HOME-$a system file---------"
     echo "[Unit]
     Description=${DAEMON} daemon
