@@ -33,11 +33,6 @@ for i in range(0, num_txs):
     status, validators_response = query_staking_validators()
     if not status:
         logging.error(validators_response)    
-    else:
-        monikers = ""
-        for validator in validators_response['validators']:
-            monikers += f"{validator['description']['moniker']} "
-        logging.info(f"Monikers :: {monikers}")
 
     # Fetch staking delegations
     status, delegations_response = query_staking_delegations(sender, val1)
