@@ -9,13 +9,8 @@ set -e
 CURPATH=`dirname $(realpath "$0")`
 cd $CURPATH
 
-# set environment with env config.
-set -a
-source ../env
-set +a
-
 # check environment variables are set
-bash ../deps/env-check.sh $CURPATH
+. ../deps/env-check.sh
 
 # NUM_VALS represents number of validator nodes
 NUM_VALS=$1

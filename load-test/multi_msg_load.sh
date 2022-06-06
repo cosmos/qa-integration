@@ -6,18 +6,8 @@ set -e
 CURPATH=`dirname $(realpath "$0")`
 cd $CURPATH
 
-# set environment with env config.
-set -a
-source ../env
-set +a
-
-# set pythonpath environment
-cd ..
-export PYTHONPATH=$PWD:$PWD/python-qa-tools
-echo $PYTHONPATH
-
 # check environment variables are set
-bash ./deps/env-check.sh $CURPATH
+. ../deps/env-check.sh
 
 # we can pass optional arguments when running this script
 # available arguments are -s/--sender, -r/--receiver, -n/--num_txs, -h/--help

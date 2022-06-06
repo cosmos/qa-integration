@@ -6,13 +6,8 @@
 CURPATH=`dirname $(realpath "$0")`
 cd $CURPATH
 
-# set environment with env config.
-set -a
-source ../env
-set +a
-
 # check environment variables are set
-bash ../deps/env-check.sh $CURPATH
+. ../deps/env-check.sh
 
 # NUM_VALS represents number of validator nodes
 NUM_VALS=$1
@@ -39,5 +34,5 @@ do
     result=$(curl -s "${RPC}")
     height=$(echo "${result}" | jq -r '.result.sync_info.latest_block_height')
     syncStatus=$(echo "${result}" | jq -r '.result.sync_info.catching_up')
-    echo "STATUS of validator-$a: rpc : $RPC , latest_block_height : $height , catching_up : $syncStatus **"
+    echo "STATUS of validator-$a: rpc : $RPC , latest_block_height : $height , catching_up : $syncStatus"
 done
