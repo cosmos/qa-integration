@@ -21,6 +21,12 @@ RPC="http://localhost:16657"
 ```
 >Note: Need not to export the env varibables using `export` command, These env values are fetched automatically by the scripts.
 
+### Commands:
+```
+make install-deps
+make lint
+```
+
 ### Scripts:-
 
 ## deps
