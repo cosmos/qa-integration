@@ -5,7 +5,6 @@ from modules.bank.query import query_balances
 from modules.staking.query import query_staking_delegations, query_staking_validators
 from utils import num_txs_type
 
-
 logging.basicConfig(format='%(message)s',
                     level=logging.DEBUG)
 
