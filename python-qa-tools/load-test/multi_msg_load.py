@@ -35,15 +35,15 @@ if not status:
 receiver_balance_old = int(receiver_balance_old['balances'][0]['amount'])
 
 # Fetching sequence numbers of to and from accounts
-status, sender_acc_seq = query_account(sender)
+status, sender_acc = query_account(sender)
 if not status:
     sys.exit(sender_acc_seq)
 
-status, receiver_acc_seq = query_account(receiver)
+status, receiver_acc = query_account(receiver)
 if not status:
     sys.exit(receiver_acc_seq)
 
-seq1no, seq2no = int(sender_acc_seq['sequence']), int(receiver_acc_seq['sequence'])    
+sender_acc_seq, receiver_acc_seq = int(sender_acc['sequence']), int(receiver_acc['sequence'])    
 
 # Generating unsigned transactions with a single transfer message 
 status, unsignedTxto = create_unsigned_txs(sender, receiver, amount_to_be_sent, 'unsignedto.json')
@@ -61,15 +61,15 @@ for i in range(NUM_TXS):
     create_multi_messages(NUM_MSGS, 'unsignedfrom.json')
 
     # Signing and broadcasting the unsigned transactions from sender to receiver
-    seqto = seq1no + i
+    seqto = sender_acc_seq + i
     status, txHash = sign_and_broadcast_txs('unsignedto.json', 'signedto.json', sender, seqto)
-    if not status:
+    if not status: # if the txn is successful
         logging.error(f"sign_and_broadcast_tx from sender to receiver failed : {txHash}")
     else:
         logging.info(f"broadcasted txhash: {txHash}")
 
     # Signing and broadcasting the unsigned transactions from receiver to sender
-    seqfrom = seq2no + i
+    seqfrom = receiver_acc_seq + i
     status, txHash = sign_and_broadcast_txs('unsignedfrom.json', 'signedfrom.json', receiver, seqfrom)
     if not status: # if the txn is unsuccessful
         logging.error(f"sign_and_broadcast_tx from receiver to sender failed : {txHash}")
