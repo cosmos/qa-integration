@@ -55,6 +55,4 @@ def create_multi_messages(num_msgs, file_name):
         file_data["body"]["messages"] = messages
         file.seek(0)
         json.dump(file_data, file, indent = 4)
-        
-        
-        
+     
