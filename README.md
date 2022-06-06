@@ -85,7 +85,6 @@ make lint
   chmod +x ./load-test/multi_msg_load.sh
   ./load-test/multi_msg_load.sh -h
   ./load-test/multi_msg_load.sh -s <address> -r <address>
-
   ```
 
 `query_load.sh`:- This script floods the network with balance queries, delegation queries and staking queries. It creates a load of 10,000 querires.
