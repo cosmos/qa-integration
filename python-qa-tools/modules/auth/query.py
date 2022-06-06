@@ -12,7 +12,7 @@ def account_type(address):
         raise argparse.ArgumentTypeError(response)
     return address
   
-# query account function will take the bech32 address as input and output the information of account.
+# query_account function will take the bech32 address as input and output the information of account.
 def query_account(address):
     try:
         command = f"{DAEMON} query auth account {address} --node {RPC} --output json"
