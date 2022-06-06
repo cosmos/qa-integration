@@ -20,7 +20,7 @@ if sender == receiver:
     sys.exit('Error: The values of arguments "sender" and "receiver" are equal make sure to set different values')
 
 
-#### Fetch Balances from sender receiver ####
+# Fetch Balances from sender receiver
 status, sender_balance_old= query_balances(sender)
 if not status:
     sys.exit(sender_balance_old)
