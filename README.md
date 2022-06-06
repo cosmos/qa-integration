@@ -27,9 +27,9 @@ make install-deps
 make lint
 ```
 
-### Scripts:-
+## Scripts:-
 
-## deps
+### deps
 
 `env-check.sh`:- This script is called before executing the other scripts ensuring that the env variables are properly imported.
 
@@ -49,7 +49,7 @@ make lint
   ./deps/prereq.sh
   ```
 
-## provison
+### provison
 
 `start_chain.sh`:- This script sets up the environment. It takes two arguments from the user. First argument is the number of nodes that need to be setup and the second argument is the number of additional accounts that need to be created. 
 
@@ -75,7 +75,7 @@ make lint
 
 ```
 
-## load-test
+### load-test
 
 `multi_msg_load.sh`:- This script test a series of bank transfer transactions with multiple messages between two accounts. It takes two optional arguments namely -s(sender) and -r(receiver). 
 
@@ -116,7 +116,7 @@ make lint
   ./load-test/single_msg_load.sh -s <address> -r <address>
   ```
 
-## misc-scripts
+### misc-scripts
 
 `distribution.sh`:- This script executes the distribuition mudule txs like `withdraw-rewards`, `withdraw-rewards --commission` and `withdraw-all-rewards`
 
@@ -148,7 +148,7 @@ make lint
  #then it executes on the first two validators by default.
  ```
 
- ## node-management
+ ### node-management
  
 `node_status.sh`:- This script displays the latest block height and sync status of the nodes.
  
