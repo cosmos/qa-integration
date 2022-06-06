@@ -41,7 +41,7 @@ do
     validator=$("${DAEMON}" keys show validator${a} --bech val --keyring-backend test --home $DAEMON_HOME-${a} --output json)
     VALADDRESS=$(echo "${validator}" | jq -r '.address')
     FROMKEY="validator${a}"
-    echo "validator address :: $VALADDRESS and from k1ey :: $FROMKEY"
+    echo "INFO: validator address : $VALADDRESS, operator key : $FROMKEY"
     echo "Iteration no $a and values of address : $VALADDRESS and key : $FROMKEY"
     echo "--------- withdraw-rewards of $FROMKEY-----------"
     wrTx=$("${DAEMON}" tx distribution withdraw-rewards "${VALADDRESS}" --from $FROMKEY --fees 1000"${DENOM}" --chain-id "${CHAINID}" --keyring-backend test --home $DAEMON_HOME-${a} --node $RPC --output json -y)
@@ -66,11 +66,11 @@ do
     INC=`expr $DIFF \* 2`
     PORT=`expr 16657 + $INC` 
     RPC="http://${IP}:${PORT}"
-    echo "NODE :: $RPC"
+    echo "Node RPC : $RPC"
     validator=$("${DAEMON}" keys show validator${a} --bech val --keyring-backend test --home $DAEMON_HOME-${a} --output json)
     VALADDRESS=$(echo "${validator}" | jq -r '.address')
     FROMKEY="validator${a}"
-    echo "validator address :: $VALADDRESS and From key :: $FROMKEY"
+    echo "INFO: validator address : $VALADDRESS, operator key : $FROMKEY"
     echo "Iteration no $a and values of address : $VALADDRESS and key : $FROMKEY"
     echo "--------- withdraw-rewards commission of $FROMKEY-----------"
     wrcTx=$("${DAEMON}" tx distribution withdraw-rewards "${VALADDRESS}" --from $FROMKEY --commission --fees 1000"${DENOM}" --chain-id "${CHAINID}" --keyring-backend test --home $DAEMON_HOME-${a} --node $RPC --output json -y)
@@ -99,7 +99,7 @@ do
     validator=$("${DAEMON}" keys show validator${a} --bech val --keyring-backend test --home $DAEMON_HOME-${a} --output json)
     VALADDRESS=$(echo "${validator}" | jq -r '.address')
     FROMKEY="validator${a}"
-    echo "validator address :: $VALADDRESS and From key :: $FROMKEY"
+    echo "INFO: validator address : $VALADDRESS, operator key : $FROMKEY"
     echo "Iteration no $a and values of address : $VALADDRESS and key : $FROMKEY"
     echo "------ withdraw-all-rewards of $FROMKEY --------"
     wartx=$($DAEMON tx distribution withdraw-all-rewards --from $FROMKEY --fees 1000"${DENOM}" --chain-id $CHAINID --keyring-backend test --home $DAEMON_HOME-${a} --node $RPC --output json -y)

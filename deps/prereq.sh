@@ -38,11 +38,20 @@ else
   go version
 fi
 
-if command_exists python3-dev ; then
+if command_exists python3 ; then
   echo "python3-dev is already installed"
 else
   echo "Installing python3-dev"
-  sudo apt install python3-dev
+  sudo apt update
+  sudo apt install python3-dev -y
+fi
+
+if command_exists pylint ; then
+  echo "pylint is already installed"
+else
+  echo "Installing pylint"
+  sudo apt update
+  sudo apt install pylint -y
 fi
 
 echo "" >> ~/.bashrc

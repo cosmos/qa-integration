@@ -22,37 +22,30 @@ sender, receiver, NUM_TXS, amount_to_be_sent = args.sender, args.receiver, int(a
 if sender == receiver:
     sys.exit('Error: The values of arguments "sender" and "receiver" are equal make sure to set different values')
 
-
-#### Fetch balances of sender and receiver accounts before executing the load test ####
+# Fetch balances of sender and receiver accounts before executing the load test
 status, sender_balance_old= query_balances(sender)
 if not status:
     sys.exit(sender_balance_old)
 sender_balance_old = int(sender_balance_old['balances'][0]['amount'])
 
-#### Fetch Balances of receiver executing the load test ####
+# Fetch Balances of receiver executing the load test
 status, receiver_balance_old = query_balances(receiver)
 if not status:
     sys.exit(receiver_balance_old)
 receiver_balance_old = int(receiver_balance_old['balances'][0]['amount'])
 
-### Fetch Sender's expected balance after load test #####
-sender_expected_balance = sender_balance_old - amount_to_be_sent    
-### Fetch Receiver's expected balance after load test###
-
-
-#### Fetching sequence numbers of to and from accounts
-status, seq1_response = query_account(sender)
+# Fetching sequence numbers of to and from accounts
+status, sender_acc_seq = query_account(sender)
 if not status:
-    sys.exit(seq1_response)
+    sys.exit(sender_acc_seq)
 
-status, seq2_response = query_account(receiver)
+status, receiver_acc_seq = query_account(receiver)
 if not status:
-    sys.exit(seq2_response)
+    sys.exit(receiver_acc_seq)
 
-seq1no, seq2no = int(seq1_response['sequence']), int(seq2_response['sequence'])    
+seq1no, seq2no = int(sender_acc_seq['sequence']), int(receiver_acc_seq['sequence'])    
 
-
-#### Generating unsigned transactions with a single transfer message 
+# Generating unsigned transactions with a single transfer message 
 status, unsignedTxto = create_unsigned_txs(sender, receiver, amount_to_be_sent, 'unsignedto.json')
 if not status:
     logging.error(unsignedTxto)
@@ -63,11 +56,11 @@ if not status:
         
 for i in range(NUM_TXS):
         
-#### Duplicating and appending transfer message in the existing array to create a multi-msg transaction        
+    # Duplicating and appending transfer message in the existing array to create a multi-msg transaction        
     create_multi_messages(NUM_MSGS, 'unsignedto.json')
     create_multi_messages(NUM_MSGS, 'unsignedfrom.json')
 
-    ### Signing and broadcasting the unsigned transactions from sender to receiver ###
+    # Signing and broadcasting the unsigned transactions from sender to receiver
     seqto = seq1no + i
     status, txHash = sign_and_broadcast_txs('unsignedto.json', 'signedto.json', sender, seqto)
     if not status:
@@ -75,7 +68,7 @@ for i in range(NUM_TXS):
     else:
         logging.info(f"broadcasted txhash: {txHash}")
 
-    ### Signing and broadcasting the unsigned transactions from receiver to sender ###
+    # Signing and broadcasting the unsigned transactions from receiver to sender
     seqfrom = seq2no + i
     status, txHash = sign_and_broadcast_txs('unsignedfrom.json', 'signedfrom.json', receiver, seqfrom)
     if not status: # if the txn is unsuccessful
@@ -86,7 +79,7 @@ for i in range(NUM_TXS):
 logging.info('waiting for tx confirmation, avg time is 7s.')
 time.sleep(7)
 
-#### Verifying the balance deductions ####
+# Verifying the balance deductions
 status, sender_balance_updated = query_balances(sender)
 if not status:
     sys.exit(sender_balance_updated)
@@ -102,4 +95,3 @@ receiver_diff = int(receiver_balance_old) - int(receiver_balance_updated)
 
 print_balance_deductions('sender', sender_diff)
 print_balance_deductions('receiver', receiver_diff)
-
