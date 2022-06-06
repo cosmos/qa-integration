@@ -15,4 +15,3 @@ def query_balances(address):
         return True, json.loads(balance)
     except Exception as e:
         return False, e
-    
