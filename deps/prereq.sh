@@ -3,6 +3,7 @@
 ## This script installs the basic apt packages and also checks if go is installed on the system or
 ## not. If go is not installed on the system then go1.17.3 is installed by the script. Env variables
 ## related to go are also exported to bashrc. 
+
 command_exists () {
     type "$1" &> /dev/null ;
 }
@@ -10,16 +11,17 @@ command_exists () {
 cd $HOME
 
 if command_exists go ; then
-    echo "Golang is already installed"
+  echo "Golang is already installed"
 else
   echo "Install dependencies"
   sudo apt update
   sudo apt-get -y upgrade
   sudo apt install build-essential jq -y
-  wget https://dl.google.com/go/go1.17.3.linux-amd64.tar.gz
-  tar -xvf go1.17.3.linux-amd64.tar.gz
+  source ../env
+  wget https://dl.google.com/go/go$goversion.linux-amd64.tar.gz
+  tar -xvf go$goversion.linux-amd64.tar.gz
   sudo mv go /usr/local
-  rm go1.17.3.linux-amd64.tar.gz
+  rm go$goversion.linux-amd64.tar.gz
   echo "------ Update bashrc ---------------"
   export GOPATH=$HOME/go
   export GOROOT=/usr/local/go
@@ -35,3 +37,22 @@ else
   mkdir -p $GOPATH/src/github.com
   go version
 fi
+
+if command_exists python3 ; then
+  echo "python3-dev is already installed"
+else
+  echo "Installing python3-dev"
+  sudo apt update
+  sudo apt install python3-dev -y
+fi
+
+if command_exists pylint ; then
+  echo "pylint is already installed"
+else
+  echo "Installing pylint"
+  sudo apt update
+  sudo apt install pylint -y
+fi
+
+echo "" >> ~/.bashrc
+source ~/.bashrc

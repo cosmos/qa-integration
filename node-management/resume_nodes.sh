@@ -2,15 +2,25 @@
 
 ## This script restarts the systemd process of the nodes. 
 
-NODES=$1
-if [ -z $NODES ]
+set -e
+
+# get absolute parent directory path of current file
+CURPATH=`dirname $(realpath "$0")`
+cd $CURPATH
+
+# check environment variables are set
+. ../deps/env-check.sh
+
+# NUM_VALS represents number of validator nodes
+NUM_VALS=$1
+if [ -z $NUM_VALS ]
 then
-    NODES=1
+    NUM_VALS=1
 fi
 
-echo "**** Number of nodes to be resumed: $NODES ****"
+echo "INFO: Number of validator nodes to be resumed: $NUM_VALS"
 echo "---------- Restarting systemd service files --------"
-for (( a=1; a<=$NODES; a++ ))
+for (( a=1; a<=$NUM_VALS; a++ ))
 do
     sudo -S systemctl restart $DAEMON-${a}.service
     echo "-- Resumed $DAEMON-${a}.service --"

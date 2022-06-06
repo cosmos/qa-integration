@@ -3,34 +3,16 @@
 ## This script sends out a collection of balance queries, delegation queries
 ## and staking queries on the network.
 
-ACC=$1
-if [ -z $ACC ]
-then
-    ACC=1
-fi
+set -e
 
-IP="$(dig +short myip.opendns.com @resolver1.opendns.com)"
-echo "Public IP address: ${IP}"
-PORT=16657
+# get absolute parent directory path of current file
+CURPATH=`dirname $(realpath "$0")`
+cd $CURPATH
 
-if [ -z $IP ]
-then
-    IP=127.0.0.1
-    PORT=16657
-fi
+# check environment variables are set
+. ../deps/env-check.sh
 
-RPC="http://${IP}:${PORT}"
-acc1=$($DAEMON keys show validator$ACC -a --home $DAEMON_HOME-1 --keyring-backend test)
-val1=$($DAEMON keys show validator$ACC -a --bech val --home $DAEMON_HOME-1 --keyring-backend test)
-for (( a=1; a<10000; a++ ))
-do
-	bTx=$("${DAEMON}" q bank balances "${acc1}" --node $RPC --output json)
-	bTxres=$(echo "${bTx}" | jq -r '.balances')
-	echo "** Balance :: $bTxres **"
-	sTx=$("${DAEMON}" q staking validators --node $RPC --output json)
-	sTxres=$(echo "${sTx}" | jq -r '.validators[].description.moniker')
-	echo "** Monikers :: $sTxres **"
-	dTx=$("${DAEMON}" q staking delegation "${acc1}" "${val1}" --node $RPC --output json)
-	dTxres=$(echo "${dTx}" | jq -r '.delegation.shares')
-	echo "** Delegations :: $dTxres **"
-done
+# we can pass optional arguments when running this script
+# available arguments are -s/--sender, -n/--num_txs, -h/--help
+# example: ./query_load.sh -s cosmos1f2838advrjl3c8h4kjfvfmhkh0gs0wf6cyzwu8 -n 10
+python3 ./python-qa-tools/load-test/query_load.py $1 $2 $3 $4
