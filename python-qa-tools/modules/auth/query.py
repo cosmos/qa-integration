@@ -5,7 +5,7 @@ from utils import exec_command
 DAEMON = os.getenv('DAEMON')
 RPC = os.getenv('RPC')
 
-# account type is an user-defined data type used to validate account addresses read from Argument Parser.
+# account_type is an user-defined data type used to validate account addresses read from Argument Parser.
 def account_type(address):
     status, response = query_account(address)
     if not status:
