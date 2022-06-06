@@ -38,5 +38,3 @@ for i in range(0, num_txs):
     status, delegations_response = query_staking_delegations(sender, val1)
     if not status:
         logging.error(delegations_response)
-    else:
-        logging.info(f"Delegations :: {delegations_response['delegation']['shares']}")
