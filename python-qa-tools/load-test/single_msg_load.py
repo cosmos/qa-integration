@@ -33,19 +33,19 @@ receiver_balance_old = receiver_balance_old['balances'][0]['amount']
 
 #### Fetching sequence numbers of to and from accounts
 os.chdir(os.path.expanduser(HOME))
-status, seq1_response = query_account(sender)
+status, sender_acc = query_account(sender)
 if not status:
-    sys.exit(seq1_response)
+    sys.exit(sender_acc)
 
-status, seq2_response = query_account(receiver)
+status, receiver_acc = query_account(receiver)
 if not status:
-    sys.exit(seq2_response)
+    sys.exit(receiver_acc)
 
-seq1no, seq2no = int(seq1_response['sequence']), int(seq2_response['sequence'])
+sender_acc_seq, receiver_acc_seq = int(sender_acc['sequence']), int(receiver_acc['sequence'])
 
 for i in range(NUM_TXS):
-    seqto = seq1no + i
-    seqfrom = seq2no + i
+    seqto = sender_acc_seq + i
+    seqfrom = receiver_acc_seq + i
     status, sTxto = tx_send(sender, receiver, amount_to_be_sent, None, False, seqto)
     if not status:
         logging.error(f"{sTxto}")
