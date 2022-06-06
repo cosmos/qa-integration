@@ -2,7 +2,6 @@ import os, json
 
 from utils import exec_command
 
-
 DAEMON = os.getenv('DAEMON')
 DAEMON_HOME = os.getenv('DAEMON_HOME')
 
