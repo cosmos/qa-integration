@@ -37,11 +37,11 @@ receiver_balance_old = int(receiver_balance_old['balances'][0]['amount'])
 # Fetching sequence numbers of to and from accounts
 status, sender_acc = query_account(sender)
 if not status:
-    sys.exit(sender_acc_seq)
+    sys.exit(sender_acc)
 
 status, receiver_acc = query_account(receiver)
 if not status:
-    sys.exit(receiver_acc_seq)
+    sys.exit(receiver_acc)
 
 sender_acc_seq, receiver_acc_seq = int(sender_acc['sequence']), int(receiver_acc['sequence'])    
 
