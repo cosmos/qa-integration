@@ -1,4 +1,11 @@
-import argparse, os, sys, time
+"""
+This script test a series of bank transfer transactions with multiple messages between two accounts.
+It takes two optional arguments namely -s(sender) and -r(receiver)
+"""
+import argparse
+import os
+import sys
+import time
 import logging
 from core.keys import keys_show
 from modules.auth.query import account_type, query_account
@@ -8,90 +15,116 @@ from utils import create_multi_messages, print_balance_deductions
 
 HOME = os.getenv('HOME')
 NUM_MSGS = int(os.getenv('NUM_MSGS'))
- 
 logging.basicConfig(format='%(message)s',
                     level=logging.DEBUG)
 
-parser = argparse.ArgumentParser(description='This program takes inputs for intializing multi message load test.')
-parser.add_argument('-s', '--sender', type = account_type, default = keys_show("account1")[1]['address'], help = 'Sender bech32 address')
-parser.add_argument('-r', '--receiver', type= account_type, default = keys_show("account2")[1]['address'], help= 'Receiver bech32 address')
-parser.add_argument('-n', '--num_txs', type = int, default = 1000, help= 'Number of transactions to be made, atleast should be 1000')
-args = parser.parse_args()
-sender, receiver, NUM_TXS, amount_to_be_sent = args.sender, args.receiver, int(args.num_txs), 1000000
+PARSER = argparse.ArgumentParser(
+    description='This program takes inputs for intializing multi message load test.'
+    )
+PARSER.add_argument(
+    '-s', '--sender',
+    type=account_type,
+    default=keys_show("account1")[1]['address'],
+    help='Sender bech32 address')
+PARSER.add_argument(
+    '-r', '--receiver',
+    type=account_type,
+    default=keys_show("account2")[1]['address'],
+    help='Receiver bech32 address')
+PARSER.add_argument(
+    '-n', '--num_txs',
+    type=int,
+    default=1000,
+    help='Number of transactions to be made, atleast should be 1000')
+ARGS = PARSER.parse_args()
+SENDER = ARGS.sender
+RECEIVER = ARGS.receiver
+NUM_TXS = int(ARGS.num_txs)
+AMOUNT_TO_BE_SENT = 1000000
 
-if sender == receiver:
-    sys.exit('Error: The values of arguments "sender" and "receiver" are equal make sure to set different values')
+if SENDER == RECEIVER:
+    sys.exit('''Error: The values of arguments "sender" and "receiver"
+            are equal make sure to set different values''')
 
 # Fetch balances of sender and receiver accounts before executing the load test
-status, sender_balance_old= query_balances(sender)
-if not status:
-    sys.exit(sender_balance_old)
-sender_balance_old = int(sender_balance_old['balances'][0]['amount'])
+STATUS, SENDER_BALANCE_OLD = query_balances(SENDER)
+if not STATUS:
+    sys.exit(SENDER_BALANCE_OLD)
+SENDER_BALANCE_OLD = int(SENDER_BALANCE_OLD['balances'][0]['amount'])
 
 # Fetch Balances of receiver executing the load test
-status, receiver_balance_old = query_balances(receiver)
-if not status:
-    sys.exit(receiver_balance_old)
-receiver_balance_old = int(receiver_balance_old['balances'][0]['amount'])
+STATUS, RECEIVER_BALANCE_OLD = query_balances(RECEIVER)
+if not STATUS:
+    sys.exit(RECEIVER_BALANCE_OLD)
+RECEIVER_BALANCE_OLD = int(RECEIVER_BALANCE_OLD['balances'][0]['amount'])
 
 # Fetching sequence numbers of to and from accounts
-status, sender_acc_seq = query_account(sender)
-if not status:
-    sys.exit(sender_acc_seq)
+STATUS, SENDER_ACC_SEQ = query_account(SENDER)
+if not STATUS:
+    sys.exit(SENDER_ACC_SEQ)
 
-status, receiver_acc_seq = query_account(receiver)
-if not status:
-    sys.exit(receiver_acc_seq)
+STATUS, RECEIVER_ACC_SEQ = query_account(RECEIVER)
+if not STATUS:
+    sys.exit(RECEIVER_ACC_SEQ)
 
-seq1no, seq2no = int(sender_acc_seq['sequence']), int(receiver_acc_seq['sequence'])    
+SEQ1NO, SEQ2NO = int(SENDER_ACC_SEQ['sequence']), int(RECEIVER_ACC_SEQ['sequence'])
 
-# Generating unsigned transactions with a single transfer message 
-status, unsignedTxto = create_unsigned_txs(sender, receiver, amount_to_be_sent, 'unsignedto.json')
-if not status:
-    logging.error(unsignedTxto)
+# Generating unsigned transactions with a single transfer message
+STATUS, UNSIGNED_TX_TO = create_unsigned_txs(SENDER, RECEIVER, AMOUNT_TO_BE_SENT, 'unsignedto.json')
+if not STATUS:
+    logging.error(UNSIGNED_TX_TO)
 
-status, unsignedTxfrom = create_unsigned_txs(receiver, sender, amount_to_be_sent, 'unsignedfrom.json')
-if not status:
-    logging.error(unsignedTxfrom)
-        
+STATUS, UNSIGNED_TX_FROM = create_unsigned_txs(
+    RECEIVER,
+    SENDER,
+    AMOUNT_TO_BE_SENT,
+    'unsignedfrom.json')
+if not STATUS:
+    logging.error(UNSIGNED_TX_FROM)
+
 for i in range(NUM_TXS):
-        
-    # Duplicating and appending transfer message in the existing array to create a multi-msg transaction        
+
+    # Duplicating and appending transfer message in the existing array
+    # to create a multi-msg transaction.
     create_multi_messages(NUM_MSGS, 'unsignedto.json')
     create_multi_messages(NUM_MSGS, 'unsignedfrom.json')
 
     # Signing and broadcasting the unsigned transactions from sender to receiver
-    seqto = seq1no + i
-    status, txHash = sign_and_broadcast_txs('unsignedto.json', 'signedto.json', sender, seqto)
+    seqto = SEQ1NO + i
+    status, txHash = sign_and_broadcast_txs('unsignedto.json', 'signedto.json', SENDER, seqto)
     if not status:
-        logging.error(f"sign_and_broadcast_tx from sender to receiver failed : {txHash}")
+        logging.error("sign_and_broadcast_tx from sender to receiver failed : %s", txHash)
     else:
-        logging.info(f"broadcasted txhash: {txHash}")
+        logging.info("broadcasted txhash: %s", txHash)
 
     # Signing and broadcasting the unsigned transactions from receiver to sender
-    seqfrom = seq2no + i
-    status, txHash = sign_and_broadcast_txs('unsignedfrom.json', 'signedfrom.json', receiver, seqfrom)
+    seqfrom = SEQ1NO + i
+    status, txHash = sign_and_broadcast_txs(
+        'unsignedfrom.json',
+        'signedfrom.json',
+        RECEIVER,
+        seqfrom)
     if not status: # if the txn is unsuccessful
-        logging.error(f"sign_and_broadcast_tx from receiver to sender failed : {txHash}")
+        logging.error("sign_and_broadcast_tx from receiver to sender failed : %s", txHash)
     else:
-        logging.info(f"broadcasted txhash: {txHash}")
+        logging.info("broadcasted txhash: %s", txHash)
 
 logging.info('waiting for tx confirmation, avg time is 7s.')
 time.sleep(7)
 
 # Verifying the balance deductions
-status, sender_balance_updated = query_balances(sender)
+STATUS, SENDER_BALANCE_UPDATED = query_balances(SENDER)
 if not status:
-    sys.exit(sender_balance_updated)
-sender_balance_updated = sender_balance_updated['balances'][0]['amount']
+    sys.exit(SENDER_BALANCE_UPDATED)
+SENDER_BALANCE_UPDATED = SENDER_BALANCE_UPDATED['balances'][0]['amount']
 
-status, receiver_balance_updated = query_balances(receiver)
+STATUS, RECEIVER_BALANCE_UPDATED = query_balances(RECEIVER)
 if not status:
-    sys.exit(receiver_balance_updated)
-receiver_balance_updated = receiver_balance_updated['balances'][0]['amount']
+    sys.exit(RECEIVER_BALANCE_UPDATED)
+RECEIVER_BALANCE_UPDATED = RECEIVER_BALANCE_UPDATED['balances'][0]['amount']
 
-sender_diff = int(sender_balance_old) - int(sender_balance_updated)
-receiver_diff = int(receiver_balance_old) - int(receiver_balance_updated)
+SENDER_DIFF = int(SENDER_BALANCE_OLD) - int(SENDER_BALANCE_UPDATED)
+RECEIVER_DIFF = int(RECEIVER_BALANCE_OLD) - int(RECEIVER_BALANCE_UPDATED)
 
-print_balance_deductions('sender', sender_diff)
-print_balance_deductions('receiver', receiver_diff)
+print_balance_deductions('sender', SENDER_DIFF)
+print_balance_deductions('receiver', RECEIVER_DIFF)
