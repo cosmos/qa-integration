@@ -6,13 +6,15 @@ install-deps:
 lint: install-deps
 	pylint ./python-qa-tools
 
-setup-chain: install-deps
-	bash ./node-management/shutdown_nodes.sh $(NUM_VALS)
-	bash ./provision/start_chain.sh $(NUM_VALS) 2
+setup-chains: install-deps
+	@bash ./provision/start_chain.sh $(NUM_VALS) 2
 	@echo "Waiting for chain to start..."
 	sleep 10
 
-test-all: install-deps setup-chain
+stop-chains:
+	@bash ./node-management/shutdown_nodes.sh $(NUM_VALS)
+
+test-all: setup-chains
 	@bash ./node-management/node_status.sh $(NUM_VALS)
 	@bash ./node-management/pause_nodes.sh $(NUM_VALS)
 	@bash ./node-management/resume_nodes.sh $(NUM_VALS)
@@ -24,20 +26,24 @@ test-all: install-deps setup-chain
 	@bash ./load-test/query_load.sh -n 50
 	@bash ./load-test/send_load.sh -n 50
 	@bash ./load-test/single_msg_load.sh -n 50
-	@bash ./node-management/shutdown_nodes.sh $(NUM_VALS)
+	$(MAKE) stop-chains
 
-test-multi-msg: install-deps setup-chain
+test-multi-msg: setup-chains
 	@echo "Running multi msg load test..."
 	@bash ./load-test/multi_msg_load.sh -n 50
+	$(MAKE) stop-chains
 
-test-query-load: install-deps setup-chain
+test-query-load: setup-chains
 	@echo "Running query load test..."
 	@bash ./load-test/query_load.sh -n 50
+	$(MAKE) stop-chains
 
-test-send-load: install-deps setup-chain
+test-send-load: setup-chains
 	@echo "Running send msg load test..."
 	@bash ./load-test/send_load.sh -n 50
+	$(MAKE) stop-chains
 
-test-single-msg: install-deps setup-chain
+test-single-msg: setup-chains
 	@echo "Running single msg load test..."
 	@bash ./load-test/single_msg_load.sh -n 50
+	$(MAKE) stop-chains
