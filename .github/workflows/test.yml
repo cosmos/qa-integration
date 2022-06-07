@@ -1,0 +1,45 @@
+name: Load Tests 
+#  Load Tests workflow runs various load tests
+#  This workflow run on pushes to master, workflow_dispatch & on every pull request
+on:
+  pull_request:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+permissions:
+  contents: read
+
+jobs:
+  test-multi-msg:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: multi msg load test
+        run: |
+          make test-multi-msg
+  
+  test-query-load:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: query load test
+        run: |
+          make test-query-load
+
+  test-send-load:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: send msg load test
+        run: |
+          make test-send-load
+  
+  test-single-msg:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: single msg load test
+        run: |
+          make test-single-msg

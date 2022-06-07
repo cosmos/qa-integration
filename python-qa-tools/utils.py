@@ -34,8 +34,8 @@ def is_tool(binary):
 
 # num_txs_type is a user-defined type.
 def num_txs_type(x):
-    if int(x) < 1000:
-        raise argparse.ArgumentTypeError('The argument NUM_TXS should be 1000 or more')
+    if int(x) < 50:
+        raise argparse.ArgumentTypeError('The argument NUM_TXS should be 50 or more')
     return int(x)
 
 # node_type is a user-defined type.
