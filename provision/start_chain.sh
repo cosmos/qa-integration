@@ -29,10 +29,17 @@ go install github.com/cosmos/cosmos-sdk/cosmovisor/cmd/cosmovisor@v1.0.0
 # strings $(which cosmovisor) | egrep -e "mod\s+github.com/cosmos/cosmos-sdk/cosmovisor"
 export REPO=$(basename $GH_URL .git)
 
-echo "INFO: Installing $DAEMON"
-CURR_VERSION='v'$($DAEMON version)
-if [ $CURR_VERSION != $CHAIN_VERSION ]
+DAEMON_EXISTS=""
+CURR_VERSION=""
+echo "INFO: Checking $DAEMON is installed or not"
+if type $DAEMON &> /dev/null; then
+    DAEMON_EXISTS="true"
+    CURR_VERSION='v'$($DAEMON version)
+fi
+
+if [[ -z DAEMON_EXISTS || $CURR_VERSION != $CHAIN_VERSION ]]
 then
+    echo "INFO: Installing $DAEMON"
     if [ ! -d $REPO ]
     then
         git clone $GH_URL
@@ -42,6 +49,7 @@ then
     make install
 fi
 cd $HOME
+echo "Installed $DAEMON version details:"
 # check version
 $DAEMON version --long
 # export daemon home paths
