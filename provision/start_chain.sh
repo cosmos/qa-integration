@@ -24,9 +24,13 @@ fi
 NUM_ACCOUNTS=$2
 echo "INFO: Setting up $NUM_NODES validator nodes and $NUM_ACCOUNTS accounts"
 cd $HOME
+export GOPATH=$HOME/go
+export GOBIN=$GOPATH/bin
+export PATH=$PATH:/usr/local/go/bin:$GOBIN
+mkdir -p "$GOBIN"
 echo "INFO: Installing cosmovisor"
 go install github.com/cosmos/cosmos-sdk/cosmovisor/cmd/cosmovisor@v1.0.0
-# strings $(which cosmovisor) | egrep -e "mod\s+github.com/cosmos/cosmos-sdk/cosmovisor"
+strings $(which cosmovisor) | egrep -e "mod\s+github.com/cosmos/cosmos-sdk/cosmovisor"
 export REPO=$(basename $GH_URL .git)
 
 DAEMON_EXISTS=""
@@ -37,7 +41,6 @@ if type $DAEMON &> /dev/null; then
     CURR_VERSION='v'$($DAEMON version)
 fi
 
-cd $HOME
 if [[ -z DAEMON_EXISTS || $CURR_VERSION != $CHAIN_VERSION ]]
 then
     echo "INFO: Installing $DAEMON"
@@ -47,14 +50,8 @@ then
     fi
     cd $REPO
     git fetch --all && git checkout $CHAIN_VERSION
-    export GOPATH=$HOME/go
-    export GOBIN=$GOPATH/bin
-    export PATH=$PATH:/usr/local/go/bin:$GOBIN
-    mkdir -p "$GOBIN"
     make install
 fi
-echo "GOPATH: $GOPATH"
-echo "PATH: $PATH"
 cd $HOME
 echo "Installed $DAEMON version details:"
 # check version
