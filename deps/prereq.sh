@@ -34,7 +34,7 @@ if [[ -z $GOPATH || -z $GOBIN || "$PATH" != *"$SGOBIN"* ]]; then
   echo "" >> ~/.bashrc
   echo 'export GOPATH=$HOME/go' >> ~/.bashrc
   echo 'export GOBIN=$GOPATH/bin' >> ~/.bashrc
-  echo 'export PATH=$PATH:/usr/local/go/bin:$GOROOT/bin:$GOBIN' >> ~/.bashrc
+  echo 'export PATH=$PATH:/usr/local/go/bin:$GOBIN' >> ~/.bashrc
 fi
 source ~/.bashrc
 mkdir -p "$GOBIN"

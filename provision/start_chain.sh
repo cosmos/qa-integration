@@ -24,6 +24,10 @@ fi
 NUM_ACCOUNTS=$2
 echo "INFO: Setting up $NUM_NODES validator nodes and $NUM_ACCOUNTS accounts"
 cd $HOME
+export GOPATH=$HOME/go
+export GOBIN=$GOPATH/bin
+export PATH=$PATH:/usr/local/go/bin:$GOBIN
+mkdir -p "$GOBIN"
 echo "INFO: Installing cosmovisor"
 go install github.com/cosmos/cosmos-sdk/cosmovisor/cmd/cosmovisor@v1.0.0
 strings $(which cosmovisor) | egrep -e "mod\s+github.com/cosmos/cosmos-sdk/cosmovisor"
@@ -48,6 +52,7 @@ then
     git fetch --all && git checkout $CHAIN_VERSION
     make install
 fi
+
 cd $HOME
 echo "Installed $DAEMON version details:"
 # check version
