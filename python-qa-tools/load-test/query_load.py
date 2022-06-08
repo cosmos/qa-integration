@@ -17,7 +17,7 @@ logging.basicConfig(format='%(message)s',
 
 PARSER = argparse.ArgumentParser(
     description='This program takes inputs for intializing tx query load test.'
-    )
+)
 PARSER.add_argument('-s', '--sender',
                     type=account_type,
                     default=keys_show("validator1")[1]['address'],
@@ -48,15 +48,8 @@ for i in range(0, NUM_TXS):
     status, validators_response = query_staking_validators()
     if not status:
         logging.error(validators_response)
-    else:
-        monikers = ""
-        for validator in validators_response['validators']:
-            monikers += f"{validator['description']['moniker']} "
-        logging.info("Monikers :: %s", monikers)
 
     # Fetch staking delegations
     status, delegations_response = query_staking_delegations(SENDER, VAL1)
     if not status:
         logging.error(delegations_response)
-    else:
-        logging.info("Delegations :: %s", delegations_response['delegation']['shares'])

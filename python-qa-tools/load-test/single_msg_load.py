@@ -52,7 +52,7 @@ if not STATUS:
     sys.exit(RECEIVER_BALANCE_OLD)
 RECEIVER_BALANCE_OLD = RECEIVER_BALANCE_OLD['balances'][0]['amount']
 
-#### Fetching sequence numbers of to and from accounts
+# Fetching sequence numbers of to and from accounts
 os.chdir(os.path.expanduser(HOME))
 STATUS, SEQ1_RESPONSE = query_account(SENDER)
 if not STATUS:
@@ -67,12 +67,14 @@ SEQ1NO, SEQ2NO = int(SEQ1_RESPONSE['sequence']), int(SEQ2_RESPONSE['sequence'])
 for i in range(NUM_TXS):
     seqto = SEQ1NO + i
     seqfrom = SEQ2NO + i
-    STATUS, sTxto = tx_send(SENDER, RECEIVER, AMOUNT_TO_BE_SENT, None, False, seqto)
+    STATUS, sTxto = tx_send(
+        SENDER, RECEIVER, AMOUNT_TO_BE_SENT, None, False, seqto)
     if not STATUS:
         logging.error("%s", sTxto)
     else:
         logging.info("TX HASH to :: %s", sTxto['txhash'])
-    STATUS, sTxfrom = tx_send(RECEIVER, SENDER, AMOUNT_TO_BE_SENT, None, False, seqfrom)
+    STATUS, sTxfrom = tx_send(
+        RECEIVER, SENDER, AMOUNT_TO_BE_SENT, None, False, seqfrom)
     if not STATUS:
         logging.error("%s", sTxfrom)
     else:

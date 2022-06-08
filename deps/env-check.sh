@@ -1,8 +1,8 @@
 #/bin/sh
 
-## This script verifies if all the necessary env variables are configured or exported for the setup scripts to
-## work. If any of the values are not configured in env file or exported then a message is displayed which reminds the user
-## to export them.
+# This script verifies if all the necessary env variables are configured or exported for the setup scripts to
+# work. If any of the values are not configured in env file or exported then a message is displayed which reminds the user
+# to export them.
 
 # set environment with env config.
 set -a

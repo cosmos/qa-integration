@@ -27,7 +27,67 @@ make install-deps
 make lint
 ```
 
-### Scripts:-
+## Scripts:-
+
+### deps
+
+`env-check.sh`:- This script is called before executing the other scripts ensuring that the env variables are properly imported.
+
+    ```
+    Usage:-
+
+    chmod +x ./deps/env-check.sh
+    ./deps/env-check.sh
+    ```
+
+`prereq.sh`:- This script is used to install all the dependencies and Go lang required to run the other scripts.
+
+  ```
+  Usage:-
+
+  chmod +x ./deps/prereq.sh
+  ./deps/prereq.sh
+  ```
+
+### provison
+
+`start_chain.sh`:- This script sets up the environment. It takes two arguments from the user. First argument is the number of nodes that need to be setup and the second argument is the number of additional accounts that need to be created. 
+
+  ```
+  Usage:-
+
+  git clone https://github.com/cosmos/qa-integration.git
+  cd qa-integration
+  chmod +x provision/start_chain.sh
+  ./provision/start_chain.sh 2 2
+
+  #This will create a network with 2 validators and 2 additional accounts. If the second argument is not passed, no new additional accounts are created. 
+  #If no arguments are passed it creates a two node network by default.
+  ```
+
+`test_upgrade.sh`:- This script test the process of moving the upgraded version of binary from build folder to Cosmovisor's upgrades folder. This shell script    takes one argument as NODE(Number of nodes to be upgraded).
+
+```
+  Usage:-
+
+  chmod +x ./provision/test_upgrade.sh 2
+  ./provision/test_upgrade.sh 2
+
+```
+
+### load-test
+
+`multi_msg_load.sh`:- This script test a series of bank transfer transactions with multiple messages between two accounts. It takes two optional arguments namely -s(sender) and -r(receiver). 
+
+  ```
+  Usage:-
+
+  chmod +x ./load-test/multi_msg_load.sh
+  ./load-test/multi_msg_load.sh -h
+  ./load-test/multi_msg_load.sh -s <address> -r <address>
+  ```
+
+`query_load.sh`:- This script floods the network with balance queries, delegation queries and staking queries. It creates a load of 10,000 querires.
 
 ## deps
 
@@ -117,7 +177,7 @@ make lint
   ./load-test/single_msg_load.sh -s <address> -r <address>
   ```
 
-## misc-scripts
+### misc-scripts
 
 `distribution.sh`:- This script executes the distribuition mudule txs like `withdraw-rewards`, `withdraw-rewards --commission` and `withdraw-all-rewards`
 
@@ -149,7 +209,7 @@ make lint
  #then it executes on the first two validators by default.
  ```
 
- ## node-management
+ ### node-management
  
 `node_status.sh`:- This script displays the latest block height and sync status of the nodes.
  

@@ -9,12 +9,10 @@ from utils import exec_command
 DAEMON = os.getenv('DAEMON')
 RPC = os.getenv('RPC')
 
-# query_balances returns the balance json by taking bech32 address as parameter.
-
 
 def query_balances(address):
-    """_summary_
-
+    """
+    query_balances returns the balance json by taking bech32 address as parameter.
     Args:
         address (_str_): bech32 address
 

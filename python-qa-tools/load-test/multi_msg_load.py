@@ -20,7 +20,7 @@ logging.basicConfig(format='%(message)s',
 
 PARSER = argparse.ArgumentParser(
     description='This program takes inputs for intializing multi message load test.'
-    )
+)
 PARSER.add_argument(
     '-s', '--sender',
     type=account_type,
@@ -67,10 +67,12 @@ STATUS, RECEIVER_ACC_SEQ = query_account(RECEIVER)
 if not STATUS:
     sys.exit(RECEIVER_ACC_SEQ)
 
-SEQ1NO, SEQ2NO = int(SENDER_ACC_SEQ['sequence']), int(RECEIVER_ACC_SEQ['sequence'])
+SEQ1NO, SEQ2NO = int(SENDER_ACC_SEQ['sequence']), int(
+    RECEIVER_ACC_SEQ['sequence'])
 
 # Generating unsigned transactions with a single transfer message
-STATUS, UNSIGNED_TX_TO = create_unsigned_txs(SENDER, RECEIVER, AMOUNT_TO_BE_SENT, 'unsignedto.json')
+STATUS, UNSIGNED_TX_TO = create_unsigned_txs(
+    SENDER, RECEIVER, AMOUNT_TO_BE_SENT, 'unsignedto.json')
 if not STATUS:
     logging.error(UNSIGNED_TX_TO)
 
@@ -91,9 +93,11 @@ for i in range(NUM_TXS):
 
     # Signing and broadcasting the unsigned transactions from sender to receiver
     seqto = SEQ1NO + i
-    status, txHash = sign_and_broadcast_txs('unsignedto.json', 'signedto.json', SENDER, seqto)
+    status, txHash = sign_and_broadcast_txs(
+        'unsignedto.json', 'signedto.json', SENDER, seqto)
     if not status:
-        logging.error("sign_and_broadcast_tx from sender to receiver failed : %s", txHash)
+        logging.error(
+            "sign_and_broadcast_tx from sender to receiver failed : %s", txHash)
     else:
         logging.info("broadcasted txhash: %s", txHash)
 
@@ -104,8 +108,9 @@ for i in range(NUM_TXS):
         'signedfrom.json',
         RECEIVER,
         seqfrom)
-    if not status: # if the txn is unsuccessful
-        logging.error("sign_and_broadcast_tx from receiver to sender failed : %s", txHash)
+    if not status:  # if the txn is unsuccessful
+        logging.error(
+            "sign_and_broadcast_tx from receiver to sender failed : %s", txHash)
     else:
         logging.info("broadcasted txhash: %s", txHash)
 
