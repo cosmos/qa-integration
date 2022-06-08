@@ -10,6 +10,7 @@ def keys_show(account, type = "acc"):
     try:
         command = f"{DAEMON} keys show {account} --home {DAEMON_HOME}-1 --bech {type} --keyring-backend test --output json"
         stdout, stderr = exec_command(command)
+        print(f"Output...StdOut...{stdout}....StdErr...{stderr}")
         if len(stderr):
             return False, stderr
         return True, json.loads(stdout)
