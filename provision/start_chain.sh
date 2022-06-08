@@ -37,6 +37,7 @@ if type $DAEMON &> /dev/null; then
     CURR_VERSION='v'$($DAEMON version)
 fi
 
+cd $HOME
 if [[ -z DAEMON_EXISTS || $CURR_VERSION != $CHAIN_VERSION ]]
 then
     echo "INFO: Installing $DAEMON"

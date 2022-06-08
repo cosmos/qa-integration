@@ -15,7 +15,7 @@ logging.basicConfig(format='%(message)s',
 parser = argparse.ArgumentParser(description='This program takes inputs for intializing multi message load test.')
 parser.add_argument('-s', '--sender', type = account_type, default = keys_show("account1")[1]['address'], help = 'Sender bech32 address')
 parser.add_argument('-r', '--receiver', type= account_type, default = keys_show("account2")[1]['address'], help= 'Receiver bech32 address')
-parser.add_argument('-n', '--num_txs', type = num_txs_type, default = 1000, help= 'Number of transactions to be made, atleast should be 50')
+parser.add_argument('-n', '--num_txs', type = num_txs_type, default = 1000, help= 'Number of transactions to be made, should be positive integer')
 args = parser.parse_args()
 sender, receiver, NUM_TXS, amount_to_be_sent = args.sender, args.receiver, int(args.num_txs), 1000000
 
