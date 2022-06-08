@@ -1,4 +1,4 @@
-#/bin/sh
+#/bin/bash
 
 ## This script installs the basic apt packages and also checks if go is installed on the system or
 ## not. If go is not installed on the system then go1.17.3 is installed by the script. Env variables
@@ -27,16 +27,16 @@ else
   echo 'export GOROOT=/usr/local/go' >> ~/.bashrc
 fi
 
-if [[ -z $GOPATH || -z $GOBIN || "$PATH" != *"$SGOBIN"* ]]; then
-  echo "------ Update bashrc ---------------"
-  export GOPATH=$HOME/go
-  export GOBIN=$GOPATH/bin
-  echo "" >> ~/.bashrc
-  echo 'export GOPATH=$HOME/go' >> ~/.bashrc
-  echo 'export GOBIN=$GOPATH/bin' >> ~/.bashrc
-  echo 'export PATH=$PATH:/usr/local/go/bin:$GOBIN' >> ~/.bashrc
-fi
-. ~/.bashrc
+# if [[ -z $GOPATH || -z $GOBIN || "$PATH" != *"$SGOBIN"* ]]; then
+#   echo "------ Update bashrc ---------------"
+#   export GOPATH=$HOME/go
+#   export GOBIN=$GOPATH/bin
+#   echo "" >> ~/.bashrc
+#   echo 'export GOPATH=$HOME/go' >> ~/.bashrc
+#   echo 'export GOBIN=$GOPATH/bin' >> ~/.bashrc
+#   echo 'export PATH=$PATH:/usr/local/go/bin:$GOBIN' >> ~/.bashrc
+# fi
+source ~/.bashrc
 mkdir -p "$GOBIN"
 mkdir -p $GOPATH/src/github.com
 go version
@@ -56,6 +56,3 @@ else
   sudo apt update
   sudo apt install pylint -y
 fi
-
-echo "" >> ~/.bashrc
-. ~/.bashrc

@@ -24,6 +24,7 @@ fi
 NUM_ACCOUNTS=$2
 echo "INFO: Setting up $NUM_NODES validator nodes and $NUM_ACCOUNTS accounts"
 cd $HOME
+mkdir -p "$GOBIN"
 echo "INFO: Installing cosmovisor"
 go install github.com/cosmos/cosmos-sdk/cosmovisor/cmd/cosmovisor@v1.0.0
 strings $(which cosmovisor) | egrep -e "mod\s+github.com/cosmos/cosmos-sdk/cosmovisor"
