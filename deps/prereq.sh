@@ -26,16 +26,6 @@ else
   echo "" >> ~/.bashrc
   echo 'export GOROOT=/usr/local/go' >> ~/.bashrc
 fi
-
-# if [[ -z $GOPATH || -z $GOBIN || "$PATH" != *"$SGOBIN"* ]]; then
-#   echo "------ Update bashrc ---------------"
-#   export GOPATH=$HOME/go
-#   export GOBIN=$GOPATH/bin
-#   echo "" >> ~/.bashrc
-#   echo 'export GOPATH=$HOME/go' >> ~/.bashrc
-#   echo 'export GOBIN=$GOPATH/bin' >> ~/.bashrc
-#   echo 'export PATH=$PATH:/usr/local/go/bin:$GOBIN' >> ~/.bashrc
-# fi
 source ~/.bashrc
 mkdir -p "$GOBIN"
 mkdir -p $GOPATH/src/github.com

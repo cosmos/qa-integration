@@ -16,6 +16,8 @@ jobs:
       - name: multi msg load test
         run: |
           make test-multi-msg
+        env:
+          IS_PUBLIC: false
   
   test-query-load:
     runs-on: ubuntu-latest
@@ -24,6 +26,8 @@ jobs:
       - name: query load test
         run: |
           make test-query-load
+        env:
+          IS_PUBLIC: false
 
   test-send-load:
     runs-on: ubuntu-latest
@@ -32,6 +36,8 @@ jobs:
       - name: send msg load test
         run: |
           make test-send-load
+        env:
+          IS_PUBLIC: false
   
   test-single-msg:
     runs-on: ubuntu-latest
@@ -40,3 +46,5 @@ jobs:
       - name: single msg load test
         run: |
           make test-single-msg
+        env:
+          IS_PUBLIC: false

@@ -14,5 +14,5 @@ cd $CURPATH
 
 # we can pass optional arguments when running this script
 # available arguments are -s/--sender, -n/--num_txs, -h/--help
-# example: ./query_load.sh -s cosmos1f2838advrjl3c8h4kjfvfmhkh0gs0wf6cyzwu8 -n 100
+# example: ./query_load.sh -s cosmos1f2838advrjl3c8h4kjfvfmhkh0gs0wf6cyzwu8 -n 10
 python3 ./python-qa-tools/load-test/query_load.py $1 $2 $3 $4

@@ -142,11 +142,12 @@ do
     cp $DAEMON_HOME-1/config/genesis.json $DAEMON_HOME-$a/config/
 done
 
-echo "INFO: Getting public IP address to configure peers"
-IP=""
-if [ -z $IP ]
+IP="$(dig +short myip.opendns.com @resolver1.opendns.com)"
+if [[ -z $IP || "$IS_PUBLIC" == "false" ]]
 then
     IP=127.0.0.1
+else
+    echo "INFO: Configuring peers with public IP address"
 fi
 
 for (( a=1; a<=$NUM_VALS; a++ ))
