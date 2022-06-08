@@ -1,4 +1,8 @@
-import json, os
+"""_summary_
+The functions in this module calls Bank transaction subcommands.
+"""
+import json
+import os
 from core.tx import tx_broadcast, tx_sign
 from utils import exec_command
 
@@ -10,57 +14,110 @@ DAEMON_HOME = os.getenv('DAEMON_HOME')
 RPC = os.getenv('RPC')
 DEFAULT_GAS = 2000000
 
-# The function 'create_unsigned_txs' takes sender(from_address), receiver(to_address), amount and file_name as parameters and call the function tx_send
-# internally and stores the json to file_name file.
-def create_unsigned_txs(from_address, to_address, amount, file_name):
-    try:
-        status, unsignedTx = tx_send(from_address, to_address, amount, gas = DEFAULT_GAS, unsigned = True)
-        if not status:
-            return status, unsignedTx 
-        with open(f"{HOME}/{file_name}", 'w') as outfile:
-            json.dump(unsignedTx, outfile)
-        return True, unsignedTx
-    except Exception as e:
-        return False, e
 
-# The function 'sign_and_broadcast_txs' takes unsigned_file, signed_file, from_address and sequence as parameters.
-# Signs and the broadcasts the unsigned transactions.
-def sign_and_broadcast_txs(unsigned_file, signed_file, from_address, sequence):
+def create_unsigned_txs(from_address, to_address, amount, file_name):
+    """
+    The function 'create_unsigned_txs' takes sender(from_address), receiver(to_address), amount
+    and file_name as parameters and call the function tx_send internally and stores the json to
+    file_name file.
+
+    Args:
+        from_address (_str_): sender bech32 address
+        to_address (_str_): receiver bech32 address
+        amount (_unit_): amount to be transferred
+        file_name (_str_): filepath to store unsigned transactions
+
+    Returns:
+        _tuple_: (bool, str|json)
+    """
     try:
-        status, signTx = tx_sign(unsigned_file, from_address, sequence, DEFAULT_GAS)
+        status, unsigned_tx = tx_send(
+            from_address,
+            to_address,
+            amount,
+            gas=DEFAULT_GAS,
+            unsigned=True)
         if not status:
-            return status, signTx
+            return status, unsigned_tx
+        with open(f"{HOME}/{file_name}", 'w') as outfile:
+            json.dump(unsigned_tx, outfile)
+        return True, unsigned_tx
+    except Exception as error:  # pylint: disable=broad-except
+        return False, error
+
+
+def sign_and_broadcast_txs(unsigned_file, signed_file, from_address, sequence):
+    """
+    The function 'sign_and_broadcast_txs' takes unsigned_file, signed_file, from_address
+    and sequence as parameters.
+    Signs and the broadcasts the unsigned transactions.
+    Args:
+        unsigned_file (_str_): file path to fetch unsigned transactions.
+        signed_file (_str_): filepath to write signed transactions.
+        from_address (_type_): sender bech address
+        sequence (_type_): The sequence number of the signing account (offline mode only).
+
+    Returns:
+        _tuple_: (bool, str|json)
+    """
+    try:
+        status, sign_tx = tx_sign(
+            unsigned_file, from_address, sequence, DEFAULT_GAS)
+        if not status:
+            return status, sign_tx
         with open(f'{HOME}/{signed_file}', 'w') as outfile:
-            json.dump(signTx, outfile)
-            
-        status, broadcast_response = tx_broadcast(signed_file, DEFAULT_GAS, 'block')
+            json.dump(sign_tx, outfile)
+
+        status, broadcast_response = tx_broadcast(
+            signed_file, DEFAULT_GAS, 'block')
         if not status:
             return status, broadcast_response
         return status, broadcast_response['txhash']
-    except Exception as e:
-        return False, e
+    except Exception as error:  # pylint: disable=broad-except
+        return False, error
 
-# The function tx_send internally calls the 'tx send' command and return the response in json format.
-def tx_send(from_address, to_address, amount, gas="auto", unsigned = False, sequence = None):
-    try:    
+
+def tx_send(from_address, to_address, amount, gas="auto", unsigned=False, sequence=None):
+    """
+    The function tx_send internally calls the 'tx send' command
+    and return the response in json format.
+    Args:
+        from_address (_str_): sender bech address
+        to_address (_str_): receiver bech address
+        amount (_uint_): amount to be transferred.
+        gas (str, optional): gas limit to set per-transaction; set to "auto"
+        to calculate sufficient gas automatically (default auto).
+        unsigned (bool, optional): Defaults to False.
+        sequence (_uint_, optional): The sequence number of the signing account (offline mode only)
+        defaults to None.
+
+    Returns:
+        _type_: _description_
+    """
+    try:
         if unsigned:
-            command = f"{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} --chain-id {CHAINID} --output json --node {RPC} --generate-only --gas {gas}"
-            Tx, Txerr = exec_command(command)
-            if len(Txerr):
-                return False, Txerr
-            return True, json.loads(Tx)
+            command = f'''{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} \
+                --chain-id {CHAINID} --output json --node {RPC} --generate-only --gas {gas}'''
+            tx_resp, tx_err = exec_command(command)
+            if len(tx_err) != 0:
+                return False, tx_err
+            return True, json.loads(tx_resp)
         else:
-            if sequence != None:
-                command = f"{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --sequence {sequence} --gas {gas}"
-                
+            if sequence is not None:
+                command = f'''{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} \
+                    --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} \
+                        --output json -y --sequence {sequence} --gas {gas}'''
+
             else:
-                command = f"{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}"
-            Tx, Txerr = exec_command(command)
-            Tx = json.loads(Tx)
-            if len(Txerr):
-                return False, Txerr
-            elif Tx['code'] != 0:
-                return False, Tx
-            return True, Tx
-    except Exception as e:
-        return False, e
+                command = f'''{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} \
+                    --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} \
+                        --output json -y --gas {gas}'''
+            tx_resp, tx_err = exec_command(command)
+            tx_resp = json.loads(tx_resp)
+            if len(tx_err) != 0:
+                return False, tx_err
+            elif tx_resp['code'] != 0:
+                return False, tx_resp
+            return True, tx_resp
+    except Exception as error:  # pylint: disable=broad-except
+        return False, error
