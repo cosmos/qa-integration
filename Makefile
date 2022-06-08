@@ -30,20 +30,20 @@ test-all: setup-chains
 
 test-multi-msg: setup-chains
 	@echo "Running multi msg load test..."
-	@bash ./load-test/multi_msg_load.sh -n 50
+	. ./load-test/multi_msg_load.sh -n 50
 	$(MAKE) stop-chains
 
 test-query-load: setup-chains
 	@echo "Running query load test..."
-	@bash ./load-test/query_load.sh -n 50
+	. ./load-test/query_load.sh -n 50
 	$(MAKE) stop-chains
 
 test-send-load: setup-chains
 	@echo "Running send msg load test..."
-	@bash ./load-test/send_load.sh -n 50
+	. ./load-test/send_load.sh -n 50
 	$(MAKE) stop-chains
 
 test-single-msg: setup-chains
 	@echo "Running single msg load test..."
-	@bash ./load-test/single_msg_load.sh -n 50
+	. ./load-test/single_msg_load.sh -n 50
 	$(MAKE) stop-chains
