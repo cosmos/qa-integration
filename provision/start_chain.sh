@@ -49,6 +49,8 @@ then
     git fetch --all && git checkout $CHAIN_VERSION
     make install
 fi
+echo "GOPATH: $GOPATH"
+echo "PATH: $PATH"
 cd $HOME
 echo "Installed $DAEMON version details:"
 # check version
