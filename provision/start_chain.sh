@@ -143,7 +143,7 @@ do
 done
 
 echo "INFO: Getting public IP address to configure peers"
-IP="$(dig +short myip.opendns.com @resolver1.opendns.com)"
+IP=""
 if [ -z $IP ]
 then
     IP=127.0.0.1
