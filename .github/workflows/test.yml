@@ -8,9 +8,6 @@ on:
     branches:
       - master
 
-permissions:
-  contents: read
-
 jobs:
   test-multi-msg:
     runs-on: ubuntu-latest
