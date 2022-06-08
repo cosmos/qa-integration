@@ -22,6 +22,9 @@ else
   tar -xvf go$goversion.linux-amd64.tar.gz
   sudo mv go /usr/local
   rm go$goversion.linux-amd64.tar.gz
+fi
+
+if [[ -z $GOPATH || -z $GOBIN || "$PATH" != *"$SGOBIN"* ]]; then
   echo "------ Update bashrc ---------------"
   export GOPATH=$HOME/go
   export GOROOT=/usr/local/go
@@ -32,11 +35,11 @@ else
   echo 'export GOROOT=/usr/local/go' >> ~/.bashrc
   echo 'export GOBIN=$GOPATH/bin' >> ~/.bashrc
   echo 'export PATH=$PATH:/usr/local/go/bin:$GOBIN' >> ~/.bashrc
-  source ~/.bashrc
-  mkdir -p "$GOBIN"
-  mkdir -p $GOPATH/src/github.com
-  go version
 fi
+source ~/.bashrc
+mkdir -p "$GOBIN"
+mkdir -p $GOPATH/src/github.com
+go version
 
 if command_exists python3 ; then
   echo "python3-dev is already installed"
