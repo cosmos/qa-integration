@@ -6,10 +6,16 @@ install-deps:
 lint: install-deps
 	pylint ./python-qa-tools
 
-setup-chains: install-deps
+setup-chains: install-deps stop-chains
 	@bash ./provision/start_chain.sh $(NUM_VALS) 2
 	@echo "Waiting for chain to start..."
 	sleep 10
+
+pause-chains:
+	@bash ./node-management/pause_nodes.sh $(NUM_VALS)
+
+resume-chains:
+	@bash ./node-management/resume_nodes.sh $(NUM_VALS)
 
 stop-chains:
 	@bash ./node-management/shutdown_nodes.sh $(NUM_VALS)

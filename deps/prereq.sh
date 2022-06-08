@@ -27,7 +27,6 @@ else
   echo 'export GOROOT=/usr/local/go' >> ~/.bashrc
 fi
 source ~/.bashrc
-mkdir -p "$GOBIN"
 mkdir -p $GOPATH/src/github.com
 go version
 
