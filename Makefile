@@ -1,18 +1,18 @@
 NUM_VALS = 2
 
 install-deps:
-	bash ./deps/prereq.sh
+	. ./deps/prereq.sh
 
 lint: install-deps
 	pylint ./python-qa-tools
 
 setup-chains: install-deps
-	@bash ./provision/start_chain.sh $(NUM_VALS) 2
+	. ./provision/start_chain.sh $(NUM_VALS) 2
 	@echo "Waiting for chain to start..."
 	sleep 10
 
 stop-chains:
-	@bash ./node-management/shutdown_nodes.sh $(NUM_VALS)
+	. ./node-management/shutdown_nodes.sh $(NUM_VALS)
 
 test-all: setup-chains
 	@bash ./node-management/node_status.sh $(NUM_VALS)
