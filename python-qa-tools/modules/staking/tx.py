@@ -59,3 +59,78 @@ def tx_redelegate(from_key,from_address, to_address, amount,fee, gas="auto", uns
             return True, tx
     except Exception as e:
         return False, e
+
+# tx_redelegate function internally calls the 'redelegate tx' command and return the response in json format.
+def tx_redelegate(from_key,from_address, to_address, amount,fee, gas="auto", unsigned = False, sequence = None):
+    try:    
+        if unsigned:
+            command = f"{DAEMON} tx staking redelegate {from_address} {to_address} {amount}{DENOM} --from {from_key} --fees {fee}{DENOM} --chain-id {CHAINID} --output json --node {RPC} --generate-only --gas {gas}"
+            tx, tx_err = exec_command(command)
+            if len(tx_err):
+                return False, tx_err
+            return True, json.loads(tx)
+        else:
+            if sequence is not None:
+                command = f"{DAEMON} tx staking redelegate {from_address} {to_address} {amount}{DENOM} --from {from_key} --fees {fee}{DENOM} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --sequence {sequence} --gas {gas}"
+                
+            else:
+                command = f"{DAEMON}  tx staking redelegate {from_address} {to_address} {amount}{DENOM} --from {from_key} --fees {fee}{DENOM} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}"
+            tx, tx_err = exec_command(command)
+            tx = json.loads(tx)
+            if len(text_file):
+                return False, tx_err
+            elif tx['code'] != 0:
+                return False, tx
+            return True, tx
+    except Exception as e:
+        return False, e
+
+# tx_redelegate function internally calls the 'redelegate tx' command and return the response in json format.
+def tx_redelegate(from_key,from_address, to_address, amount,fee, gas="auto", unsigned = False, sequence = None):
+    try:    
+        if unsigned:
+            command = f"{DAEMON} tx staking redelegate {from_address} {to_address} {amount}{DENOM} --from {from_key} --fees {fee}{DENOM} --chain-id {CHAINID} --output json --node {RPC} --generate-only --gas {gas}"
+            tx, tx_err = exec_command(command)
+            if len(tx_err):
+                return False, tx_err
+            return True, json.loads(tx)
+        else:
+            if sequence is not None:
+                command = f"{DAEMON} tx staking redelegate {from_address} {to_address} {amount}{DENOM} --from {from_key} --fees {fee}{DENOM} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --sequence {sequence} --gas {gas}"
+                
+            else:
+                command = f"{DAEMON}  tx staking redelegate {from_address} {to_address} {amount}{DENOM} --from {from_key} --fees {fee}{DENOM} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}"
+            tx, tx_err = exec_command(command)
+            tx = json.loads(tx)
+            if len(text_file):
+                return False, tx_err
+            elif tx['code'] != 0:
+                return False, tx
+            return True, tx
+    except Exception as e:
+        return False, e
+
+# tx_unbond function internally calls the 'unbond tx' command and return the response in json format.
+def tx_unbond(from_key,from_address, to_address, amount,fee, gas="auto", unsigned = False, sequence = None):
+    try:    
+        if unsigned:
+            command = f"{DAEMON} tx staking unbond {from_address} {amount}{DENOM} --from {from_key} --fees {fee}{DENOM} --chain-id {CHAINID} --output json --node {RPC} --generate-only --gas {gas}"
+            tx, tx_err = exec_command(command)
+            if len(tx_err):
+                return False, tx_err
+            return True, json.loads(tx)
+        else:
+            if sequence is not None:
+                command = f"{DAEMON} tx staking unbond {from_address} {amount}{DENOM} --from {from_key} --fees {fee}{DENOM} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --sequence {sequence} --gas {gas}"
+                
+            else:
+                command = f"{DAEMON}  tx staking unbond {from_address} {amount}{DENOM} --from {from_key} --fees {fee}{DENOM} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}"
+            tx, tx_err = exec_command(command)
+            tx = json.loads(tx)
+            if len(text_file):
+                return False, tx_err
+            elif tx['code'] != 0:
+                return False, tx
+            return True, tx
+    except Exception as e:
+        return False, e
