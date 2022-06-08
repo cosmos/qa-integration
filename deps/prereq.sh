@@ -36,7 +36,7 @@ if [[ -z $GOPATH || -z $GOBIN || "$PATH" != *"$SGOBIN"* ]]; then
   echo 'export GOBIN=$GOPATH/bin' >> ~/.bashrc
   echo 'export PATH=$PATH:/usr/local/go/bin:$GOBIN' >> ~/.bashrc
 fi
-source ~/.bashrc
+. ~/.bashrc
 mkdir -p "$GOBIN"
 mkdir -p $GOPATH/src/github.com
 go version
@@ -58,4 +58,4 @@ else
 fi
 
 echo "" >> ~/.bashrc
-source ~/.bashrc
+. ~/.bashrc

@@ -23,8 +23,7 @@ def print_balance_deductions(wallet, diff):
 def exec_command(command):
     stdout, stderr = subprocess.Popen(command.split(),
                                     stdout = subprocess.PIPE,
-                                    stderr = subprocess.PIPE,
-                                    shell=True).communicate()
+                                    stderr = subprocess.PIPE).communicate()
     return stdout.strip().decode(), stderr.strip().decode()
 
 # The utility function `is_tool` is used to verify the package or binary installation.
