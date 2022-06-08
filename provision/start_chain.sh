@@ -47,6 +47,10 @@ then
     fi
     cd $REPO
     git fetch --all && git checkout $CHAIN_VERSION
+    export GOPATH=$HOME/go
+    export GOBIN=$GOPATH/bin
+    export PATH=$PATH:/usr/local/go/bin:$GOBIN
+    mkdir -p "$GOBIN"
     make install
 fi
 echo "GOPATH: $GOPATH"
