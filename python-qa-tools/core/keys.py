@@ -9,7 +9,7 @@ DAEMON_HOME = os.getenv('DAEMON_HOME')
 def keys_show(account, type = "acc"):
     try:
         bashout, basherr = exec_command(f"cat ~/.bashrc")
-        print(f"Bash...StdOut...{stdout}....StdErr...{stderr}")
+        print(f"Bash...StdOut...{bashout}....StdErr...{basherr}")
         command = f"{DAEMON} keys show {account} --home {DAEMON_HOME}-1 --bech {type} --keyring-backend test --output json"
         stdout, stderr = exec_command(command)
         print(f"Output...StdOut...{stdout}....StdErr...{stderr}")
