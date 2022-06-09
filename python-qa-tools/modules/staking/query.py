@@ -27,3 +27,14 @@ def query_staking_delegations(delegator, validator):
         return True, json.loads(delegations)
     except Exception as e:
         return False, e
+
+# `query_staking_delegations` fetches all redelegation records for an individual delegator.   
+def query_staking_redelegations(delegator_addr, validator):
+    try:
+        command = f"{DAEMON} q staking redelegation {delegator_addr} --node {RPC} --chain-id {CHAINID} --output json"
+        redelegations, err = exec_command(command)
+        if len(err):
+            return False, err
+        return True, json.loads(redelegations)
+    except Exception as e:
+        return False, e
