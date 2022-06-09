@@ -32,8 +32,8 @@ def is_tool(binary):
     from shutil import which
     return which(binary) is not None
 
-# num_txs_type is a user-defined type.
-def num_txs_type(x):
+# validate_num_txs will validate num_txs value
+def validate_num_txs(x):
     if int(x) < 1:
         raise argparse.ArgumentTypeError('The argument NUM_TXS should be positive integer')
     return int(x)
