@@ -44,7 +44,6 @@ logging.info(f"initial sequence number of sender account : {seq1no}")
 
 num_success_txs, num_failed_txs, num_other_errors, failed_code_errors = 0, 0, 0, {}
 
-
 for i in range(seq1no, bound):
     status, tx = tx_send(sender, receiver, 1000000, 200000, sequence=i)
     (
