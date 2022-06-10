@@ -26,14 +26,14 @@ ARGS = PARSER.parse_args()
 SENDER, RECEIVER = ARGS.sender, ARGS.receiver
 
 # query account sequence
-STATUS, ACCOUNT = query_account(SENDER)
+STATUS, SENDER_ACCOUNT = query_account(SENDER)
 if not STATUS:
-    sys.exit(ACCOUNT)
-SEQ1NO = int(ACCOUNT['sequence'])
-BOUND = 10000 + SEQ1NO
-logging.info("initial sequence number of sender account : %s", SEQ1NO)
+    sys.exit(SENDER_ACCOUNT)
+SENDER_ACC_SEQ = int(SENDER_ACCOUNT['sequence'])
+BOUND = 10000 + SENDER_ACC_SEQ
+logging.info("initial sequence number of sender account : %s", SENDER_ACC_SEQ)
 
-for i in range(SEQ1NO, BOUND):
+for i in range(SENDER_ACC_SEQ, BOUND):
     status, tx = tx_send(SENDER, RECEIVER, 1000000, 200000, sequence=i)
     if not status:
         logging.error(tx)

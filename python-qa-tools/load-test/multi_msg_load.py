@@ -35,28 +35,28 @@ PARSER.add_argument(
     '-n', '--num_txs',
     type=int,
     default=1000,
-    help='Number of transactions to be made, atleast should be 1000')
+    help='Number of transactions to be made.')
 ARGS = PARSER.parse_args()
 SENDER = ARGS.sender
 RECEIVER = ARGS.receiver
 NUM_TXS = int(ARGS.num_txs)
-AMOUNT_TO_BE_SENT = 1000000
+AMOUNT = 1000000
 
 if SENDER == RECEIVER:
     sys.exit('''Error: The values of arguments "sender" and "receiver"
             are equal make sure to set different values''')
 
 # Fetch balances of sender and receiver accounts before executing the load test
-STATUS, SENDER_BALANCE_OLD = query_balances(SENDER)
+STATUS, SENDER_BAL_AFTER = query_balances(SENDER)
 if not STATUS:
-    sys.exit(SENDER_BALANCE_OLD)
-SENDER_BALANCE_OLD = int(SENDER_BALANCE_OLD['balances'][0]['amount'])
+    sys.exit(SENDER_BAL_AFTER)
+SENDER_BAL_AFTER = int(SENDER_BAL_AFTER['balances'][0]['amount'])
 
 # Fetch Balances of receiver executing the load test
-STATUS, RECEIVER_BALANCE_OLD = query_balances(RECEIVER)
+STATUS, RECEIVER_BAL_BEFORE = query_balances(RECEIVER)
 if not STATUS:
-    sys.exit(RECEIVER_BALANCE_OLD)
-RECEIVER_BALANCE_OLD = int(RECEIVER_BALANCE_OLD['balances'][0]['amount'])
+    sys.exit(RECEIVER_BAL_BEFORE)
+RECEIVER_BAL_BEFORE = int(RECEIVER_BAL_BEFORE['balances'][0]['amount'])
 
 # Fetching sequence numbers of to and from accounts
 STATUS, SENDER_ACC = query_account(SENDER)
@@ -72,14 +72,14 @@ SENDER_ACC_SEQ, RECEIVER_ACC_SEQ = int(SENDER_ACC['sequence']), int(
 
 # Generating unsigned transactions with a single transfer message
 STATUS, UNSIGNED_TX_TO = create_unsigned_txs(
-    SENDER, RECEIVER, AMOUNT_TO_BE_SENT, 'unsignedto.json')
+    SENDER, RECEIVER, AMOUNT, 'unsignedto.json')
 if not STATUS:
     logging.error(UNSIGNED_TX_TO)
 
 STATUS, UNSIGNED_TX_FROM = create_unsigned_txs(
     RECEIVER,
     SENDER,
-    AMOUNT_TO_BE_SENT,
+    AMOUNT,
     'unsignedfrom.json')
 if not STATUS:
     logging.error(UNSIGNED_TX_FROM)
@@ -118,18 +118,18 @@ logging.info('waiting for tx confirmation, avg time is 7s.')
 time.sleep(7)
 
 # Verifying the balance deductions
-STATUS, SENDER_BALANCE_UPDATED = query_balances(SENDER)
+STATUS, SENDER_BAL_AFTER = query_balances(SENDER)
 if not status:
-    sys.exit(SENDER_BALANCE_UPDATED)
-SENDER_BALANCE_UPDATED = SENDER_BALANCE_UPDATED['balances'][0]['amount']
+    sys.exit(SENDER_BAL_AFTER)
+SENDER_BAL_AFTER = SENDER_BAL_AFTER['balances'][0]['amount']
 
-STATUS, RECEIVER_BALANCE_UPDATED = query_balances(RECEIVER)
+STATUS, RECEIVER_BAL_AFTER = query_balances(RECEIVER)
 if not status:
-    sys.exit(RECEIVER_BALANCE_UPDATED)
-RECEIVER_BALANCE_UPDATED = RECEIVER_BALANCE_UPDATED['balances'][0]['amount']
+    sys.exit(RECEIVER_BAL_AFTER)
+RECEIVER_BAL_AFTER = RECEIVER_BAL_AFTER['balances'][0]['amount']
 
-SENDER_DIFF = int(SENDER_BALANCE_OLD) - int(SENDER_BALANCE_UPDATED)
-RECEIVER_DIFF = int(RECEIVER_BALANCE_OLD) - int(RECEIVER_BALANCE_UPDATED)
+SENDER_DIFF = int(SENDER_BAL_AFTER) - int(SENDER_BAL_AFTER)
+RECEIVER_DIFF = int(RECEIVER_BAL_BEFORE) - int(RECEIVER_BAL_AFTER)
 
 print_balance_deductions('sender', SENDER_DIFF)
 print_balance_deductions('receiver', RECEIVER_DIFF)
