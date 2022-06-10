@@ -6,12 +6,12 @@ import os
 from core.tx import tx_broadcast, tx_sign
 from utils import exec_command
 
-DAEMON = os.getenv('DAEMON')
-DENOM = os.getenv('DENOM')
-CHAINID = os.getenv('CHAINID')
-HOME = os.getenv('HOME')
-DAEMON_HOME = os.getenv('DAEMON_HOME')
-RPC = os.getenv('RPC')
+DAEMON = os.getenv("DAEMON")
+DENOM = os.getenv("DENOM")
+CHAINID = os.getenv("CHAINID")
+HOME = os.getenv("HOME")
+DAEMON_HOME = os.getenv("DAEMON_HOME")
+RPC = os.getenv("RPC")
 DEFAULT_GAS = 2000000
 
 
@@ -32,14 +32,11 @@ def create_unsigned_txs(from_address, to_address, amount, file_name):
     """
     try:
         status, unsigned_tx = tx_send(
-            from_address,
-            to_address,
-            amount,
-            gas=DEFAULT_GAS,
-            unsigned=True)
+            from_address, to_address, amount, gas=DEFAULT_GAS, unsigned=True
+        )
         if not status:
             return status, unsigned_tx
-        with open(f"{HOME}/{file_name}", 'w') as outfile:
+        with open(f"{HOME}/{file_name}", "w") as outfile:
             json.dump(unsigned_tx, outfile)
         return True, unsigned_tx
     except Exception as error:  # pylint: disable=broad-except
@@ -61,23 +58,23 @@ def sign_and_broadcast_txs(unsigned_file, signed_file, from_address, sequence):
         _tuple_: (bool, str|json)
     """
     try:
-        status, sign_tx = tx_sign(
-            unsigned_file, from_address, sequence, DEFAULT_GAS)
+        status, sign_tx = tx_sign(unsigned_file, from_address, sequence, DEFAULT_GAS)
         if not status:
             return status, sign_tx
-        with open(f'{HOME}/{signed_file}', 'w') as outfile:
+        with open(f"{HOME}/{signed_file}", "w") as outfile:
             json.dump(sign_tx, outfile)
 
-        status, broadcast_response = tx_broadcast(
-            signed_file, DEFAULT_GAS, 'block')
+        status, broadcast_response = tx_broadcast(signed_file, DEFAULT_GAS, "block")
         if not status:
             return status, broadcast_response
-        return status, broadcast_response['txhash']
+        return status, broadcast_response["txhash"]
     except Exception as error:  # pylint: disable=broad-except
         return False, error
 
 
-def tx_send(from_address, to_address, amount, gas="auto", unsigned=False, sequence=None):
+def tx_send(
+    from_address, to_address, amount, gas=DEFAULT_GAS, unsigned=False, sequence=None
+):
     """
     The function tx_send internally calls the 'tx send' command
     and return the response in json format.
@@ -92,31 +89,31 @@ def tx_send(from_address, to_address, amount, gas="auto", unsigned=False, sequen
         defaults to None.
 
     Returns:
-        _type_: _description_
+        _tuple_: bool, str|json
     """
     try:
         if unsigned:
-            command = f'''{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} \
-                --chain-id {CHAINID} --output json --node {RPC} --generate-only --gas {gas}'''
+            command = f"""{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} \
+                --chain-id {CHAINID} --output json --node {RPC} --generate-only --gas {gas}"""
             tx_resp, tx_err = exec_command(command)
             if len(tx_err) != 0:
                 return False, tx_err
             return True, json.loads(tx_resp)
         else:
             if sequence is not None:
-                command = f'''{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} \
+                command = f"""{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} \
                     --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} \
-                        --output json -y --sequence {sequence} --gas {gas}'''
+                        --output json -y --sequence {sequence} --gas {gas}"""
 
             else:
-                command = f'''{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} \
+                command = f"""{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} \
                     --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} \
-                        --output json -y --gas {gas}'''
+                        --output json -y --gas {gas}"""
             tx_resp, tx_err = exec_command(command)
             tx_resp = json.loads(tx_resp)
             if len(tx_err) != 0:
                 return False, tx_err
-            elif tx_resp['code'] != 0:
+            elif tx_resp["code"] != 0:
                 return False, tx_resp
             return True, tx_resp
     except Exception as error:  # pylint: disable=broad-except

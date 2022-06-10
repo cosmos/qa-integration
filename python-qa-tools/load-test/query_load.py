@@ -9,23 +9,28 @@ from core.keys import keys_show
 from modules.auth.query import account_type
 from modules.bank.query import query_balances
 from modules.staking.query import query_staking_delegations, query_staking_validators
-from utils import num_txs_type
+from utils import validate_num_txs
 
 
-logging.basicConfig(format='%(message)s',
-                    level=logging.DEBUG)
+logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
 PARSER = argparse.ArgumentParser(
-    description='This program takes inputs for intializing tx query load test.'
+    description="This program takes inputs for intializing tx query load test."
 )
-PARSER.add_argument('-s', '--sender',
-                    type=account_type,
-                    default=keys_show("validator1")[1]['address'],
-                    help='From which account the transaction should be intialized')
-PARSER.add_argument('-n', '--num_txs',
-                    type=num_txs_type,
-                    default=1000,
-                    help='Number of transactions to be made, atleast should be 1000')
+PARSER.add_argument(
+    "-s",
+    "--sender",
+    type=account_type,
+    default=keys_show("validator1")[1]["address"],
+    help="From which account the transaction should be intialized",
+)
+PARSER.add_argument(
+    "-n",
+    "--num_txs",
+    type=validate_num_txs,
+    default=1000,
+    help="Number of transactions to be made, should be positive integer",
+)
 ARGS = PARSER.parse_args()
 
 SENDER, NUM_TXS = ARGS.sender, int(ARGS.num_txs)
@@ -33,7 +38,7 @@ SENDER, NUM_TXS = ARGS.sender, int(ARGS.num_txs)
 STATUS, VAL1 = keys_show(SENDER, "val")
 if not STATUS:
     sys.exit(VAL1)
-VAL1 = VAL1['address']
+VAL1 = VAL1["address"]
 
 for i in range(0, NUM_TXS):
     # Fetch balance of sender

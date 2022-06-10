@@ -5,8 +5,8 @@ import os
 import json
 from utils import exec_command
 
-DAEMON = os.getenv('DAEMON')
-DAEMON_HOME = os.getenv('DAEMON_HOME')
+DAEMON = os.getenv("DAEMON")
+DAEMON_HOME = os.getenv("DAEMON_HOME")
 
 
 def keys_show(account, account_type="acc"):
@@ -21,8 +21,8 @@ def keys_show(account, account_type="acc"):
         _type_: _description_
     """
     try:
-        command = f'''{DAEMON} keys show {account} --home {DAEMON_HOME}-1 --bech {account_type} \
-            --keyring-backend test --output json'''
+        command = f"""{DAEMON} keys show {account} --home {DAEMON_HOME}-1 --bech {account_type} \
+            --keyring-backend test --output json"""
         stdout, stderr = exec_command(command)
         if len(stderr) != 0:
             return False, stderr

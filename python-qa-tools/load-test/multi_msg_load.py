@@ -11,7 +11,7 @@ from core.keys import keys_show
 from modules.auth.query import account_type, query_account
 from modules.bank.query import query_balances
 from modules.bank.tx import sign_and_broadcast_txs, create_unsigned_txs
-from utils import create_multi_messages, print_balance_deductions
+from utils import create_multi_messages, validate_num_txs, print_balance_deductions
 
 HOME = os.getenv("HOME")
 NUM_MSGS = int(os.getenv("NUM_MSGS"))
@@ -35,7 +35,11 @@ PARSER.add_argument(
     help="Receiver bech32 address",
 )
 PARSER.add_argument(
-    "-n", "--num_txs", type=int, default=1000, help="Number of transactions to be made."
+    "-n",
+    "--num_txs",
+    type=validate_num_txs,
+    default=1000,
+    help="Number of transactions to be made, should be positive integer",
 )
 ARGS = PARSER.parse_args()
 SENDER = ARGS.sender
