@@ -3,6 +3,7 @@ from core.keys import keys_show
 from modules.auth.query import account_type, query_account
 from modules.bank.tx import tx_send
 from utils import check_tx_result, print_tx_summary, validate_num_txs
+from stats import clear_data_by_type
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
@@ -43,6 +44,8 @@ bound = num_txs + seq1no
 logging.info(f"initial sequence number of sender account : {seq1no}")
 
 num_success_txs, num_failed_txs, num_other_errors, failed_code_errors = 0, 0, 0, {}
+
+clear_data_by_type("send-load")
 
 for i in range(seq1no, bound):
     status, tx = tx_send(sender, receiver, 1000000, 200000, sequence=i)

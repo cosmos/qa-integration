@@ -1,6 +1,6 @@
 import argparse, os, json, logging, subprocess
 
-from black import err
+from stats import check_status
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
@@ -23,11 +23,19 @@ def print_balance_deductions(wallet, diff):
 
 
 # The utility function `exec_command` is used to execute the cosmos-sdk based commands.
-def exec_command(command):
-    stdout, stderr = subprocess.Popen(
-        command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    ).communicate()
-    return stdout.strip().decode(), stderr.strip().decode()
+def exec_command(command, test_type=None, cmd_type=None):
+    try:
+        stdout, stderr = subprocess.Popen(
+            command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        ).communicate()
+        out, err = stdout.strip().decode(), stderr.strip().decode()
+        if test_type:
+            check_status(test_type, cmd_type, out, err)
+        return out, err
+    except Exception as e:
+        if test_type:
+            check_status(test_type, cmd_type, '', e)
+        return None, e
 
 
 # The utility function `is_tool` is used to verify the package or binary installation.
