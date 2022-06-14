@@ -1,9 +1,10 @@
 import argparse, os, sys, logging
+from cgi import test
 from core.keys import keys_show
 from modules.auth.query import account_type, query_account
 from modules.bank.tx import tx_send
-from utils import check_tx_result, print_tx_summary, validate_num_txs
-from stats import clear_data_by_type
+from utils import validate_num_txs
+from stats import clear_data_by_type, print_stats
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
@@ -43,31 +44,13 @@ seq1no = int(account["sequence"])
 bound = num_txs + seq1no
 logging.info(f"initial sequence number of sender account : {seq1no}")
 
-num_success_txs, num_failed_txs, num_other_errors, failed_code_errors = 0, 0, 0, {}
-
-clear_data_by_type("send-load")
+# declaring test type and clearing db data with same test type
+test_type = "send-load"
+clear_data_by_type(test_type)
 
 for i in range(seq1no, bound):
-    status, tx = tx_send(sender, receiver, 1000000, 200000, sequence=i)
-    (
-        failed_code_errors,
-        num_success_txs,
-        num_failed_txs,
-        num_other_errors,
-    ) = check_tx_result(
-        tx,
-        status,
-        failed_code_errors,
-        num_success_txs,
-        num_failed_txs,
-        num_other_errors,
+    status, tx = tx_send(
+        sender, receiver, 1000000, 200000, sequence=i, test_type=test_type
     )
 
-print_tx_summary(
-    num_txs,
-    num_txs,
-    failed_code_errors,
-    num_success_txs,
-    num_failed_txs,
-    num_other_errors,
-)
+print_stats(test_type)

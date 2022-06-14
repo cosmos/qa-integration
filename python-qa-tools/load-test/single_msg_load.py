@@ -4,11 +4,11 @@ from modules.auth.query import account_type, query_account
 from modules.bank.query import query_balances
 from modules.bank.tx import tx_send
 from utils import (
-    print_tx_summary,
     validate_num_txs,
     print_balance_deductions,
-    check_tx_result,
 )
+from stats import clear_data_by_type, print_stats
+
 
 HOME = os.getenv("HOME")
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
@@ -76,41 +76,19 @@ sender_acc_seq, receiver_acc_seq = int(sender_acc["sequence"]), int(
     receiver_acc["sequence"]
 )
 
-num_success_txs, num_failed_txs, num_other_errors, failed_code_errors = 0, 0, 0, {}
+# declaring test type and clearing db data with same test type
+test_type = "single-msg-load"
+clear_data_by_type(test_type)
 
 for i in range(NUM_TXS):
     seqto = sender_acc_seq + i
     seqfrom = receiver_acc_seq + i
-    status, sTxto = tx_send(sender, receiver, amount_to_be_sent, 100000, False, seqto)
-    (
-        failed_code_errors,
-        num_success_txs,
-        num_failed_txs,
-        num_other_errors,
-    ) = check_tx_result(
-        sTxto,
-        status,
-        failed_code_errors,
-        num_success_txs,
-        num_failed_txs,
-        num_other_errors,
+    status, sTxto = tx_send(
+        sender, receiver, amount_to_be_sent, 100000, False, seqto, test_type
     )
 
     status, sTxfrom = tx_send(
-        receiver, sender, amount_to_be_sent, 100000, False, seqfrom
-    )
-    (
-        failed_code_errors,
-        num_success_txs,
-        num_failed_txs,
-        num_other_errors,
-    ) = check_tx_result(
-        sTxfrom,
-        status,
-        failed_code_errors,
-        num_success_txs,
-        num_failed_txs,
-        num_other_errors,
+        receiver, sender, amount_to_be_sent, 100000, False, seqfrom, test_type
     )
 
 logging.info("waiting for tx confirmation, avg time is 7s.")
@@ -133,11 +111,4 @@ receiver_diff = int(receiver_balance_old) - int(receiver_balance_updated)
 print_balance_deductions("sender", sender_diff)
 print_balance_deductions("receiver", receiver_diff)
 
-print_tx_summary(
-    NUM_TXS * 2,
-    NUM_TXS * 2,
-    failed_code_errors,
-    num_success_txs,
-    num_failed_txs,
-    num_other_errors,
-)
+print_stats(test_type)

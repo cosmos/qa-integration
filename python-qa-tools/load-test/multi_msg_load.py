@@ -8,9 +8,8 @@ from utils import (
     create_multi_messages,
     validate_num_txs,
     print_balance_deductions,
-    check_tx_result,
-    print_tx_summary,
 )
+from stats import clear_data_by_type, print_stats
 
 HOME = os.getenv("HOME")
 NUM_MSGS = int(os.getenv("NUM_MSGS"))
@@ -54,6 +53,8 @@ if sender == receiver:
         'Error: The values of arguments "sender" and "receiver" are equal make sure to set different values'
     )
 
+test_type = "multi-msg-load"
+
 # Fetch balances of sender and receiver accounts before executing the load test
 status, sender_balance_old = query_balances(sender)
 if not status:
@@ -81,18 +82,20 @@ sender_acc_seq, receiver_acc_seq = int(sender_acc["sequence"]), int(
 
 # Generating unsigned transactions with a single transfer message
 status, unsignedTxto = create_unsigned_txs(
-    sender, receiver, amount_to_be_sent, "unsignedto.json"
+    sender, receiver, amount_to_be_sent, "unsignedto.json", test_type
 )
 if not status:
     logging.error(unsignedTxto)
 
 status, unsignedTxfrom = create_unsigned_txs(
-    receiver, sender, amount_to_be_sent, "unsignedfrom.json"
+    receiver, sender, amount_to_be_sent, "unsignedfrom.json", test_type
 )
 if not status:
     logging.error(unsignedTxfrom)
 
-num_success_txs, num_failed_txs, num_other_errors, failed_code_errors = 0, 0, 0, {}
+
+# clearing db data with same test type
+clear_data_by_type(test_type)
 
 for i in range(NUM_TXS):
 
@@ -104,40 +107,14 @@ for i in range(NUM_TXS):
     seqto = sender_acc_seq + i
     logging.info(f"Signing and broadcasting tx: {i*2+1}")
     status, tx = sign_and_broadcast_txs(
-        "unsignedto.json", "signedto.json", sender, seqto
-    )
-    (
-        failed_code_errors,
-        num_success_txs,
-        num_failed_txs,
-        num_other_errors,
-    ) = check_tx_result(
-        tx,
-        status,
-        failed_code_errors,
-        num_success_txs,
-        num_failed_txs,
-        num_other_errors,
+        "unsignedto.json", "signedto.json", sender, seqto, test_type
     )
 
     # Signing and broadcasting the unsigned transactions from receiver to sender
     seqfrom = receiver_acc_seq + i
     logging.info(f"Signing and broadcasting tx: {i*2+2}")
     status, tx = sign_and_broadcast_txs(
-        "unsignedfrom.json", "signedfrom.json", receiver, seqfrom
-    )
-    (
-        failed_code_errors,
-        num_success_txs,
-        num_failed_txs,
-        num_other_errors,
-    ) = check_tx_result(
-        tx,
-        status,
-        failed_code_errors,
-        num_success_txs,
-        num_failed_txs,
-        num_other_errors,
+        "unsignedfrom.json", "signedfrom.json", receiver, seqfrom, test_type
     )
 
 logging.info("waiting for tx confirmation, avg time is 7s.")
@@ -160,11 +137,4 @@ receiver_diff = int(receiver_balance_old) - int(receiver_balance_updated)
 print_balance_deductions("sender", sender_diff)
 print_balance_deductions("receiver", receiver_diff)
 
-print_tx_summary(
-    NUM_TXS * 2,
-    NUM_TXS * 2 * NUM_MSGS,
-    failed_code_errors,
-    num_success_txs,
-    num_failed_txs,
-    num_other_errors,
-)
+print_stats(test_type)

@@ -34,7 +34,7 @@ def exec_command(command, test_type=None, cmd_type=None):
         return out, err
     except Exception as e:
         if test_type:
-            check_status(test_type, cmd_type, '', e)
+            check_status(test_type, cmd_type, "", e)
         return None, e
 
 
@@ -79,61 +79,3 @@ def create_multi_messages(num_msgs, file_name):
         file_data["body"]["messages"] = messages
         file.seek(0)
         json.dump(file_data, file, indent=4)
-
-
-# check_tx_result checks tx whether failed or success and update count based on it
-def check_tx_result(
-    tx_result,
-    status,
-    failed_code_errors,
-    num_success_txs,
-    num_failed_txs,
-    num_other_errors,
-):
-    if not status:
-        num_failed_txs += 1
-        logging.error(f"ERROR: {tx_result}")
-        if type(tx_result) is dict and "code" in tx_result:
-            if tx_result["code"] not in failed_code_errors:
-                failed_code_errors[tx_result["code"]] = []
-            error_type = tx_result["raw_log"]
-            split_raw_log = error_type.split(":")
-            if len(split_raw_log):
-                error_type = split_raw_log[-1].strip()
-
-            failed_code_errors[tx_result["code"]].append(error_type)
-        else:
-            num_other_errors += 1
-
-    else:
-        num_success_txs += 1
-
-    return failed_code_errors, num_success_txs, num_failed_txs, num_other_errors
-
-
-def print_tx_summary(
-    num_txs,
-    num_msgs,
-    failed_code_errors,
-    num_success_txs,
-    num_failed_txs,
-    num_other_errors,
-):
-    logging.info(
-        f"""
-Testing Stats:
------------------------------
-Number of transactions executed: {num_txs}
-Number of messages executed: {num_msgs}
-Number of successful transactions: {num_success_txs} ({(num_success_txs/num_txs)*100}%)
-Number of failed transactions: {num_failed_txs} ({(num_failed_txs/num_txs)*100}%)
-        """
-    )
-    if num_failed_txs:
-        logging.info("Failures:")
-        for key, value in failed_code_errors.items():
-            logging.info(f"Failed with code {key} ({value[0]}): {len(value)}")
-        if num_other_errors:
-            logging.info(f"Other errors: {num_other_errors}")
-
-    logging.info("-----------------------------")
