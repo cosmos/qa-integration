@@ -16,8 +16,7 @@ fi
 
 echo "--------- No.of validators who have to vote on the proposal : $NUM_VALS ------------"
 IP="$(dig +short myip.opendns.com @resolver1.opendns.com)"
-
-if [ -z $IP ]
+if [[ -z $IP || "$IS_PUBLIC" == "false" ]]
 then
     IP=127.0.0.1
 fi

@@ -41,7 +41,7 @@ def sign_and_broadcast_txs(unsigned_file, signed_file, from_address, sequence):
         return False, e
 
 # The function tx_send internally calls the 'tx send' command and return the response in json format.
-def tx_send(from_address, to_address, amount, gas="auto", unsigned = False, sequence = None):
+def tx_send(from_address, to_address, amount, gas=DEFAULT_GAS, unsigned = False, sequence = None):
     try:    
         if unsigned:
             command = f"{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} --chain-id {CHAINID} --output json --node {RPC} --generate-only --gas {gas}"

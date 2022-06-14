@@ -1,4 +1,4 @@
-#/bin/sh
+#/bin/bash
 
 ## This script installs the basic apt packages and also checks if go is installed on the system or
 ## not. If go is not installed on the system then go1.17.3 is installed by the script. Env variables
@@ -22,21 +22,13 @@ else
   tar -xvf go$goversion.linux-amd64.tar.gz
   sudo mv go /usr/local
   rm go$goversion.linux-amd64.tar.gz
-  echo "------ Update bashrc ---------------"
   export GOPATH=$HOME/go
-  export GOROOT=/usr/local/go
-  export GOBIN=$GOPATH/bin
-  export PATH=$PATH:/usr/local/go/bin:$GOBIN
   echo "" >> ~/.bashrc
-  echo 'export GOPATH=$HOME/go' >> ~/.bashrc
   echo 'export GOROOT=/usr/local/go' >> ~/.bashrc
-  echo 'export GOBIN=$GOPATH/bin' >> ~/.bashrc
-  echo 'export PATH=$PATH:/usr/local/go/bin:$GOBIN' >> ~/.bashrc
-  source ~/.bashrc
-  mkdir -p "$GOBIN"
-  mkdir -p $GOPATH/src/github.com
-  go version
 fi
+source ~/.bashrc
+mkdir -p $GOPATH/src/github.com
+go version
 
 if command_exists python3 ; then
   echo "python3-dev is already installed"
@@ -53,6 +45,3 @@ else
   sudo apt update
   sudo apt install pylint -y
 fi
-
-echo "" >> ~/.bashrc
-source ~/.bashrc

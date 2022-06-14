@@ -24,15 +24,23 @@ fi
 NUM_ACCOUNTS=$2
 echo "INFO: Setting up $NUM_NODES validator nodes and $NUM_ACCOUNTS accounts"
 cd $HOME
+mkdir -p "$GOBIN"
 echo "INFO: Installing cosmovisor"
 go install github.com/cosmos/cosmos-sdk/cosmovisor/cmd/cosmovisor@v1.0.0
 strings $(which cosmovisor) | egrep -e "mod\s+github.com/cosmos/cosmos-sdk/cosmovisor"
 export REPO=$(basename $GH_URL .git)
 
-echo "INFO: Installing $DAEMON"
-CURR_VERSION='v'$($DAEMON version)
-if [ $CURR_VERSION != $CHAIN_VERSION ]
+DAEMON_EXISTS=""
+CURR_VERSION=""
+echo "INFO: Checking $DAEMON is installed or not"
+if type $DAEMON &> /dev/null; then
+    DAEMON_EXISTS="true"
+    CURR_VERSION='v'$($DAEMON version)
+fi
+
+if [[ -z DAEMON_EXISTS || $CURR_VERSION != $CHAIN_VERSION ]]
 then
+    echo "INFO: Installing $DAEMON"
     if [ ! -d $REPO ]
     then
         git clone $GH_URL
@@ -41,7 +49,9 @@ then
     git fetch --all && git checkout $CHAIN_VERSION
     make install
 fi
+
 cd $HOME
+echo "Installed $DAEMON version details:"
 # check version
 $DAEMON version --long
 # export daemon home paths
@@ -132,11 +142,12 @@ do
     cp $DAEMON_HOME-1/config/genesis.json $DAEMON_HOME-$a/config/
 done
 
-echo "INFO: Getting public IP address to configure peers"
 IP="$(dig +short myip.opendns.com @resolver1.opendns.com)"
-if [ -z $IP ]
+if [[ -z $IP || "$IS_PUBLIC" == "false" ]]
 then
     IP=127.0.0.1
+else
+    echo "INFO: Configuring peers with public IP address"
 fi
 
 for (( a=1; a<=$NUM_VALS; a++ ))

@@ -3,14 +3,14 @@ from core.keys import keys_show
 from modules.auth.query import account_type
 from modules.bank.query import query_balances
 from modules.staking.query import query_staking_delegations, query_staking_validators
-from utils import num_txs_type
+from utils import validate_num_txs
 
 logging.basicConfig(format='%(message)s',
                     level=logging.DEBUG)
 
 parser = argparse.ArgumentParser(description='This program takes inputs for intializing tx query load test.')
 parser.add_argument('-s', '--sender', type= account_type, default = keys_show("validator1")[1]['address'], help= 'From which account the transaction should be intialized')
-parser.add_argument('-n', '--num_txs', type = num_txs_type, default = 1000, help= 'Number of transactions to be made, atleast should be 1000')
+parser.add_argument('-n', '--num_txs', type = validate_num_txs, default = 1000, help= 'Number of transactions to be made, should be positive integer')
 args = parser.parse_args()
 
 sender, num_txs = args.sender, int(args.num_txs)

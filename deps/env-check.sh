@@ -12,6 +12,9 @@ set +a
 # set pythonpath environment with absolute path of python-qa-tools directory
 cd ..
 export PYTHONPATH=$PWD:$PWD/python-qa-tools
+export GOPATH=$HOME/go
+export GOBIN=$GOPATH/bin
+export PATH=$PATH:/usr/local/go/bin:$GOBIN
 
 display_usage() {
     printf "** Please configure env file or export all the necessary env variables  :: **\n Daemon : $DAEMON\n Denom : $DENOM\n ChainID : $CHAINID\n DaemonHome : $DAEMON_HOME\n \n Github URL : $GH_URL\n Chain Version : $CHAIN_VERSION\n"
