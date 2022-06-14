@@ -21,7 +21,7 @@ display_usage() {
     exit 1
 }
 
-if [ -z $DAEMON ] || [ -z $DENOM ] || [ -z $CHAINID ] || [ -z $DAEMON_HOME ] || [ -z $GH_URL ] || [ -z $CHAIN_VERSION ] || [ -z $RPC ] || [-z $MONGO_URL]
+if [ -z $DAEMON ] || [ -z $DENOM ] || [ -z $CHAINID ] || [ -z $DAEMON_HOME ] || [ -z $GH_URL ] || [ -z $CHAIN_VERSION ] || [ -z $RPC ] || [ -z $MONGO_URL ]
 then 
     display_usage
 fi
