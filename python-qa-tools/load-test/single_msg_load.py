@@ -76,19 +76,18 @@ sender_acc_seq, receiver_acc_seq = int(sender_acc["sequence"]), int(
     receiver_acc["sequence"]
 )
 
-# declaring test type and clearing db data with same test type
-test_type = "single-msg-load"
-clear_data_by_type(test_type)
+# clearing db data with same test type
+clear_data_by_type()
 
 for i in range(NUM_TXS):
     seqto = sender_acc_seq + i
     seqfrom = receiver_acc_seq + i
     status, sTxto = tx_send(
-        sender, receiver, amount_to_be_sent, 100000, False, seqto, test_type
+        sender, receiver, amount_to_be_sent, 100000, False, seqto
     )
 
     status, sTxfrom = tx_send(
-        receiver, sender, amount_to_be_sent, 100000, False, seqfrom, test_type
+        receiver, sender, amount_to_be_sent, 100000, False, seqfrom
     )
 
 logging.info("waiting for tx confirmation, avg time is 7s.")
@@ -111,4 +110,4 @@ receiver_diff = int(receiver_balance_old) - int(receiver_balance_updated)
 print_balance_deductions("sender", sender_diff)
 print_balance_deductions("receiver", receiver_diff)
 
-print_stats(test_type)
+print_stats()

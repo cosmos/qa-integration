@@ -1,6 +1,6 @@
 import argparse, os, json, logging, subprocess
 
-from stats import check_status
+from stats import record_stat, TX_TYPE, QUERY_TYPE
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
@@ -23,18 +23,29 @@ def print_balance_deductions(wallet, diff):
 
 
 # The utility function `exec_command` is used to execute the cosmos-sdk based commands.
-def exec_command(command, test_type=None, cmd_type=None):
+def exec_command(command):
     try:
+        test_type = os.getenv("TEST_TYPE") if os.getenv("TEST_TYPE") else None
+        # getting command type
+        sub_commands = command.split()
+        cmd_type = None
+        if len(sub_commands) > 1 and (
+            sub_commands[1] == "q" or sub_commands[1] == "query"
+        ):
+            cmd_type = QUERY_TYPE
+        elif len(sub_commands) > 1 and (sub_commands[1] == "tx"):
+            cmd_type = TX_TYPE
+
         stdout, stderr = subprocess.Popen(
             command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE
         ).communicate()
         out, err = stdout.strip().decode(), stderr.strip().decode()
-        if test_type:
-            check_status(test_type, cmd_type, out, err)
+        if test_type and cmd_type:
+            record_stat(test_type, cmd_type, out, err)
         return out, err
     except Exception as e:
-        if test_type:
-            check_status(test_type, cmd_type, "", e)
+        if test_type and cmd_type:
+            record_stat(test_type, cmd_type, "", e)
         return None, e
 
 

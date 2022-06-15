@@ -34,14 +34,13 @@ if not status:
     sys.exit(val1)
 val1 = val1["address"]
 
-test_type = "query-load"
 
 # clearing db data with same test type
-clear_data_by_type(test_type)
+clear_data_by_type()
 
 for i in range(0, num_txs):
     # Fetch balance of sender
-    status, balance_query_response = query_balances(sender, test_type)
+    status, balance_query_response = query_balances(sender)
     if not status:
         logging.error(balance_query_response)
     else:
@@ -49,13 +48,13 @@ for i in range(0, num_txs):
         logging.info(f"Balance :: {balance}")
 
     # Fetch staking validators
-    status, validators_response = query_staking_validators(test_type)
+    status, validators_response = query_staking_validators()
     if not status:
         logging.error(validators_response)
 
     # Fetch staking delegations
-    status, delegations_response = query_staking_delegations(sender, val1, test_type)
+    status, delegations_response = query_staking_delegations(sender, val1)
     if not status:
         logging.error(delegations_response)
 
-print_stats(test_type, QUERY_TYPE)
+print_stats(QUERY_TYPE)

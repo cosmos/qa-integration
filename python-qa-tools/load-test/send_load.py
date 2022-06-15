@@ -43,13 +43,10 @@ seq1no = int(account["sequence"])
 bound = num_txs + seq1no
 logging.info(f"initial sequence number of sender account : {seq1no}")
 
-# declaring test type and clearing db data with same test type
-test_type = "send-load"
-clear_data_by_type(test_type)
+# clearing db data with same test type
+clear_data_by_type()
 
 for i in range(seq1no, bound):
-    status, tx = tx_send(
-        sender, receiver, 1000000, 200000, sequence=i, test_type=test_type
-    )
+    status, tx = tx_send(sender, receiver, 1000000, 200000, sequence=i)
 
-print_stats(test_type)
+print_stats()

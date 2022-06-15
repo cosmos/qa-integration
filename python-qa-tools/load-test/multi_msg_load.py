@@ -53,8 +53,6 @@ if sender == receiver:
         'Error: The values of arguments "sender" and "receiver" are equal make sure to set different values'
     )
 
-test_type = "multi-msg-load"
-
 # Fetch balances of sender and receiver accounts before executing the load test
 status, sender_balance_old = query_balances(sender)
 if not status:
@@ -82,20 +80,20 @@ sender_acc_seq, receiver_acc_seq = int(sender_acc["sequence"]), int(
 
 # Generating unsigned transactions with a single transfer message
 status, unsignedTxto = create_unsigned_txs(
-    sender, receiver, amount_to_be_sent, "unsignedto.json", test_type
+    sender, receiver, amount_to_be_sent, "unsignedto.json"
 )
 if not status:
     logging.error(unsignedTxto)
 
 status, unsignedTxfrom = create_unsigned_txs(
-    receiver, sender, amount_to_be_sent, "unsignedfrom.json", test_type
+    receiver, sender, amount_to_be_sent, "unsignedfrom.json"
 )
 if not status:
     logging.error(unsignedTxfrom)
 
 
 # clearing db data with same test type
-clear_data_by_type(test_type)
+clear_data_by_type()
 
 for i in range(NUM_TXS):
 
@@ -107,14 +105,14 @@ for i in range(NUM_TXS):
     seqto = sender_acc_seq + i
     logging.info(f"Signing and broadcasting tx: {i*2+1}")
     status, tx = sign_and_broadcast_txs(
-        "unsignedto.json", "signedto.json", sender, seqto, test_type
+        "unsignedto.json", "signedto.json", sender, seqto
     )
 
     # Signing and broadcasting the unsigned transactions from receiver to sender
     seqfrom = receiver_acc_seq + i
     logging.info(f"Signing and broadcasting tx: {i*2+2}")
     status, tx = sign_and_broadcast_txs(
-        "unsignedfrom.json", "signedfrom.json", receiver, seqfrom, test_type
+        "unsignedfrom.json", "signedfrom.json", receiver, seqfrom
     )
 
 logging.info("waiting for tx confirmation, avg time is 7s.")
@@ -137,4 +135,4 @@ receiver_diff = int(receiver_balance_old) - int(receiver_balance_updated)
 print_balance_deductions("sender", sender_diff)
 print_balance_deductions("receiver", receiver_diff)
 
-print_stats(test_type)
+print_stats()
