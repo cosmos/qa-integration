@@ -1,5 +1,4 @@
-import argparse, os, sys, logging
-from cgi import test
+import argparse, sys, logging
 from core.keys import keys_show
 from modules.auth.query import account_type, query_account
 from modules.bank.tx import tx_send
