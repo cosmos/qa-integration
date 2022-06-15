@@ -24,10 +24,10 @@ def tx_delegate(from_key, to_address, amount,fee, gas="auto", unsigned = False, 
                 command = f"{DAEMON} tx staking delegate {to_address} {amount}{DENOM} --from {from_key} --fees {fee}{DENOM} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --sequence {sequence} --gas {gas}"
                 
             else:
-                command = f"{DAEMON}  tx staking delegate {to_address} {amount}{DENOM} --from {from_key} --fees {fee}{DENOM} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}"
+                command = f"{DAEMON}  tx staking delegate {to_address} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y "
             tx, tx_err = exec_command(command)
             tx = json.loads(tx)
-            if len(text_file):
+            if len(tx_err):
                 return False, tx_err
             elif tx['code'] != 0:
                 return False, tx
