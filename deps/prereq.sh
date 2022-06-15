@@ -57,7 +57,7 @@ fi
 
 pip install -r ../python-qa-tools/requirements.txt
 
-if command_exists mongo ; then
+if command_exists mongod ; then
   echo "mongo db is already installed"
 else
   sudo apt-get install gnupg
@@ -65,5 +65,5 @@ else
   echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
   sudo apt-get update -y
   sudo apt-get install mongodb-org -y
-  sudo systemctl start mongod
 fi
+sudo systemctl start mongod
