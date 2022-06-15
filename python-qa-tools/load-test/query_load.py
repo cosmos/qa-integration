@@ -4,7 +4,7 @@ from modules.auth.query import account_type
 from modules.bank.query import query_balances
 from modules.staking.query import query_staking_delegations, query_staking_validators
 from utils import validate_num_txs
-from stats import print_stats, QUERY_TYPE
+from stats import print_stats, clear_data_by_type, QUERY_TYPE
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
@@ -35,6 +35,9 @@ if not status:
 val1 = val1["address"]
 
 test_type = "query-load"
+
+# clearing db data with same test type
+clear_data_by_type(test_type)
 
 for i in range(0, num_txs):
     # Fetch balance of sender
