@@ -8,7 +8,8 @@ command_exists () {
     type "$1" &> /dev/null ;
 }
 
-cd $HOME
+CURPATH=`dirname $(realpath "$0")`
+cd $CURPATH
 
 if command_exists go ; then
   echo "Golang is already installed"
@@ -44,4 +45,25 @@ else
   echo "Installing pylint"
   sudo apt update
   sudo apt install pylint -y
+fi
+
+if command_exists pip ; then
+  echo "pip is already installed"
+else
+  echo "Installing pip"
+  sudo apt update
+  sudo apt install python3-pip -y
+fi
+
+pip install -r ../python-qa-tools/requirements.txt
+
+if command_exists mongo ; then
+  echo "mongo db is already installed"
+else
+  sudo apt-get install gnupg
+  wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
+  echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
+  sudo apt-get update -y
+  sudo apt-get install mongodb-org -y
+  sudo systemctl start mongod
 fi

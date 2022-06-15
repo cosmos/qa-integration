@@ -172,8 +172,8 @@ do
     INC=$(($DIFF * 2))
     RPC=$((16657 + $INC)) #increment rpc ports
     LADDR=$((16656 + $INC)) #increment laddr ports
-    GRPC=$((9090 + $INC)) #increment grpc poprt
-    WGRPC=$((9091 + $INC)) #increment web grpc port
+    GRPC=$((9092 + $INC)) #increment grpc poprt
+    WGRPC=$((9093 + $INC)) #increment web grpc port
     echo "INFO: Updating validator-$a chain config"
     sed -i 's#tcp://127.0.0.1:26657#tcp://0.0.0.0:'${RPC}'#g' $DAEMON_HOME-$a/config/config.toml
     sed -i 's#tcp://0.0.0.0:26656#tcp://0.0.0.0:'${LADDR}'#g' $DAEMON_HOME-$a/config/config.toml
@@ -212,7 +212,7 @@ do
     echo "INFO: Starting $DAEMON-${a} service"
     sudo -S systemctl daemon-reload
     sudo -S systemctl start $DAEMON-${a}.service
-    sleep 1s
+    sleep 7s
     echo "INFO: Checking $DAEMON_HOME-${a} chain status"
     $DAEMON status --node tcp://localhost:${RPC}
 done
