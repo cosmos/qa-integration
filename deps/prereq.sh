@@ -23,10 +23,10 @@ else
   tar -xvf go$goversion.linux-amd64.tar.gz
   sudo mv go /usr/local
   rm go$goversion.linux-amd64.tar.gz
-  export GOPATH=$HOME/go
-  echo "" >> ~/.bashrc
-  echo 'export GOROOT=/usr/local/go' >> ~/.bashrc
 fi
+export GOPATH=$HOME/go
+echo "" >> ~/.bashrc
+echo 'export GOROOT=/usr/local/go' >> ~/.bashrc
 source ~/.bashrc
 mkdir -p $GOPATH/src/github.com
 go version
