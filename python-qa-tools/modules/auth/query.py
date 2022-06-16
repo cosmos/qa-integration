@@ -2,8 +2,8 @@ import argparse, os, json
 
 from utils import exec_command
 
-DAEMON = os.getenv('DAEMON')
-RPC = os.getenv('RPC')
+DAEMON = os.getenv("DAEMON")
+RPC = os.getenv("RPC")
 
 # account_type is an user-defined data type used to validate account addresses read from Argument Parser.
 def account_type(address):
@@ -11,7 +11,8 @@ def account_type(address):
     if not status:
         raise argparse.ArgumentTypeError(response)
     return address
-  
+
+
 # query_account function will take the bech32 address as input and output the information of account.
 def query_account(address):
     try:
@@ -22,4 +23,3 @@ def query_account(address):
         return True, json.loads(stdout)
     except Exception as e:
         return False, e
-    
