@@ -84,7 +84,7 @@ def print_stats(cmd_type=TX_TYPE):
         )
 
         stats_log = f"""
-Testing Stats:
+Testing stats of {test_type} tests:
 -----------------------------
 Number of {log_text} executed: {num_txs}
 Number of successful {log_text}: {num_success_txs} ({(num_success_txs/num_txs)*100}%)
