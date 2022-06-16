@@ -119,7 +119,7 @@ Number of failed {log_text}: {num_failed_txs} ({(num_failed_txs/num_txs)*100}%)\
                     stats_log += f"Failed with code {item['_id']} ({item['items'][0]['error_type']}): {item['count']}\n"
 
         stats_log += "-----------------------------"
+        logging.info(stats_log)
         file = open("stats.txt", "w")
         file.write(stats_log)
         file.close()
-        logging.info(stats_log)
