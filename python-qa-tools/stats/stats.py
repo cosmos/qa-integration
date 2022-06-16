@@ -82,17 +82,16 @@ def print_stats(cmd_type=TX_TYPE):
         num_failed_txs = db[COL_NAME].count_documents(
             {"test_type": test_type, "cmd_type": cmd_type, "success": False}
         )
-        logging.info(
-            f"""
+
+        stats_log = f"""
 Testing Stats:
 -----------------------------
 Number of {log_text} executed: {num_txs}
 Number of successful {log_text}: {num_success_txs} ({(num_success_txs/num_txs)*100}%)
-Number of failed {log_text}: {num_failed_txs} ({(num_failed_txs/num_txs)*100}%)
-            """
-        )
+Number of failed {log_text}: {num_failed_txs} ({(num_failed_txs/num_txs)*100}%)\n
+"""
         if num_failed_txs and cmd_type == TX_TYPE:
-            logging.info("Failures:")
+            stats_log += "Failures:\n"
             failures = list(
                 db[COL_NAME].aggregate(
                     [
@@ -115,10 +114,12 @@ Number of failed {log_text}: {num_failed_txs} ({(num_failed_txs/num_txs)*100}%)
             )
             for item in failures:
                 if item["_id"] == "unknown":
-                    logging.info(f"Runtime errors: {item['count']}")
+                    stats_log += f"Runtime errors: {item['count']}\n"
                 else:
-                    logging.info(
-                        f"Failed with code {item['_id']} ({item['items'][0]['error_type']}): {item['count']}"
-                    )
+                    stats_log += f"Failed with code {item['_id']} ({item['items'][0]['error_type']}): {item['count']}\n"
 
-        logging.info("-----------------------------")
+        stats_log += "-----------------------------"
+        logging.info(stats_log)
+        file =  open('stats.txt',"w")
+        file.write(stats_log)
+        file.close()
