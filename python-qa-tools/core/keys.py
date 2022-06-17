@@ -6,9 +6,9 @@ DAEMON = os.getenv('DAEMON')
 DAEMON_HOME = os.getenv('DAEMON_HOME')
 
 # The function `keys_show` will return the key details in json format.
-def keys_show(account, type):
+def keys_show(account, type, home):
     try:
-        command = f"{DAEMON} keys show {account} --home {DAEMON_HOME}-1 --bech {type} --keyring-backend test --output json"
+        command = f"{DAEMON} keys show {account} --home {DAEMON_HOME}-{home} --bech {type} --keyring-backend test --output json"
         stdout, stderr = exec_command(command)
         if len(stderr):
             return False, stderr
