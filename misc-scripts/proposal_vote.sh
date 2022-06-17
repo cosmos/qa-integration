@@ -45,7 +45,7 @@ for row in $(echo "${vp}" | jq -r '.proposals | .[] | @base64'); do
     then
       #cast vote
       castVote=$( ("${DAEMON}" tx gov vote "${PID}" yes --from "${FROMKEY}" --fees 1000"${DENOM}" --chain-id "${CHAINID}" --node "${RPC}" --home $DAEMON_HOME-${a} --keyring-backend test --output json -y) 2>&1) 
-      sleep 6s
+      sleep 3s
       txHash=$(echo "${castVote}"| jq -r '.txhash')
       echo "TX HASH :: $txHash"
       txResult=$("${DAEMON}" q tx "${txHash}" --node $RPC --output json)

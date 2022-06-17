@@ -115,9 +115,6 @@ for i in range(NUM_TXS):
         "unsignedfrom.json", "signedfrom.json", receiver, seqfrom
     )
 
-logging.info("waiting for tx confirmation, avg time is 7s.")
-time.sleep(7)
-
 # Verifying the balance deductions
 status, sender_balance_updated = query_balances(sender)
 if not status:
