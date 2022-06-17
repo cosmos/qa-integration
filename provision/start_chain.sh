@@ -7,6 +7,7 @@
 GOV_DEFAULT_PERIOD="60s"
 DOWNTIME_JAIL_DURATION="60s"
 UNBONDING_PERIOD="60s"
+EVIDENCE_AGE="60000000000"
 
 set -e
 
@@ -138,7 +139,7 @@ done
 echo "INFO: Collecting gentxs"
 $DAEMON collect-gentxs --home $DAEMON_HOME-1
 echo "INFO: Updating genesis values"
-sed -i "s/172800000000000/60000000000/g" $DAEMON_HOME-1/config/genesis.json
+sed -i "s/172800000000000/${EVIDENCE_AGE}/g" $DAEMON_HOME-1/config/genesis.json
 sed -i "s/172800s/${GOV_DEFAULT_PERIOD}/g" $DAEMON_HOME-1/config/genesis.json
 sed -i "s/stake/$DENOM/g" $DAEMON_HOME-1/config/genesis.json
 sed -i 's/"downtime_jail_duration": "600s"/"downtime_jail_duration": "'${DOWNTIME_JAIL_DURATION}'"/' $DAEMON_HOME-1/config/genesis.json
