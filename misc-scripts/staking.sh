@@ -40,7 +40,7 @@ do
     echo "Iteration no $a and values of from : $FROMKEY to : $TO"
     echo "--------- Delegation from $FROMKEY to $TO-----------"
     dTx=$("${DAEMON}" tx staking delegate "${TO}" 10000"${DENOM}" --from $FROMKEY --fees 1000"${DENOM}" --chain-id "${CHAINID}" --keyring-backend test --home $DAEMON_HOME-${a} --node $RPC --output json -y)
-    sleep 6s
+    sleep 3s
     dtxHash=$(echo "${dTx}" | jq -r '.txhash')
     echo "TX HASH :: $dtxHash **"
     txResult=$("${DAEMON}" q tx "${dtxHash}" --node $RPC --output json)
@@ -62,15 +62,14 @@ do
     if [ $a == 1 ]
     then
         N=$NUM_VALS
-        P=`expr $NUM_VALS - 1`
-        fromValidator=$("${DAEMON}" keys show "validator${N}" --bech val --keyring-backend test --home $DAEMON_HOME-${N} --output json)
+        fromValidator=$("${DAEMON}" keys show "validator${a}" --bech val --keyring-backend test --home $DAEMON_HOME-${a} --output json)
         FROMADDRESS=$(echo "${fromValidator}" | jq -r '.address')
-        toValidator=$("${DAEMON}" keys show "validator${P}" --bech val --keyring-backend test --home $DAEMON_HOME-${P} --output json)
+        toValidator=$("${DAEMON}" keys show "validator${N}" --bech val --keyring-backend test --home $DAEMON_HOME-${N} --output json)
         TOADDRESS=$(echo "${toValidator}" | jq -r '.address')
         FROM=$FROMADDRESS
         TO=$TOADDRESS
-        FROMKEY="validator${N}"
-        TOKEY="validator${P}"
+        FROMKEY="validator${a}"
+        TOKEY="validator${N}"
     else 
         DIFF=`expr $a - 1`
         INC=`expr $DIFF \* 2`
@@ -90,8 +89,9 @@ do
 
     echo "Iteration no $a and values of from : $FROMKEY to : $TOKEY"
     echo "--------- Redelegation from $FROM to $TO-----------"
+    echo "${DAEMON} tx staking redelegate ${FROM} ${TO} 10000${DENOM} --from ${FROMKEY} --fees 1000${DENOM} --gas 400000 --chain-id ${CHAINID} --keyring-backend test --home $DAEMON_HOME-${a} --node $RPC --output json -y"
     rdTx=$("${DAEMON}" tx staking redelegate "${FROM}" "${TO}" 10000"${DENOM}" --from "${FROMKEY}" --fees 1000"${DENOM}" --gas 400000 --chain-id "${CHAINID}" --keyring-backend test --home $DAEMON_HOME-${a} --node $RPC --output json -y)
-    sleep 6s
+    sleep 3s
     rdtxHash=$(echo "${rdTx}" | jq -r '.txhash')
     echo "TX HASH :: $rdtxHash"
     txResult=$("${DAEMON}" q tx "${rdtxHash}" --node $RPC --output json)
@@ -119,7 +119,7 @@ do
     echo "Iteration no $a and values of from : $FROM and fromKey : $FROMKEY"
     echo "--------- Running unbond tx command of $FROM and key : $FROMKEY------------"
     ubTx=$("${DAEMON}" tx staking unbond "${FROM}" 10000"${DENOM}" --from "${FROMKEY}" --fees 1000"${DENOM}" --chain-id "${CHAINID}" --keyring-backend test --home $DAEMON_HOME-${a} --node $RPC --output json -y)
-    sleep 6s
+    sleep 3s
     ubtxHash=$(echo "${ubTx}" | jq -r '.txhash')
     echo "TX HASH :: $ubtxHash"
     txResult=$("${DAEMON}" q tx "${ubtxHash}" --node $RPC --output json)

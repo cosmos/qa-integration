@@ -184,6 +184,7 @@ do
     sed -i 's#0.0.0.0:9091#0.0.0.0:'${WGRPC}'#g' $DAEMON_HOME-$a/config/app.toml
     sed -i '/max_num_inbound_peers =/c\max_num_inbound_peers = 140' $DAEMON_HOME-$a/config/config.toml
     sed -i '/max_num_outbound_peers =/c\max_num_outbound_peers = 110' $DAEMON_HOME-$a/config/config.toml
+    sed -i '/skip_timeout_commit = false/c\skip_timeout_commit = true' $DAEMON_HOME-$a/config/config.toml
 done
 # create systemd service files
 for (( a=1; a<=$NUM_VALS; a++ ))
@@ -212,7 +213,7 @@ do
     echo "INFO: Starting $DAEMON-${a} service"
     sudo -S systemctl daemon-reload
     sudo -S systemctl start $DAEMON-${a}.service
-    sleep 7s
+    sleep 3s
     echo "INFO: Checking $DAEMON_HOME-${a} chain status"
     $DAEMON status --node tcp://localhost:${RPC}
 done

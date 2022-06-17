@@ -85,9 +85,6 @@ for i in range(NUM_TXS):
         receiver, sender, amount_to_be_sent, 100000, False, seqfrom
     )
 
-logging.info("waiting for tx confirmation, avg time is 7s.")
-time.sleep(7)
-
 #### Print Balances ####
 status, sender_balance_updated = query_balances(sender)
 if not status:

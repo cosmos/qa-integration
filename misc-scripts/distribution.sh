@@ -40,7 +40,7 @@ do
     echo "Iteration no $a and values of address : $VALADDRESS and key : $FROMKEY"
     echo "--------- withdraw-rewards of $FROMKEY-----------"
     wrTx=$("${DAEMON}" tx distribution withdraw-rewards "${VALADDRESS}" --from $FROMKEY --fees 1000"${DENOM}" --chain-id "${CHAINID}" --keyring-backend test --home $DAEMON_HOME-${a} --node $RPC --output json -y)
-    sleep 6s
+    sleep 3s
     wrtxHash=$(echo "${wrTx}" | jq -r '.txhash')
     echo "TX HASH :: $wrtxHash"
     txResult=$("${DAEMON}" q tx "${wrtxHash}" --node $RPC --output json)
@@ -69,7 +69,7 @@ do
     echo "Iteration no $a and values of address : $VALADDRESS and key : $FROMKEY"
     echo "--------- withdraw-rewards commission of $FROMKEY-----------"
     wrcTx=$("${DAEMON}" tx distribution withdraw-rewards "${VALADDRESS}" --from $FROMKEY --commission --fees 1000"${DENOM}" --chain-id "${CHAINID}" --keyring-backend test --home $DAEMON_HOME-${a} --node $RPC --output json -y)
-    sleep 6s
+    sleep 3s
     wrctxHash=$(echo "${wrcTx}" | jq -r '.txhash')
     echo "TX HASH :: $wrctxHash"
     txResult=$("${DAEMON}" q tx "${wrctxHash}" --node $RPC --output json)
@@ -98,7 +98,7 @@ do
     echo "Iteration no $a and values of address : $VALADDRESS and key : $FROMKEY"
     echo "------ withdraw-all-rewards of $FROMKEY --------"
     wartx=$($DAEMON tx distribution withdraw-all-rewards --from $FROMKEY --fees 1000"${DENOM}" --chain-id $CHAINID --keyring-backend test --home $DAEMON_HOME-${a} --node $RPC --output json -y)
-    sleep 6s
+    sleep 3s
     wartxHash=$(echo "${wartx}" | jq -r '.txhash')
     echo "TX HASH :: $wartxHash"
     txResult=$("${DAEMON}" q tx "${wartxHash}" --node $RPC --output json)
