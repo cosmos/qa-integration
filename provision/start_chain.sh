@@ -3,6 +3,12 @@
 ## This script sets up a multinode network and generates multilple addresses with 
 ## balance for testing purposes.
 
+
+GOV_DEFAULT_PERIOD="60s"
+DOWNTIME_JAIL_DURATION="60s"
+UNBONDING_PERIOD="60s"
+EVIDENCE_AGE="60000000000"
+
 set -e
 
 # get absolute parent directory path of current file
@@ -133,9 +139,11 @@ done
 echo "INFO: Collecting gentxs"
 $DAEMON collect-gentxs --home $DAEMON_HOME-1
 echo "INFO: Updating genesis values"
-sed -i "s/172800000000000/600000000000/g" $DAEMON_HOME-1/config/genesis.json
-sed -i "s/172800s/600s/g" $DAEMON_HOME-1/config/genesis.json
+sed -i "s/172800000000000/${EVIDENCE_AGE}/g" $DAEMON_HOME-1/config/genesis.json
+sed -i "s/172800s/${GOV_DEFAULT_PERIOD}/g" $DAEMON_HOME-1/config/genesis.json
 sed -i "s/stake/$DENOM/g" $DAEMON_HOME-1/config/genesis.json
+sed -i 's/"downtime_jail_duration": "600s"/"downtime_jail_duration": "'${DOWNTIME_JAIL_DURATION}'"/' $DAEMON_HOME-1/config/genesis.json
+sed -i 's/"unbonding_time": "1814400s"/"unbonding_time": "'${UNBONDING_PERIOD}'"/' $DAEMON_HOME-1/config/genesis.json
 echo "INFO: Distribute genesis.json of validator-1 to remaining nodes"
 for (( a=2; a<=$NUM_VALS; a++ ))
 do
@@ -172,8 +180,8 @@ do
     INC=$(($DIFF * 2))
     RPC=$((16657 + $INC)) #increment rpc ports
     LADDR=$((16656 + $INC)) #increment laddr ports
-    GRPC=$((9090 + $INC)) #increment grpc poprt
-    WGRPC=$((9091 + $INC)) #increment web grpc port
+    GRPC=$((9092 + $INC)) #increment grpc poprt
+    WGRPC=$((9093 + $INC)) #increment web grpc port
     echo "INFO: Updating validator-$a chain config"
     sed -i 's#tcp://127.0.0.1:26657#tcp://0.0.0.0:'${RPC}'#g' $DAEMON_HOME-$a/config/config.toml
     sed -i 's#tcp://0.0.0.0:26656#tcp://0.0.0.0:'${LADDR}'#g' $DAEMON_HOME-$a/config/config.toml
@@ -184,6 +192,7 @@ do
     sed -i 's#0.0.0.0:9091#0.0.0.0:'${WGRPC}'#g' $DAEMON_HOME-$a/config/app.toml
     sed -i '/max_num_inbound_peers =/c\max_num_inbound_peers = 140' $DAEMON_HOME-$a/config/config.toml
     sed -i '/max_num_outbound_peers =/c\max_num_outbound_peers = 110' $DAEMON_HOME-$a/config/config.toml
+    sed -i '/skip_timeout_commit = false/c\skip_timeout_commit = true' $DAEMON_HOME-$a/config/config.toml
 done
 # create systemd service files
 for (( a=1; a<=$NUM_VALS; a++ ))
@@ -212,7 +221,7 @@ do
     echo "INFO: Starting $DAEMON-${a} service"
     sudo -S systemctl daemon-reload
     sudo -S systemctl start $DAEMON-${a}.service
-    sleep 1s
+    sleep 3s
     echo "INFO: Checking $DAEMON_HOME-${a} chain status"
     $DAEMON status --node tcp://localhost:${RPC}
 done
