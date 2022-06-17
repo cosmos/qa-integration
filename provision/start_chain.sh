@@ -3,6 +3,11 @@
 ## This script sets up a multinode network and generates multilple addresses with 
 ## balance for testing purposes.
 
+
+GOV_DEFAULT_PERIOD="60s"
+DOWNTIME_JAIL_DURATION="60s"
+UNBONDING_PERIOD="60s"
+
 set -e
 
 # get absolute parent directory path of current file
@@ -133,9 +138,11 @@ done
 echo "INFO: Collecting gentxs"
 $DAEMON collect-gentxs --home $DAEMON_HOME-1
 echo "INFO: Updating genesis values"
-sed -i "s/172800000000000/600000000000/g" $DAEMON_HOME-1/config/genesis.json
-sed -i "s/172800s/600s/g" $DAEMON_HOME-1/config/genesis.json
+sed -i "s/172800000000000/60000000000/g" $DAEMON_HOME-1/config/genesis.json
+sed -i "s/172800s/${GOV_DEFAULT_PERIOD}/g" $DAEMON_HOME-1/config/genesis.json
 sed -i "s/stake/$DENOM/g" $DAEMON_HOME-1/config/genesis.json
+sed -i 's/"downtime_jail_duration": "600s"/"downtime_jail_duration": "'${DOWNTIME_JAIL_DURATION}'"/' $DAEMON_HOME-1/config/genesis.json
+sed -i 's/"unbonding_time": "1814400s"/"unbonding_time": "'${UNBONDING_PERIOD}'"/' $DAEMON_HOME-1/config/genesis.json
 echo "INFO: Distribute genesis.json of validator-1 to remaining nodes"
 for (( a=2; a<=$NUM_VALS; a++ ))
 do
