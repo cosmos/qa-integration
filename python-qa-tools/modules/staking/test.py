@@ -110,6 +110,6 @@ time.sleep(3)
 status, unbond_amount = query_unbonding_delegation(delegator, validator)
 unbond_balance = unbond_amount["entries"][0]["balance"]
 if amount_to_be_sent == int(unbond_balance):
-    logging.info(f"unbonding tx is successfull.")
+    logging.info(f"unbond tx is successfull.")
 else:
     logging.error("error in unbond tx.")
