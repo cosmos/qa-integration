@@ -6,7 +6,7 @@
 
 # set environment with env config.
 set -a
-source ../env
+source ../../env
 set +a
 
 # set pythonpath environment with absolute path of python-qa-tools directory
