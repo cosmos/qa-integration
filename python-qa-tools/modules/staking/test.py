@@ -36,8 +36,7 @@ if not status:
 else:
     logging.info(f"tx_hash of delegate_tx :: {delegate_tx['txhash']}")
 
-time.sleep(7)
-
+time.sleep(3)
 
 # query delegation amount
 before_del_amount = query_staking_delegations(delegator, validator)[1]["balance"][
@@ -50,7 +49,7 @@ if not status:
 else:
     logging.info(f"tx_hash to :: {delegateTx['txhash']}")
 
-time.sleep(7)
+time.sleep(3)
 
 # query delegations and match the delagted amount
 after_del_amount = query_staking_delegations(delegator, validator)[1]["balance"][
@@ -68,7 +67,7 @@ if not status:
 else:
     logging.info(f"tx_hash if delegate_tx :: {delegateTx['txhash']}")
 
-time.sleep(7)
+time.sleep(3)
 
 # query redelegation amount
 before_redel_amount = query_staking_delegations(delegator, dst_val_address)[1][
@@ -84,7 +83,7 @@ if not status:
 else:
     logging.info(f"tx_hash of redelegate tx :: {redelegateTx['txhash']}")
 
-time.sleep(7)
+time.sleep(3)
 
 # query redelegation amount and match the amount before and after the tx
 after_redel_amount = query_staking_delegations(delegator, dst_val_address)[1][
@@ -103,9 +102,9 @@ status, unbond_tx = tx_unbond("account1", validator, amount_to_be_sent)
 if not status:
     logging.error(f"unbond tx status :: {status}")
 else:
-    logging.info(f"unbond tx :: {unbond_tx}")
+    logging.info(f"unbond tx :: {unbond_tx['txhash']}")
 
-time.sleep(7)
+time.sleep(3)
 
 # query unbond tx and check the unbonded amount
 status, unbond_amount = query_unbonding_delegation(delegator, validator)
