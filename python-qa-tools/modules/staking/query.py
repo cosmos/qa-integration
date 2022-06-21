@@ -21,7 +21,6 @@ def query_staking_validators():
 def query_staking_delegations(delegator, validator):
     try:
         command = f"{DAEMON} q staking delegation {delegator} {validator} --node {RPC} --chain-id {CHAINID} --output json"
-        print(f"commandddddd...{command}")
         delegations, delegationerr = exec_command(command)
         if len(delegationerr):
             return False, delegationerr

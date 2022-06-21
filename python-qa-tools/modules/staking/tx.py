@@ -11,21 +11,20 @@ RPC = os.getenv('RPC')
 DEFAULT_GAS = 2000000
 
 # tx_delegate function internally calls the 'delegate tx' command and return the response in json format.
-def tx_delegate(from_key, validator_addr, amount,fee, gas=DEFAULT_GAS, unsigned = False, sequence = None):
+def tx_delegate(from_key, validator_addr, amount, gas=DEFAULT_GAS, unsigned = False, sequence = None):
     try:    
         if unsigned:
-            command = f"{DAEMON} tx staking delegate {validator_addr} {amount}{DENOM} --from {from_key} --fees {fee}{DENOM} --chain-id {CHAINID} --output json --node {RPC} --generate-only --gas {gas}"
+            command = f"{DAEMON} tx staking delegate {validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --output json --node {RPC} --generate-only --gas {gas}"
             tx, tx_err = exec_command(command)
             if len(tx_err):
                 return False, tx_err
             return True, json.loads(tx)
         else:
             if sequence is not None:
-                command = f"{DAEMON} tx staking delegate {validator_addr} {amount}{DENOM} --from {from_key} --fees {fee}{DENOM} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --sequence {sequence} --gas {gas}"
+                command = f"{DAEMON} tx staking delegate {validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --sequence {sequence} --gas {gas}"
                 
             else:
                 command = f"{DAEMON}  tx staking delegate {validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}"
-            print(f"Command...{command}")
             tx, tx_err = exec_command(command)
             tx = json.loads(tx)
             if len(tx_err):
@@ -51,7 +50,6 @@ def tx_redelegate(from_key,src_validator_addr, dst_validator_addr, amount, gas=D
                 
             else:
                 command = f"{DAEMON}  tx staking redelegate {src_validator_addr} {dst_validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}"
-            print(f"redelegate commanddddddd...{command}")
             tx, tx_err = exec_command(command)
             tx = json.loads(tx)
             if len(tx_err):
@@ -77,7 +75,6 @@ def tx_unbond(from_key,validator_addr, amount, gas=DEFAULT_GAS, unsigned = False
                 
             else:
                 command = f"{DAEMON} tx staking unbond {validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}"
-            print(f"unbond tx command............{command}")
             tx, tx_err = exec_command(command)
             tx = json.loads(tx)
             if len(tx_err):
@@ -105,7 +102,6 @@ def tx_create_validator(from_key, amount,moniker, gas=DEFAULT_GAS, unsigned = Fa
                 
             else:
                 command = f"{DAEMON} tx staking create-validator --amount {amount}{DENOM} --commission-max-change-rate 0.1 --commission-max-rate 0.2 --commission-rate 0.1 --from {from_key} --min-self-delegation 1 --moniker {moniker} --pubkey $(simd tendermint show-validator --home {DAEMON_HOME}-1)  --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}"
-            print(f"create validator command............{command}")
             tx, tx_err = exec_command(command)
             tx = json.loads(tx)
             if len(tx_err):
