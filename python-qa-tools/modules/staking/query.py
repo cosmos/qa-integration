@@ -60,3 +60,14 @@ def query_unbonding_delegation(delegator_addr, validator_addr):
         return True, json.loads(redelegations)
     except Exception as e:
         return False, e
+
+# `query_validator` query details about an individual validator.
+def query_validator(validator_addr):
+    try:
+        command = f"{DAEMON} q staking validator {validator_addr} --node {RPC} --chain-id {CHAINID} --output json"
+        validator, err = exec_command(command)
+        if len(err):
+            return False, err
+        return True, json.loads(validator)
+    except Exception as e:
+        return False, e

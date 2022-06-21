@@ -58,7 +58,7 @@ after_del_amount = query_staking_delegations(delegator, validator)[1]["balance"]
 if (int(before_del_amount) + amount_to_be_sent) == int(after_del_amount):
     logging.info(f"delegation tx was successfull from {delegator} to {validator}")
 else:
-    logging.error("mismatch in delegation amount...")
+    logging.error("mismatch in delegation amount.")
 
 # redelegation tx
 status, delegateTx = tx_delegate("account1", dst_val_address, amount_to_be_sent)
@@ -94,7 +94,7 @@ if (int(before_redel_amount) + amount_to_be_sent) == int(after_redel_amount):
         f"redelegation tx was successfull from {delegator} to {dst_val_address}"
     )
 else:
-    logging.error("mismatch in redelegation amount...")
+    logging.error("tx failed! mismatch in redelegation amount.")
 
 
 # unbond tx
@@ -110,6 +110,6 @@ time.sleep(3)
 status, unbond_amount = query_unbonding_delegation(delegator, validator)
 unbond_balance = unbond_amount["entries"][0]["balance"]
 if amount_to_be_sent == int(unbond_balance):
-    logging.info(f"unbonding tx is successfull..")
+    logging.info(f"unbonding tx is successfull.")
 else:
     logging.error("error in unbond tx.")
