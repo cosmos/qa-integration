@@ -34,6 +34,11 @@ test-all: setup-chain
 	TEST_TYPE=single-msg-load bash ./scripts/load-test/single_msg_load.sh -n 50
 	$(MAKE) stop-chain
 
+test-all-modules: setup-chain
+	@echo "Running all individual module tests..."
+	TEST_TYPE=module bash ./scripts/tests/all_modules.sh -n 50
+	$(MAKE) stop-chain
+
 test-multi-msg: setup-chain
 	@echo "Running multi msg load test..."
 	TEST_TYPE=multi-msg-load bash ./scripts/load-test/multi_msg_load.sh -n 50

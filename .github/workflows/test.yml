@@ -68,3 +68,18 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           filename: ../../stats.txt
+
+  test-all-modules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: all modules integration tests
+        run: |
+          make test-all-modules
+        env:
+          IS_PUBLIC: false
+      - uses: harupy/comment-on-pr@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          filename: ../../stats.txt
