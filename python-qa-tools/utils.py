@@ -5,10 +5,11 @@ from stats import record_stat, TX_TYPE, QUERY_TYPE
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
 DAEMON = os.getenv("DAEMON")
-
 HOME = os.getenv("HOME")
+DAEMON_HOME = os.getenv("DAEMON_HOME")
+DEFAULT_GAS = 2000000
 
-# The function `print_balance_deductions` will print information about the balance deductions after transactions for a wallet or account.
+# `print_balance_deductions` will print information about the balance deductions after transactions for a wallet or account.
 def print_balance_deductions(wallet, diff):
     if diff > 0:
         logging.error("Some of the transactions failed")
@@ -22,7 +23,7 @@ def print_balance_deductions(wallet, diff):
         )
 
 
-# The utility function `exec_command` is used to execute the cosmos-sdk based commands.
+# `exec_command` is used to execute the cosmos-sdk based commands.
 def exec_command(command):
     try:
         test_type = os.getenv("TEST_TYPE") if os.getenv("TEST_TYPE") else None
@@ -49,7 +50,7 @@ def exec_command(command):
         return None, e
 
 
-# The utility function `is_tool` is used to verify the package or binary installation.
+# `is_tool` is used to verify the package or binary installation.
 def is_tool(binary):
     """Check whether `name` is on PATH and marked as executable."""
     from shutil import which
@@ -76,7 +77,7 @@ def node_type(x):
     return x
 
 
-# The function `create_multi_messages` is used to duplicate the messages in a single transaction.
+# `create_multi_messages` is used to duplicate the messages in a single transaction.
 def create_multi_messages(num_msgs, file_name):
     messages = []
     with open(f"{HOME}/{file_name}", "r+") as file:
@@ -90,3 +91,28 @@ def create_multi_messages(num_msgs, file_name):
         file_data["body"]["messages"] = messages
         file.seek(0)
         json.dump(file_data, file, indent=4)
+
+
+def tx_command(command, unsigned=False, sequence=None):
+    try:
+        if unsigned:
+            command = f"{command} --generate-only"
+            tx, tx_err = exec_command(command)
+            if len(tx_err):
+                return False, tx_err
+            return True, json.loads(tx)
+        else:
+            if sequence is not None:
+                command = f"{command} --keyring-backend test --home {DAEMON_HOME}-1 -y --sequence {sequence}"
+
+            else:
+                command = f"{command} --keyring-backend test --home {DAEMON_HOME}-1 -y"
+            tx, tx_err = exec_command(command)
+            tx = json.loads(tx)
+            if len(tx_err):
+                return False, tx_err
+            elif tx["code"] != 0:
+                return False, tx
+            return True, tx
+    except Exception as e:
+        return False, e
