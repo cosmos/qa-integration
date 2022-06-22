@@ -55,7 +55,7 @@ else
   sudo apt install python3-pip -y
 fi
 
-pip install -r ../python-qa-tools/requirements.txt
+pip install -r ../../internal/requirements.txt
 
 if command_exists mongod ; then
   echo "mongo db is already installed"

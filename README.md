@@ -21,13 +21,45 @@ RPC="http://localhost:16657"
 ```
 >Note: Need not to export the env varibables using `export` command, These env values are fetched automatically by the scripts.
 
-### Commands:
+## Commands:
+
+### Installation and Linting
 ```
 make install-deps
 make lint
 ```
 
-## Scripts:-
+### Chain setup
+```
+make setup-chain
+make pause-chain
+make resume-chain
+make stop-chain
+```
+
+### Tests
+
+To execute all the tests
+```
+make test-all
+```
+
+To execute multi-msg load test
+```
+make test-multi-msg
+```
+
+To execute single-msg load test
+```
+make test-single-msg
+```
+
+To execute query load test
+```
+make test-query-load
+```
+
+## More details about the scripts
 
 ### deps
 
@@ -49,7 +81,7 @@ make lint
   ./deps/prereq.sh
   ```
 
-### provison
+### Chain management
 
 `start_chain.sh`:- This script sets up the environment. It takes two arguments from the user. First argument is the number of nodes that need to be setup and the second argument is the number of additional accounts that need to be created. 
 
@@ -58,21 +90,61 @@ make lint
 
   git clone https://github.com/cosmos/qa-integration.git
   cd qa-integration
-  chmod +x provision/start_chain.sh
-  ./provision/start_chain.sh 2 2
+  chmod +x ./scripts/chain/start_chain.sh
+  ./scripts/chain/start_chain.sh 2 2
 
   #This will create a network with 2 validators and 2 additional accounts. If the second argument is not passed, no new additional accounts are created. 
   #If no arguments are passed it creates a two node network by default.
   ```
 
-`test_upgrade.sh`:- This script test the process of moving the upgraded version of binary from build folder to Cosmovisor's upgrades folder. This shell script    takes one argument as NODE(Number of nodes to be upgraded).
+`node_status.sh`:- This script displays the latest block height and sync status of the nodes.
+ 
+ ```
+ Usage:-
+
+ chmod +x ./scripts/chain/node_status.sh
+ ./scripts/chain/node_status.sh 5
+ # This script takes one argument from user which specifies the number of validators for which the status will be displayed. If no argument is passed then it displays the status of the first node.
+ ```
+
+ `pause_nodes.sh`:- This script pauses the nodes.
+
+ ```
+ Usage:-
+
+ chmod +x ./scripts/chain/pause_nodes.sh
+ ./scripts/chain/pause_nodes.sh 5
+ # This script takes one argument from the user which specifies the number of nodes to pause. If no argument is passed then just the first node will be paused.
+ ```
+
+ `resume_nodes.sh`:- This script starts the paused nodes.
+
+ ```
+ Usage:-
+
+ chmod +x ./scripts/chain/resume_nodes.sh
+ ./scripts/chain/resume_nodes.sh 5
+  #This script takes one argument from the user which specifies the number of nodes to start back up. If no argument is passed then just the first node is started
+  #back up.
+ ```
+
+ `shutdown_nodes.sh`:- This script shuts down the nodes and removes their respective home directories as well.
+
+ ```
+ Usage:-
+
+ chmod +x ./scripts/chain/shutdown_nodes.sh
+ ./scripts/chain/shutdown_nodes.sh 5
+ #This script takes one argument from the user which specifies the number of nodes to shut down. If no argument is passed then just the first node is shut down.
+ ```
+
+`test_upgrade.sh`:- This script test the process of moving the upgraded version of binary from build folder to Cosmovisor's upgrades folder. This shell script takes one argument as NODE(Number of nodes to be upgraded).
 
 ```
   Usage:-
 
-  chmod +x ./provision/test_upgrade.sh 2
-  ./provision/test_upgrade.sh 2
-
+  chmod +x ./scripts/upgrade/test_upgrade.sh 2
+  ./scripts/upgrade/test_upgrade.sh 2
 ```
 
 ### load-test
@@ -82,9 +154,9 @@ make lint
   ```
   Usage:-
 
-  chmod +x ./load-test/multi_msg_load.sh
-  ./load-test/multi_msg_load.sh -h
-  ./load-test/multi_msg_load.sh -s <address> -r <address>
+  chmod +x ./scripts/tests/multi_msg_load.sh
+  ./scripts/tests/multi_msg_load.sh -h
+  ./scripts/tests/multi_msg_load.sh -s <address> -r <address>
   ```
 
 `query_load.sh`:- This script floods the network with balance queries, delegation queries and staking queries. It creates a load of 10,000 querires.
@@ -92,8 +164,8 @@ make lint
  ```
  Usage:-
 
- chmod +x query_load.sh
- ./query_load.sh
+ chmod +x /scripts/tests/query_load.sh
+ ./scripts/tests/query_load.sh
  ```
 
 `send_load.sh`:- This script creates a load of 10,000 `send` transactions and floods the network.  
@@ -101,8 +173,9 @@ make lint
  ```
  Usage:-
 
- chmod +x send_load.sh
- ./send_load.sh 1 2
+ chmod +x /scripts/tests/send_load.sh
+ ./scripts/tests/send_load.sh -h
+ ./scripts/tests/send_load.sh -s <address> -r <address>
  #This script takes 2 arguments from the user which specifies the account number of `to` and `from` addresses. If no argument is passed then first and second address is taken by default.
  ```
 
@@ -111,92 +184,7 @@ make lint
   ```
   Usage:-
 
-  chmod +x ./load-test/single_msg_load.sh
-  ./load-test/single_msg_load.sh -h
-  ./load-test/single_msg_load.sh -s <address> -r <address>
+  chmod +x ./scripts/tests/single_msg_load.sh
+  ./scripts/tests/single_msg_load.sh -h
+  ./scripts/tests/single_msg_load.sh -s <address> -r <address>
   ```
-
-### misc-scripts
-
-`distribution.sh`:- This script executes the distribuition mudule txs like `withdraw-rewards`, `withdraw-rewards --commission` and `withdraw-all-rewards`
-
-  ```
-  Usage:-
-
-  chmod +x ./misc-scripts/distribution.sh
-  ./misc-scripts/distribution.sh 5
-  # This script takes one argument from the user which specifies the number of validators on which the distribution txs are to be executed. If no argument is passed then it executes on the first two #validators by default.
-  ```
-
-`proposal_vote.sh`:- This script test the gov module commands and sub commands.
-
-  ```
-  Usage:-
-
-  chmod +x ./misc-scripts/proposal_vote.sh
-  ./misc-scripts/proposal_vote.sh
-  ```
- 
-`staking.sh`:- This script executes the staking module txs like `delegate`, `redelegate` and `unbond`.
-
- ```
- Usage:-
-
- chmod +x ./misc-scripts/staking.sh
- ./misc-scripts/staking.sh 5
- # This script takes one argument from the user which specifies the number of validators on which the staking txs are to be executed. If no argument is passed
- #then it executes on the first two validators by default.
- ```
-
- ### node-management
- 
-`node_status.sh`:- This script displays the latest block height and sync status of the nodes.
- 
- ```
- Usage:-
-
- chmod +x node_status.sh
- ./node_status.sh 5
- # This script takes one argument from user which specifies the number of validators for which the status will be displayed. If no argument is passed then it displays the status of the first node.
- ```
- `pause_nodes.sh`:- This script pauses the nodes.
-
- ```
- Usage:-
-
- chmod +x pause_nodes.sh
- ./pause_nodes.sh 5
- # This script takes one argument from the user which specifies the number of nodes to pause. If no argument is passed then just the first node will be paused.
- ```
-
- `resume_nodes.sh`:- This script starts the paused nodes.
-
- ```
- Usage:-
-
- chmod +x resume_nodes.sh
- ./resume_nodes.sh 5
-  #This script takes one argument from the user which specifies the number of nodes to start back up. If no argument is passed then just the first node is started
-  #back up.
- ```
-
- 
- 
- `shutdown_nodes.sh`:- This script shuts down the nodes and removes their respective home directories as well.
-
- ```
- Usage:-
-
- chmod +x shutdown_nodes.sh
- ./shutdown_nodes.sh 5
- #This script takes one argument from the user which specifies the number of nodes to shut down. If no argument is passed then just the first node is shut down.
- ```
-
- `setup_upgrade.sh`:- This script creates the necessary folders for cosmovisor. It also builds and places the binaries in the folders depending on the upgrade name.
- ```
- Usage:-
-
- chmod +x setup_upgrade.sh
- ./setup_upgrade.sh 5
-
-```
