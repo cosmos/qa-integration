@@ -164,8 +164,8 @@ make test-query-load
  ```
  Usage:-
 
- chmod +x query_load.sh
- ./query_load.sh
+ chmod +x /scripts/tests/query_load.sh
+ /scripts/tests/query_load.sh
  ```
 
 `send_load.sh`:- This script creates a load of 10,000 `send` transactions and floods the network.  
@@ -173,8 +173,9 @@ make test-query-load
  ```
  Usage:-
 
- chmod +x send_load.sh
- ./send_load.sh 1 2
+ chmod +x /scripts/tests/send_load.sh
+ ./scripts/tests/send_load.sh -h
+ ./scripts/tests/send_load.sh -s <address> -r <address>
  #This script takes 2 arguments from the user which specifies the account number of `to` and `from` addresses. If no argument is passed then first and second address is taken by default.
  ```
 
