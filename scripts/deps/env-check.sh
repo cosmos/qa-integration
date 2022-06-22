@@ -9,9 +9,9 @@ set -a
 source ../../env
 set +a
 
-# set pythonpath environment with absolute path of python-qa-tools directory
-cd ..
-export PYTHONPATH=$PWD:$PWD/python-qa-tools
+# set pythonpath environment with absolute path of internal directory
+cd ../..
+export PYTHONPATH=$PWD:$PWD/internal
 export GOPATH=$HOME/go
 export GOBIN=$GOPATH/bin
 export PATH=$PATH:/usr/local/go/bin:$GOBIN

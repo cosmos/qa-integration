@@ -154,9 +154,9 @@ make test-query-load
   ```
   Usage:-
 
-  chmod +x ./load-test/multi_msg_load.sh
-  ./load-test/multi_msg_load.sh -h
-  ./load-test/multi_msg_load.sh -s <address> -r <address>
+  chmod +x ./scripts/tests/multi_msg_load.sh
+  ./scripts/tests/multi_msg_load.sh -h
+  ./scripts/tests/multi_msg_load.sh -s <address> -r <address>
   ```
 
 `query_load.sh`:- This script floods the network with balance queries, delegation queries and staking queries. It creates a load of 10,000 querires.
@@ -183,7 +183,7 @@ make test-query-load
   ```
   Usage:-
 
-  chmod +x ./load-test/single_msg_load.sh
-  ./load-test/single_msg_load.sh -h
-  ./load-test/single_msg_load.sh -s <address> -r <address>
+  chmod +x ./scripts/tests/single_msg_load.sh
+  ./scripts/tests/single_msg_load.sh -h
+  ./scripts/tests/single_msg_load.sh -s <address> -r <address>
   ```

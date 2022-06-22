@@ -17,6 +17,6 @@ cd $CURPATH
 for f in *; do
     if [ -d "$f" ]; then
         # Will not run if no directories are available
-        python3 ../internal/modules/$f/test.py $1 $2 $3 $4 $5 $6
+        python3 ./internal/modules/$f/test.py $1 $2 $3 $4 $5 $6
     fi
 done
