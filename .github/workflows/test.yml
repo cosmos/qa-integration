@@ -82,9 +82,3 @@ jobs:
           make test-all-modules
         env:
           IS_PUBLIC: false
-      - uses: harupy/comment-on-pr@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          filename: ../../stats.txt
-        if: github.event_name == 'pull_request'
