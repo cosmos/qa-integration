@@ -165,7 +165,7 @@ make test-query-load
  Usage:-
 
  chmod +x /scripts/tests/query_load.sh
- /scripts/tests/query_load.sh
+ ./scripts/tests/query_load.sh
  ```
 
 `send_load.sh`:- This script creates a load of 10,000 `send` transactions and floods the network.  
