@@ -6,8 +6,8 @@ import os
 import json
 from utils import exec_command
 
-DAEMON = os.getenv('DAEMON')
-RPC = os.getenv('RPC')
+DAEMON = os.getenv("DAEMON")
+RPC = os.getenv("RPC")
 
 
 def account_type(address):
@@ -41,9 +41,9 @@ def query_account(address):
     """
     try:
         command = f"{DAEMON} query auth account {address} --node {RPC} --output json"
-        stdout, stderr = exec_command(command)
-        if len(stderr) != 0:
-            return False, stderr
-        return True, json.loads(stdout)
+        std_out, std_err = exec_command(command)
+        if len(std_err) != 0:
+            return False, std_err
+        return True, json.loads(std_out)
     except Exception as error:  # pylint: disable=broad-except
         return False, error

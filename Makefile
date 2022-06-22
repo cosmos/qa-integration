@@ -4,7 +4,7 @@ install-deps:
 	@bash ./deps/prereq.sh
 
 lint: install-deps
-	pylint ./python-qa-tools
+	pylint --rcfile=./.pylintrc ./python-qa-tools
 
 setup-chains: install-deps stop-chains
 	@bash ./provision/start_chain.sh $(NUM_VALS) 2

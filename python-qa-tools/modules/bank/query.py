@@ -21,9 +21,9 @@ def query_balances(address):
     """
     try:
         command = f"{DAEMON} q bank balances {address} --node {RPC} --output json"
-        balance, balanceerr = exec_command(command)
-        if len(balanceerr) != 0:
-            return False, balanceerr
+        balance, balance_err = exec_command(command)
+        if len(balance_err) != 0:
+            return False, balance_err
         return True, json.loads(balance)
     except Exception as error:  # pylint: disable=broad-except
         return False, error

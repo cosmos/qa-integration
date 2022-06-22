@@ -23,9 +23,9 @@ def keys_show(account, account_type="acc"):
     try:
         command = f"""{DAEMON} keys show {account} --home {DAEMON_HOME}-1 --bech {account_type} \
             --keyring-backend test --output json"""
-        stdout, stderr = exec_command(command)
-        if len(stderr) != 0:
-            return False, stderr
-        return True, json.loads(stdout)
+        std_out, std_err = exec_command(command)
+        if len(std_err) != 0:
+            return False, std_err
+        return True, json.loads(std_out)
     except Exception as error:  # pylint: disable=broad-except
         return False, error

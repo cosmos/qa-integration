@@ -98,7 +98,8 @@ def tx_send(
             tx_resp, tx_err = exec_command(command)
             if len(tx_err) != 0:
                 return False, tx_err
-            return True, json.loads(tx_resp)
+            else:
+                return True, json.loads(tx_resp)
         else:
             if sequence is not None:
                 command = f"""{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} \

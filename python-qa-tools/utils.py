@@ -43,10 +43,10 @@ def exec_command(command):
     Returns:
         _tuple_: str, str
     """
-    stdout, stderr = subprocess.Popen(
-        command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE
+    std_out, std_err = subprocess.Popen(
+        command.split(), std_out=subprocess.PIPE, std_err=subprocess.PIPE
     ).communicate()
-    return stdout.strip().decode(), stderr.strip().decode()
+    return std_out.strip().decode(), std_err.strip().decode()
 
 
 def is_tool(binary):

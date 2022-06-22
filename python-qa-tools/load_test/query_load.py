@@ -14,35 +14,35 @@ from utils import validate_num_txs
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
-PARSER = argparse.ArgumentParser(
+parser = argparse.ArgumentParser(
     description="This program takes inputs for intializing tx query load test."
 )
-PARSER.add_argument(
+parser.add_argument(
     "-s",
     "--sender",
     type=account_type,
     default=keys_show("validator1")[1]["address"],
     help="From which account the transaction should be intialized",
 )
-PARSER.add_argument(
+parser.add_argument(
     "-n",
     "--num_txs",
     type=validate_num_txs,
     default=1000,
     help="Number of transactions to be made, should be positive integer",
 )
-ARGS = PARSER.parse_args()
+args = parser.parse_args()
 
-SENDER, NUM_TXS = ARGS.sender, int(ARGS.num_txs)
+sender, num_txs = args.sender, int(args.num_txs)
 
-STATUS, VAL1 = keys_show(SENDER, "val")
-if not STATUS:
-    sys.exit(VAL1)
-VAL1 = VAL1["address"]
+status, val1 = keys_show(sender, "val")
+if not status:
+    sys.exit(val1)
+val1 = val1["address"]
 
-for i in range(0, NUM_TXS):
+for i in range(0, num_txs):
     # Fetch balance of sender
-    status, balance_query_response = query_balances(SENDER)
+    status, balance_query_response = query_balances(sender)
     if not status:
         logging.error(balance_query_response)
     else:
@@ -55,6 +55,6 @@ for i in range(0, NUM_TXS):
         logging.error(validators_response)
 
     # Fetch staking delegations
-    status, delegations_response = query_staking_delegations(SENDER, VAL1)
+    status, delegations_response = query_staking_delegations(sender, val1)
     if not status:
         logging.error(delegations_response)
