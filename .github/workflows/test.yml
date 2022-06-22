@@ -1,12 +1,9 @@
 name: Load Tests 
 #  Load Tests workflow runs various load tests
-#  This workflow run on pushes to master, workflow_dispatch & on every pull request
+#  This workflow run on workflow_dispatch & on every pull request
 on:
   pull_request:
   workflow_dispatch:
-  push:
-    branches:
-      - master
 
 jobs:
   test-multi-msg:
