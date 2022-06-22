@@ -1,12 +1,9 @@
 name: Load Tests 
 #  Load Tests workflow runs various load tests
-#  This workflow run on pushes to master, workflow_dispatch & on every pull request
+#  This workflow run on workflow_dispatch & on every pull request
 on:
   pull_request:
   workflow_dispatch:
-  push:
-    branches:
-      - master
 
 jobs:
   test-multi-msg:
@@ -18,6 +15,12 @@ jobs:
           make test-multi-msg
         env:
           IS_PUBLIC: false
+      - uses: harupy/comment-on-pr@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          filename: ../../stats.txt
+        if: github.event_name == 'pull_request'
   
   test-query-load:
     runs-on: ubuntu-latest
@@ -28,6 +31,12 @@ jobs:
           make test-query-load
         env:
           IS_PUBLIC: false
+      - uses: harupy/comment-on-pr@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          filename: ../../stats.txt
+        if: github.event_name == 'pull_request'
 
   test-send-load:
     runs-on: ubuntu-latest
@@ -38,6 +47,12 @@ jobs:
           make test-send-load
         env:
           IS_PUBLIC: false
+      - uses: harupy/comment-on-pr@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          filename: ../../stats.txt
+        if: github.event_name == 'pull_request'
   
   test-single-msg:
     runs-on: ubuntu-latest
@@ -46,5 +61,21 @@ jobs:
       - name: single msg load test
         run: |
           make test-single-msg
+        env:
+          IS_PUBLIC: false
+      - uses: harupy/comment-on-pr@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          filename: ../../stats.txt
+        if: github.event_name == 'pull_request'
+
+  test-all-modules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: all modules integration tests
+        run: |
+          make test-all-modules
         env:
           IS_PUBLIC: false
