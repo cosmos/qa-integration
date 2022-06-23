@@ -92,8 +92,8 @@ def create_multi_messages(num_msgs, file_name):
         file.seek(0)
         json.dump(file_data, file, indent=4)
 
-
-def tx_command(command, unsigned=False, sequence=None):
+# `execute_tx_by_type` is used to execute the tx by type.
+def execute_tx_by_type(command, unsigned=False, sequence=None):
     try:
         if unsigned:
             command = f"{command} --generate-only"

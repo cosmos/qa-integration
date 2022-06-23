@@ -75,3 +75,21 @@ def query_validator(validator_addr):
         return True, json.loads(validator)
     except Exception as e:
         return False, e
+
+
+# `query_validator_set` query details about all validators on a network.
+def query_validator_set():
+    try:
+        command = f"{DAEMON} q staking validators --node {RPC} --chain-id {CHAINID} --output json"
+        validator, err = exec_command(command)
+        if len(err):
+            return False, err
+        return True, json.loads(validator)
+    except Exception as e:
+        return False, e
+
+# `get_public_key` is to get node's tendermint validator info
+def get_public_key(temp_dir):
+    command = f"{DAEMON} tendermint show-validator --home {temp_dir}"
+    key, err = exec_command(command)
+    return key, err

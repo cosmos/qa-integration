@@ -1,5 +1,7 @@
 import os, sys, time, logging
 from core.keys import keys_show
+from internal.utils import DAEMON, exec_command
+import tempfile
 from modules.staking.tx import (
     tx_delegate,
     tx_redelegate,
@@ -7,13 +9,13 @@ from modules.staking.tx import (
     tx_create_validator,
 )
 from modules.staking.query import (
-    query_all_redelegations,
     query_staking_delegations,
-    query_staking_redelegation,
     query_unbonding_delegation,
+    query_validator,
 )
 
 HOME = os.getenv("HOME")
+DAEMON = os.getenv("DAEMON")
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
 # get validator, delegator and dst validator address
@@ -65,7 +67,7 @@ status, delegateTx = tx_delegate("account1", dst_val_address, amount_to_be_sent)
 if not status:
     logging.error(f"{delegateTx}")
 else:
-    logging.info(f"tx_hash if delegate_tx :: {delegateTx['txhash']}")
+    logging.info(f"tx_hash of delegate_tx :: {delegateTx['txhash']}")
 
 time.sleep(3)
 
@@ -113,3 +115,43 @@ if amount_to_be_sent == int(unbond_balance):
     logging.info(f"unbond tx is successfull.")
 else:
     logging.error("error in unbond tx.")
+
+# create validator
+
+temp_dir = tempfile.TemporaryDirectory()
+temp_dir_name = temp_dir.name
+TEMP_VAL = "validator-10000"
+
+command = f"{DAEMON} init testvalidator --home {temp_dir_name}"
+tx, tx_err = exec_command(command)
+if len(tx_err):
+    logging.error(f"error :: ")
+else:
+    logging.info(f"init tx res :: {tx}")
+
+status, create_val_tx = tx_create_validator(
+    "account1", amount_to_be_sent, TEMP_VAL, temp_dir_name
+)
+if not status:
+    logging.error(f"create-validator tx status :: {status}")
+else:
+    logging.info(f"create-valiator tx  hash:: {create_val_tx['txhash']}")
+
+time.sleep(7)
+
+(_, validator) = keys_show("account1", "val")
+
+# query unbond tx and check the unbonded amount
+status, validator_tx = query_validator(validator["address"])
+if not status:
+    logging.error(f"query validator status :: {status}")
+else:
+    val_name = validator_tx["description"]["moniker"]
+    if val_name == TEMP_VAL:
+        logging.info("validator created successfully..")
+    else:
+        logging.error(f"no validator found with name {TEMP_VAL}")
+
+
+# clean tmp dir
+temp_dir.cleanup()
