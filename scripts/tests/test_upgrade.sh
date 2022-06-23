@@ -7,6 +7,7 @@ set -e
 
 # get absolute parent directory path of current file
 CURPATH=`dirname $(realpath "$0")`
+echo $CURPATH
 cd $CURPATH
 
 # check environment variables are set
@@ -19,11 +20,15 @@ then
     NUM_VALS=2
 fi
 
+echo "INFO: Building binary with upgraded version"
 cd $HOME
 export REPO=$(basename $GH_URL .git)
-rm -rf $REPO
-git clone $GH_URL && cd $REPO
-git fetch && git checkout $UPGRADE_VERSION
+if [ ! -d $REPO ]
+then
+    git clone $GH_URL
+fi
+cd $REPO
+git fetch --all && git checkout $UPGRADE_VERSION
 make build
 for (( a=1; a<=$NUM_VALS; a++ ))
 do
@@ -31,3 +36,26 @@ do
     mkdir -p "$DAEMON_HOME-$a"/cosmovisor/upgrades/$UPGRADE_NAME/bin
     cp ~/$REPO/build/$DAEMON "$DAEMON_HOME-$a"/cosmovisor/upgrades/$UPGRADE_NAME/bin/
 done
+
+CURRENT_BLOCK_HEIGHT=$($DAEMON status --node $RPC | jq '.SyncInfo.latest_block_height|tonumber')
+
+echo "INFO: Submitting software upgrade proposal for upgrade: $UPGRADE_NAME"
+$DAEMON tx gov submit-proposal software-upgrade $UPGRADE_NAME --title $UPGRADE_NAME \
+    --description upgrade --upgrade-height $((CURRENT_BLOCK_HEIGHT + 60)) --deposit 10000000$DENOM \
+    --from validator1 --yes --keyring-backend test --home $DAEMON_HOME-1 --node $RPC --chain-id $CHAINID
+
+sleep 3s
+
+echo "INFO: Voting on created proposal"
+$DAEMON tx gov vote 1 yes --from validator1 --yes --keyring-backend test \
+    --home $DAEMON_HOME-1 --node $RPC --chain-id $CHAINID
+
+
+echo "INFO: Waiting for proposal to pass and upgrade"
+sleep 60s
+
+# moving back to current file folder
+cd $CURPATH
+
+# testing all txs and queries
+bash ./all_modules.sh

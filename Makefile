@@ -58,3 +58,8 @@ test-single-msg: setup-chain
 	@echo "Running single msg load test..."
 	TEST_TYPE=single-msg-load bash ./scripts/tests/single_msg_load.sh -n 50
 	$(MAKE) stop-chain
+
+test-upgrade: setup-chain
+	@echo "Running upgrade test..."
+	bash ./scripts/tests/test_upgrade.sh $(NUM_VALS)
+	$(MAKE) stop-chain

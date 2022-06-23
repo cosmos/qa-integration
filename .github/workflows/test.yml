@@ -79,3 +79,13 @@ jobs:
           make test-all-modules
         env:
           IS_PUBLIC: false
+  
+  test-upgrade:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: test software upgrade
+        run: |
+          make test-upgrade
+        env:
+          IS_PUBLIC: false
