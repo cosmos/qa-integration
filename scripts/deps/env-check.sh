@@ -25,3 +25,9 @@ if [ -z $DAEMON ] || [ -z $DENOM ] || [ -z $CHAINID ] || [ -z $DAEMON_HOME ] || 
 then 
     display_usage
 fi
+
+# set NUM_TXS env if not found
+if [[ -z $NUM_TXS || $(( $NUM_TXS )) -le 0 ]]
+then
+    export NUM_TXS=50
+fi

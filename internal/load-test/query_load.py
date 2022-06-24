@@ -1,4 +1,4 @@
-import argparse, sys, logging
+import argparse, sys, os, logging
 from core.keys import keys_show
 from modules.auth.query import account_type
 from modules.bank.query import query_balances
@@ -6,10 +6,12 @@ from modules.staking.query import query_staking_delegations, query_staking_valid
 from utils import validate_num_txs
 from stats import print_stats, clear_data_by_type, QUERY_TYPE
 
+num_txs = int(os.getenv("NUM_TXS"))
+
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
 parser = argparse.ArgumentParser(
-    description="This program takes inputs for intializing tx query load test."
+    description="This program takes inputs for intializing query load test."
 )
 parser.add_argument(
     "-s",
@@ -18,16 +20,10 @@ parser.add_argument(
     default=keys_show("validator1")[1]["address"],
     help="From which account the transaction should be intialized",
 )
-parser.add_argument(
-    "-n",
-    "--num_txs",
-    type=validate_num_txs,
-    default=1000,
-    help="Number of transactions to be made, should be positive integer",
-)
+
 args = parser.parse_args()
 
-sender, num_txs = args.sender, int(args.num_txs)
+sender = args.sender
 
 status, val1 = keys_show(sender, "val")
 if not status:

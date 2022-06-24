@@ -11,8 +11,8 @@ from utils import (
 )
 from stats import clear_data_by_type, print_stats
 
-HOME = os.getenv("HOME")
-NUM_MSGS = int(os.getenv("NUM_MSGS"))
+NUM_TXS = int(os.getenv("NUM_TXS"))
+NUM_MSGS = int(os.getenv("NUM_MSGS")) if os.getenv("NUM_MSGS") else 30
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
@@ -33,18 +33,11 @@ parser.add_argument(
     default=keys_show("account2")[1]["address"],
     help="Receiver bech32 address",
 )
-parser.add_argument(
-    "-n",
-    "--num_txs",
-    type=validate_num_txs,
-    default=1000,
-    help="Number of transactions to be made, should be positive integer",
-)
+
 args = parser.parse_args()
-sender, receiver, NUM_TXS, amount_to_be_sent = (
+sender, receiver, amount_to_be_sent = (
     args.sender,
     args.receiver,
-    int(args.num_txs),
     1000000,
 )
 

@@ -1,14 +1,16 @@
-import argparse, sys, logging
+import argparse, sys, os, logging
 from core.keys import keys_show
 from modules.auth.query import account_type, query_account
 from modules.bank.tx import tx_send
 from utils import validate_num_txs
 from stats import clear_data_by_type, print_stats
 
+num_txs = int(os.getenv("NUM_TXS"))
+
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
 parser = argparse.ArgumentParser(
-    description="This program takes inputs for intializing multi message load test."
+    description="This program takes inputs for intializing send tx load test."
 )
 parser.add_argument(
     "-s",
@@ -24,16 +26,9 @@ parser.add_argument(
     default=keys_show("account2")[1]["address"],
     help="Receiver account number.",
 )
-parser.add_argument(
-    "-n",
-    "--num_txs",
-    type=validate_num_txs,
-    default=10000,
-    help="Number of transactions to be made, should be positive integer",
-)
 args = parser.parse_args()
 
-sender, receiver, num_txs = args.sender, args.receiver, int(args.num_txs)
+sender, receiver = args.sender, args.receiver
 
 # query account sequence
 status, account = query_account(sender)

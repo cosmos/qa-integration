@@ -3,16 +3,15 @@ from core.keys import keys_show
 from modules.auth.query import account_type, query_account
 from modules.bank.query import query_balances
 from modules.bank.tx import tx_send
-from utils import (
-    validate_num_txs,
-    print_balance_deductions,
-)
+from utils import print_balance_deductions
 from stats import clear_data_by_type, print_stats
+
+NUM_TXS = int(os.getenv("NUM_TXS"))
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
 parser = argparse.ArgumentParser(
-    description="This program takes inputs for intializing multi message load test."
+    description="This program takes inputs for intializing single message load test."
 )
 parser.add_argument(
     "-s",
@@ -28,26 +27,16 @@ parser.add_argument(
     default=keys_show("account2")[1]["address"],
     help="Receiver bech32 address",
 )
-parser.add_argument(
-    "-n",
-    "--num_txs",
-    type=validate_num_txs,
-    default=10000,
-    help="Number of transactions to be made, should be positive integer",
-)
 args = parser.parse_args()
-sender, receiver, NUM_TXS, amount_to_be_sent = (
+sender, receiver, amount_to_be_sent = (
     args.sender,
     args.receiver,
-    int(args.num_txs),
     1000000,
 )
-
 if sender == receiver:
     sys.exit(
         'Error: The values of arguments "sender" and "receiver" are equal make sure to set different values'
     )
-
 
 # Fetch Balances from sender receiver
 status, sender_balance_old = query_balances(sender)
@@ -84,6 +73,8 @@ for i in range(NUM_TXS):
     status, sTxfrom = tx_send(
         receiver, sender, amount_to_be_sent, 100000, False, seqfrom
     )
+
+time.sleep(1)
 
 #### Print Balances ####
 status, sender_balance_updated = query_balances(sender)
