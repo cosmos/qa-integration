@@ -50,25 +50,17 @@ def tx_create_validator(
         public_key, err = get_public_key(temp_dir)
         if err:
             return False, err
-
-        if unsigned:
-            command = f"{DAEMON} tx staking create-validator --amount {amount}{DENOM} --commission-max-change-rate 0.1 --commission-max-rate 0.2 --commission-rate 0.1 --from {from_key} --min-self-delegation 1 --moniker {moniker} --pubkey {public_key}  --chain-id {CHAINID} -y"
-            tx, tx_err = exec_command(command)
-            if len(tx_err):
-                return False, tx_err
-            return True, json.loads(tx)
+        
+        if sequence is not None:
+            command = f"{DAEMON} tx staking create-validator --amount {amount}{DENOM} --commission-max-change-rate 0.1 --commission-max-rate 0.2 --commission-rate 0.1 --from {from_key} --min-self-delegation 1 --moniker {moniker} --pubkey {public_key}  --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --sequence {sequence} --gas {gas}"
         else:
-            if sequence is not None:
-                command = f"{DAEMON} tx staking create-validator --amount {amount}{DENOM} --commission-max-change-rate 0.1 --commission-max-rate 0.2 --commission-rate 0.1 --from {from_key} --min-self-delegation 1 --moniker {moniker} --pubkey {public_key}  --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --sequence {sequence} --gas {gas}"
-
-            else:
-                command = f"{DAEMON} tx staking create-validator --amount {amount}{DENOM} --commission-max-change-rate 0.1 --commission-max-rate 0.2 --commission-rate 0.1 --from {from_key} --min-self-delegation 1 --moniker {moniker} --pubkey {public_key}  --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}"
-            tx, tx_err = exec_command(command)
-            tx = json.loads(tx)
-            if len(tx_err):
-                return False, tx_err
-            elif tx["code"] != 0:
-                return False, tx
-            return True, tx
+            command = f"{DAEMON} tx staking create-validator --amount {amount}{DENOM} --commission-max-change-rate 0.1 --commission-max-rate 0.2 --commission-rate 0.1 --from {from_key} --min-self-delegation 1 --moniker {moniker} --pubkey {public_key}  --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}"
+        tx, tx_err = exec_command(command)
+        tx = json.loads(tx)
+        if len(tx_err):
+            return False, tx_err
+        elif tx["code"] != 0:
+            return False, tx
+        return True, tx
     except Exception as e:
         return False, e

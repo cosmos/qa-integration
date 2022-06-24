@@ -9,7 +9,7 @@ from modules.staking.tx import (
     tx_create_validator,
 )
 from modules.staking.query import (
-    query_staking_delegations,
+    query_delegator_delegations,
     query_unbonding_delegation,
     query_validator,
 )
@@ -41,7 +41,7 @@ else:
 time.sleep(3)
 
 # query delegation amount
-before_del_amount = query_staking_delegations(delegator, validator)[1]["balance"][
+before_del_amount = query_delegator_delegations(delegator, validator)[1]["balance"][
     "amount"
 ]
 
@@ -54,7 +54,7 @@ else:
 time.sleep(3)
 
 # query delegations and match the delagted amount
-after_del_amount = query_staking_delegations(delegator, validator)[1]["balance"][
+after_del_amount = query_delegator_delegations(delegator, validator)[1]["balance"][
     "amount"
 ]
 if (int(before_del_amount) + amount_to_be_sent) == int(after_del_amount):
@@ -71,8 +71,8 @@ else:
 
 time.sleep(3)
 
-# query redelegation amount
-before_redel_amount = query_staking_delegations(delegator, dst_val_address)[1][
+# query redelegated amount
+before_redel_amount = query_delegator_delegations(delegator, dst_val_address)[1][
     "balance"
 ]["amount"]
 
@@ -87,8 +87,8 @@ else:
 
 time.sleep(3)
 
-# query redelegation amount and match the amount before and after the tx
-after_redel_amount = query_staking_delegations(delegator, dst_val_address)[1][
+# query redelegated amount and match the amount before and after the tx
+after_redel_amount = query_delegator_delegations(delegator, dst_val_address)[1][
     "balance"
 ]["amount"]
 if (int(before_redel_amount) + amount_to_be_sent) == int(after_redel_amount):
@@ -117,7 +117,6 @@ else:
     logging.error("error in unbond tx.")
 
 # create validator
-
 temp_dir = tempfile.TemporaryDirectory()
 temp_dir_name = temp_dir.name
 TEMP_VAL = "validator-10000"

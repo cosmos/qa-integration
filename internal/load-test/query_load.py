@@ -2,7 +2,7 @@ import argparse, sys, logging
 from core.keys import keys_show
 from modules.auth.query import account_type
 from modules.bank.query import query_balances
-from modules.staking.query import query_staking_delegations, query_staking_validators
+from modules.staking.query import query_delegator_delegations, query_staking_validators
 from utils import validate_num_txs
 from stats import print_stats, clear_data_by_type, QUERY_TYPE
 
@@ -53,7 +53,7 @@ for i in range(0, num_txs):
         logging.error(validators_response)
 
     # Fetch staking delegations
-    status, delegations_response = query_staking_delegations(sender, val1)
+    status, delegations_response = query_delegator_delegations(sender, val1)
     if not status:
         logging.error(delegations_response)
 
