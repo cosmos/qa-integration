@@ -18,4 +18,11 @@ jobs:
           python-root-list: "./internal"
           # extra-pycodestyle-options: "--rcfile="
           use-pylint: true
+          use-pycodestyle: false
+          use-flake8: false
+          use-black: false
+          use-mypy: false
+          use-isort: false
+          use-vulture: false
+          use-pydocstyle: false
           python-version: "3.8"
