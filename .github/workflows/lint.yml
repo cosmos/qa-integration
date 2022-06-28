@@ -15,6 +15,7 @@ jobs:
           python-version: 3.8
       - uses: marian-code/python-lint-annotate@v3
         with:
+          python-root-list: "./internal"
           # extra-pycodestyle-options: "--rcfile="
           use-pylint: true
           python-version: "3.8"
