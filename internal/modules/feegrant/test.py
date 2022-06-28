@@ -4,6 +4,7 @@ from internal.utils import DAEMON, exec_command
 import tempfile
 from modules.feegrant.tx import (
     tx_grant,
+    set_periodic_expiration_grant,
 )
 from modules.feegrant.query import (
     query_feegrant_grants,
@@ -25,7 +26,7 @@ if granter == grantee:
         'Error: The values of arguments "granter" and "grantee" are equal make sure to set different values'
     )
 
-# delegate tx
+# grant tx
 status, grant = tx_grant("account1", grantee)
 if not status:
     logging.error(f"error in grant tx :: {grant}")
@@ -35,4 +36,8 @@ else:
 time.sleep(3)
 
 status, grants = query_feegrant_grants(granter, grantee)
-print(f"status and grants.............{status}{grants}")
+if not status:
+    logging.error(f"grant tx failed :: {status}")
+else:
+    if ( grants["granter"] == granter ) & (grants["grantee"] == grantee):
+        logging.info(f"grant tx is successfull!!!")
