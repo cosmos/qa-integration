@@ -1,4 +1,4 @@
-import json, os
+import json
 from core.tx import tx_broadcast, tx_sign
 from utils import exec_command, env
 

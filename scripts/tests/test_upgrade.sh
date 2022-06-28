@@ -62,7 +62,7 @@ while [[ ($QUERY_COMMAND!=$UPGRADE_VERSION) && (count -le 5) ]]; do
 done
 
 if [[ $count -eq 6 ]]; then
-    echo "INFO: Upgrade failed with binary issues"
+    echo "ERROR: Upgrade failed with binary issues"
     exit 0
 fi
 

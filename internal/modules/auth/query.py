@@ -1,4 +1,4 @@
-import argparse, os, json
+import argparse, json
 
 from utils import exec_command, env
 

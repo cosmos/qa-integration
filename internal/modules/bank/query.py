@@ -1,4 +1,4 @@
-import os, json
+import json
 
 from utils import exec_command, env
 

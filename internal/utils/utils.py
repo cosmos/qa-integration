@@ -1,6 +1,6 @@
-import argparse, os, json, logging, subprocess
+import argparse, json, logging, subprocess
 
-import env
+import utils.env as env
 
 from stats import record_stat, TX_TYPE, QUERY_TYPE
 

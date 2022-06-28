@@ -1,4 +1,4 @@
-import json, os, logging
+import json, logging
 from db import db
 import utils
 
