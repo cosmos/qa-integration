@@ -3,8 +3,8 @@ This module consists of query commands for auth cosmos-sdk module
 """
 import argparse
 import os
-import json
-from utils import exec_command
+import sys
+from internal.utils import process_response
 
 DAEMON = os.getenv("DAEMON")
 RPC = os.getenv("RPC")
@@ -29,7 +29,6 @@ def account_type(address):
     return address
 
 
-# query_account function will take the bech32 address as input and output the information of account.
 def query_account(address):
     """query account function will take the bech32 address
     as input and output the information of account.
@@ -40,11 +39,29 @@ def query_account(address):
     Returns:
         _tuple_: (bool, json|str)
     """
-    try:
-        command = f"{DAEMON} query auth account {address} --node {RPC} --output json"
-        std_out, std_err = exec_command(command)
-        if len(std_err) != 0:
-            return False, std_err
-        return True, json.loads(std_out)
-    except Exception as error:  # pylint: disable=broad-except
-        return False, error
+    command = f"{DAEMON} query auth account {address} --node {RPC} --output json"
+    return process_response(command)
+
+
+def get_sequences(sender, receiver):
+    """
+    This function returns sequence numbers for sender and receiver.
+    Args:
+        sender (_str_): Sender Bech32 address.
+        receiver (_str_):Receiver Bech32 address.
+
+    Returns:
+        _tuple_: int, int
+    """
+    status, sender_acc = query_account(sender)
+    if not status:
+        sys.exit(sender_acc)
+
+    status, receiver_acc = query_account(receiver)
+    if not status:
+        sys.exit(receiver_acc)
+
+    sender_acc_seq, receiver_acc_seq = int(sender_acc["sequence"]), int(
+        receiver_acc["sequence"]
+    )
+    return sender_acc_seq, receiver_acc_seq

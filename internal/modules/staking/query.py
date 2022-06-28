@@ -3,8 +3,7 @@ This module queries staking sub commands.
 """
 import os
 import json
-
-from utils import exec_command
+from internal.utils import exec_command
 
 DAEMON = os.getenv("DAEMON")
 RPC = os.getenv("RPC")
@@ -27,7 +26,6 @@ def query_staking_validators():
         return False, error
 
 
-# The function `query_staking_delegations` fetches the information about the delagator delegations for a validator.
 def query_staking_delegations(delegator, validator):
     """
     The function `query_staking_delegations` fetches the information

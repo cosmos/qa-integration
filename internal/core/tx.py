@@ -4,7 +4,7 @@ This module contains functions calling the `tx` commands.
 import logging
 import os
 import json
-from utils import exec_command
+from internal.utils import exec_command
 
 CHAINID = os.getenv("CHAINID")
 DAEMON = os.getenv("DAEMON")

@@ -6,7 +6,9 @@ import os
 import json
 import logging
 import subprocess
+
 from shutil import which
+
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
@@ -44,9 +46,28 @@ def exec_command(command):
         _tuple_: str, str
     """
     std_out, std_err = subprocess.Popen(
-        command.split(), std_out=subprocess.PIPE, std_err=subprocess.PIPE
+        command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE
     ).communicate()
     return std_out.strip().decode(), std_err.strip().decode()
+
+
+def process_response(command):
+    """
+    The function `process_response` will take command as argument and process
+    the raw response coming from the exec_command function.
+    Args:
+        command (_str_): The command to be exceuted.
+
+    Returns:
+        _tuple_: bool, str|json
+    """
+    try:
+        std_out, std_err = exec_command(command)
+        if len(std_err) != 0:
+            return False, std_err
+        return True, json.loads(std_out)
+    except Exception as error:  # pylint: disable=broad-except
+        return False, error
 
 
 def is_tool(binary):

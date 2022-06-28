@@ -1,58 +1,38 @@
-import argparse, os, sys, time
+"""
+This script test a series of bank transfer transactions with multiple messages between two accounts.
+It takes two optional arguments namely -s(sender) and -r(receiver)
+"""
+import os
+import sys
 import logging
-from core.keys import keys_show
-from modules.auth.query import account_type, query_account
-from modules.bank.query import query_balances
-from modules.bank.tx import sign_and_broadcast_txs, create_unsigned_txs
-from utils import (
-    create_multi_messages,
-    validate_num_txs,
-    print_balance_deductions,
-)
-from stats import clear_data_by_type, print_stats
+from internal.core.parser import Parser
+from internal.stats.stats import clear_data_by_type, print_stats
+from internal.modules.auth.query import get_sequences
+from internal.modules.bank.query import calculate_balance_deductions, query_balances
+from internal.modules.bank.tx import sign_and_broadcast_txs, create_unsigned_txs
+from internal.utils import create_multi_messages
 
 HOME = os.getenv("HOME")
 NUM_MSGS = int(os.getenv("NUM_MSGS"))
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
-parser = argparse.ArgumentParser(
-    description="This program takes inputs for intializing multi message load test."
+p = Parser(
+    "This program takes inputs for intializing multi messages load test.",
+    True,
+    True,
+    True,
 )
-parser.add_argument(
-    "-s",
-    "--sender",
-    type=account_type,
-    default=keys_show("account1")[1]["address"],
-    help="Sender bech32 address",
-)
-parser.add_argument(
-    "-r",
-    "--receiver",
-    type=account_type,
-    default=keys_show("account2")[1]["address"],
-    help="Receiver bech32 address",
-)
-parser.add_argument(
-    "-n",
-    "--num_txs",
-    type=validate_num_txs,
-    default=1000,
-    help="Number of transactions to be made, should be positive integer",
-)
-args = parser.parse_args()
-sender, receiver, NUM_TXS, amount_to_be_sent = (
-    args.sender,
-    args.receiver,
-    int(args.num_txs),
-    1000000,
-)
+args = p.parser.parse_args()
+sender, receiver, num_txs = args.sender, args.receiver, int(args.num_txs)
+amount_to_be_sent = 1000000
 
 if sender == receiver:
     sys.exit(
-        'Error: The values of arguments "sender" and "receiver" are equal make sure to set different values'
+        """Error: The values of arguments "sender" \
+                and "receiver" are equal make sure to set \
+                    different values"""
     )
-
 # Fetch balances of sender and receiver accounts before executing the load test
 status, sender_balance_old = query_balances(sender)
 if not status:
@@ -66,17 +46,7 @@ if not status:
 receiver_balance_old = int(receiver_balance_old["balances"][0]["amount"])
 
 # Fetching sequence numbers of to and from accounts
-status, sender_acc = query_account(sender)
-if not status:
-    sys.exit(sender_acc)
-
-status, receiver_acc = query_account(receiver)
-if not status:
-    sys.exit(receiver_acc)
-
-sender_acc_seq, receiver_acc_seq = int(sender_acc["sequence"]), int(
-    receiver_acc["sequence"]
-)
+sender_acc_seq, receiver_acc_seq = get_sequences(sender, receiver)
 
 # Generating unsigned transactions with a single transfer message
 status, unsignedTxto = create_unsigned_txs(
@@ -95,41 +65,28 @@ if not status:
 # clearing db data with same test type
 clear_data_by_type()
 
-for i in range(NUM_TXS):
+for i in range(num_txs):
 
-    # Duplicating and appending transfer message in the existing array to create a multi-msg transaction
+    # Duplicating and appending transfer message
+    # in the existing array to create a multi-msg transaction
     create_multi_messages(NUM_MSGS, "unsignedto.json")
     create_multi_messages(NUM_MSGS, "unsignedfrom.json")
 
     # Signing and broadcasting the unsigned transactions from sender to receiver
     seqto = sender_acc_seq + i
-    logging.info(f"Signing and broadcasting tx: {i*2+1}")
+    logging.info("Signing and broadcasting tx: %s", i * 2 + 1)
     status, tx = sign_and_broadcast_txs(
         "unsignedto.json", "signedto.json", sender, seqto
     )
 
     # Signing and broadcasting the unsigned transactions from receiver to sender
     seqfrom = receiver_acc_seq + i
-    logging.info(f"Signing and broadcasting tx: {i*2+2}")
+    logging.info("Signing and broadcasting tx: %s", i * 2 + 2)
     status, tx = sign_and_broadcast_txs(
         "unsignedfrom.json", "signedfrom.json", receiver, seqfrom
     )
 
-# Verifying the balance deductions
-status, sender_balance_updated = query_balances(sender)
-if not status:
-    sys.exit(sender_balance_updated)
-sender_balance_updated = sender_balance_updated["balances"][0]["amount"]
-
-status, receiver_balance_updated = query_balances(receiver)
-if not status:
-    sys.exit(receiver_balance_updated)
-receiver_balance_updated = receiver_balance_updated["balances"][0]["amount"]
-
-sender_diff = int(sender_balance_old) - int(sender_balance_updated)
-receiver_diff = int(receiver_balance_old) - int(receiver_balance_updated)
-
-print_balance_deductions("sender", sender_diff)
-print_balance_deductions("receiver", receiver_diff)
+# Verifying the Balances
+calculate_balance_deductions(sender, receiver, sender_balance_old, receiver_balance_old)
 
 print_stats()
