@@ -1,5 +1,6 @@
 import json, os, logging
 from db import db
+import utils
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
@@ -65,12 +66,12 @@ def record_stat(test_type, cmd_type, output, err):
 
 
 def clear_data_by_type():
-    if os.getenv("TEST_TYPE"):
-        db[COL_NAME].delete_many({"test_type": os.getenv("TEST_TYPE")})
+    if utils.env.TEST_TYPE:
+        db[COL_NAME].delete_many({"test_type": utils.env.TEST_TYPE})
 
 
 def print_stats(cmd_type=TX_TYPE):
-    test_type = os.getenv("TEST_TYPE")
+    test_type = utils.env.TEST_TYPE
     if test_type:
         log_text = "transactions" if cmd_type == TX_TYPE else "queries"
         num_txs = db[COL_NAME].count_documents(

@@ -50,9 +50,21 @@ echo "INFO: Voting on created proposal"
 $DAEMON tx gov vote 1 yes --from validator1 --yes --keyring-backend test \
     --home $DAEMON_HOME-1 --node $RPC --chain-id $CHAINID
 
-
 echo "INFO: Waiting for proposal to pass and upgrade"
 sleep 60s
+
+QUERY_COMMAND=`curl -s "$RPC/abci_query?path=%22/app/version%22" | jq -r '.result.response.value' | base64 -d && echo`
+count=0
+
+while [[ ($QUERY_COMMAND!=$UPGRADE_VERSION) && (count -le 5) ]]; do
+    count=$((count+1))
+    sleep 20s
+done
+
+if [[ $count -eq 6 ]]; then
+    echo "INFO: Upgrade failed with binary issues"
+    exit 0
+fi
 
 # moving back to current file folder
 cd $CURPATH

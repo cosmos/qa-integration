@@ -1,10 +1,10 @@
-import os, json
+import json
 
-from utils import exec_command
+from utils import exec_command, env
 
-DAEMON = os.getenv("DAEMON")
-RPC = os.getenv("RPC")
-CHAINID = os.getenv("CHAINID")
+DAEMON = env.DAEMON
+RPC = env.RPC
+CHAINID = env.CHAINID
 
 # The function 'query_staking_validators' fetches the validators information.
 def query_staking_validators():

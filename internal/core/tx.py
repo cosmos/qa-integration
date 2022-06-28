@@ -1,13 +1,13 @@
 import logging
-import os, json
+import json
 
-from utils import exec_command
+from utils import exec_command, env
 
-CHAINID = os.getenv("CHAINID")
-DAEMON = os.getenv("DAEMON")
-DAEMON_HOME = os.getenv("DAEMON_HOME")
-HOME = os.getenv("HOME")
-RPC = os.getenv("RPC")
+CHAINID = env.CHAINID
+DAEMON = env.DAEMON
+DAEMON_HOME = env.DAEMON_HOME
+HOME = env.HOME
+RPC = env.RPC
 
 # The function `tx_sign` will call cosmos-sdk command `tx sign` and the returns the response in json format.
 def tx_sign(unsigned_file_name, from_address, sequence, gas="auto"):

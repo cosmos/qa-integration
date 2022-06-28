@@ -1,12 +1,12 @@
 import argparse, os, json, logging, subprocess
 
+import env
+
 from stats import record_stat, TX_TYPE, QUERY_TYPE
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
-DAEMON = os.getenv("DAEMON")
-
-HOME = os.getenv("HOME")
+HOME = env.HOME
 
 # The function `print_balance_deductions` will print information about the balance deductions after transactions for a wallet or account.
 def print_balance_deductions(wallet, diff):
@@ -25,7 +25,7 @@ def print_balance_deductions(wallet, diff):
 # The utility function `exec_command` is used to execute the cosmos-sdk based commands.
 def exec_command(command):
     try:
-        test_type = os.getenv("TEST_TYPE") if os.getenv("TEST_TYPE") else None
+        test_type = env.TEST_TYPE
         # getting command type
         sub_commands = command.split()
         cmd_type = None
@@ -55,15 +55,6 @@ def is_tool(binary):
     from shutil import which
 
     return which(binary) is not None
-
-
-# validate_num_txs will validate num_txs value
-def validate_num_txs(x):
-    if int(x) < 1:
-        raise argparse.ArgumentTypeError(
-            "The argument NUM_TXS should be positive integer"
-        )
-    return int(x)
 
 
 # node_type is a user-defined type.

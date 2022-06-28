@@ -1,9 +1,9 @@
 import argparse, os, json
 
-from utils import exec_command
+from utils import exec_command, env
 
-DAEMON = os.getenv("DAEMON")
-RPC = os.getenv("RPC")
+DAEMON = env.DAEMON
+RPC = env.RPC
 
 # account_type is an user-defined data type used to validate account addresses read from Argument Parser.
 def account_type(address):

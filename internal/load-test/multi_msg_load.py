@@ -1,18 +1,17 @@
-import argparse, os, sys, time
-import logging
+import argparse, sys, logging
 from core.keys import keys_show
 from modules.auth.query import account_type, query_account
 from modules.bank.query import query_balances
 from modules.bank.tx import sign_and_broadcast_txs, create_unsigned_txs
 from utils import (
     create_multi_messages,
-    validate_num_txs,
     print_balance_deductions,
+    env,
 )
 from stats import clear_data_by_type, print_stats
 
-NUM_TXS = int(os.getenv("NUM_TXS"))
-NUM_MSGS = int(os.getenv("NUM_MSGS")) if os.getenv("NUM_MSGS") else 30
+NUM_TXS = env.NUM_TXS
+NUM_MSGS = env.NUM_MSGS
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 

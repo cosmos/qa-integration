@@ -1,11 +1,11 @@
-import argparse, sys, os, logging
+import argparse, sys, logging
+import utils
 from core.keys import keys_show
 from modules.auth.query import account_type, query_account
 from modules.bank.tx import tx_send
-from utils import validate_num_txs
 from stats import clear_data_by_type, print_stats
 
-num_txs = int(os.getenv("NUM_TXS"))
+num_txs = utils.env.NUM_TXS
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 

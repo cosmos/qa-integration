@@ -1,12 +1,12 @@
-import argparse, os, sys, time, logging
+import argparse, sys, time, logging
 from core.keys import keys_show
 from modules.auth.query import account_type, query_account
 from modules.bank.query import query_balances
 from modules.bank.tx import tx_send
-from utils import print_balance_deductions
+from utils import print_balance_deductions, env
 from stats import clear_data_by_type, print_stats
 
-NUM_TXS = int(os.getenv("NUM_TXS"))
+NUM_TXS = env.NUM_TXS
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
