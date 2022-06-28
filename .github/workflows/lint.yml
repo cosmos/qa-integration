@@ -10,5 +10,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - run: |
-          make lint
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - uses: marian-code/python-lint-annotate@v3
+        with:
+          # extra-pycodestyle-options: "--rcfile="
+          use-pylint: true
+          python-version: "3.8"
