@@ -1,0 +1,14 @@
+name: Lint
+#  Lint workflow checks lint issues
+#  This workflow run on workflow_dispatch & on every pull request
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: |
+          make lint
