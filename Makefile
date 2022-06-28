@@ -4,7 +4,7 @@ install-deps:
 	@bash ./scripts/deps/prereq.sh
 
 lint: install-deps
-	pylint --rcfile=./.pylintrc ./internal
+	PYTHONPATH=./internal pylint ./internal
 
 setup-chain: install-deps stop-chain
 	@bash ./scripts/chain/start_chain.sh $(NUM_VALS) 2
