@@ -17,7 +17,6 @@ def tx_grant(
 ):
     try:
         command = f"{DAEMON} tx feegrant grant {granter_key} {grantee} --spend-limit 100stake --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}"
-        # print(f"comandddddd.......{command}")
         Tx, tx_err = exec_command(command)
         Tx = json.loads(Tx)
         if len(tx_err):
@@ -36,6 +35,24 @@ def set_periodic_expiration_grant(
 ):
     try:
         command = f"{DAEMON} tx feegrant grant {granter_key} {grantee} --spend-limit 100stake --period 3600 --period-limit 10stake --expiration 36000 --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}"
+        Tx, tx_err = exec_command(command)
+        Tx = json.loads(Tx)
+        if len(tx_err):
+            return False, tx_err
+        elif Tx["code"] != 0:
+            return False, Tx
+        return True, Tx
+    except Exception as e:
+        return False, e
+
+# tx_revoke revoke fee grant from a granter to a grantee.
+def tx_revoke_feegrant(
+    granter_key,
+    grantee,
+    gas=DEFAULT_GAS,
+):
+    try:
+        command = f"{DAEMON} tx feegrant revoke {granter_key} {grantee} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}"
         Tx, tx_err = exec_command(command)
         Tx = json.loads(Tx)
         if len(tx_err):
