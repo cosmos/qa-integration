@@ -31,7 +31,7 @@ def query_balances(address):
 
 
 def calculate_balance_deductions(
-    sender, receiver, sender_balance_old, receiver_balance_old  # pylint: disable=C0330
+    sender, receiver, sender_balance_old, receiver_balance_old  # pylint: disable=c0330
 ):
     """_summary_
 

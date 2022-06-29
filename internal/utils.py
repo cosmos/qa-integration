@@ -6,8 +6,8 @@ import os
 import json
 import logging
 import subprocess
-
 from shutil import which
+from stats import record_stat, TX_TYPE, QUERY_TYPE
 
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
@@ -45,10 +45,30 @@ def exec_command(command):
     Returns:
         _tuple_: str, str
     """
-    std_out, std_err = subprocess.Popen(
-        command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE
-    ).communicate()
-    return std_out.strip().decode(), std_err.strip().decode()
+    try:
+        test_type = os.getenv("TEST_TYPE") if os.getenv("TEST_TYPE") else None
+        # getting command type
+        sub_commands = command.split()
+        cmd_type = None
+        if len(sub_commands) > 1 and (
+            sub_commands[1] == "q"  # pylint: disable=C0330
+            or sub_commands[1] == "query"  # pylint: disable=C0330
+        ):
+            cmd_type = QUERY_TYPE
+        elif len(sub_commands) > 1 and (sub_commands[1] == "tx"):
+            cmd_type = TX_TYPE
+
+        stdout, stderr = subprocess.Popen(
+            command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        ).communicate()
+        out, error = stdout.strip().decode(), stderr.strip().decode()
+        if test_type and cmd_type:
+            record_stat(test_type, cmd_type, out, error)
+        return out, error
+    except Exception as error:  # pylint: disable=W0703
+        if test_type and cmd_type:
+            record_stat(test_type, cmd_type, "", error)
+        return None, error
 
 
 def process_response(command):
