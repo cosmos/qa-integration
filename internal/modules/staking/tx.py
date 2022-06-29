@@ -3,7 +3,7 @@ import json, os
 import re
 from utils import exec_command, execute_tx_by_type
 from modules.staking.query import (
-    get_public_key,
+    get_validator_pubkey,
 )
 
 DAEMON = os.getenv("DAEMON")
@@ -12,6 +12,7 @@ CHAINID = os.getenv("CHAINID")
 HOME = os.getenv("HOME")
 DAEMON_HOME = os.getenv("DAEMON_HOME")
 RPC = os.getenv("RPC")
+
 DEFAULT_GAS = 2000000
 
 # tx_delegate function internally calls the 'delegate tx' command and return the response in json format.
@@ -47,7 +48,7 @@ def tx_create_validator(
     from_key, amount, moniker, temp_dir, gas=DEFAULT_GAS, unsigned=False, sequence=None
 ):
     try:
-        public_key, err = get_public_key(temp_dir)
+        public_key, err = get_validator_pubkey(temp_dir)
         if err:
             return False, err
         

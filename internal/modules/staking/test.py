@@ -16,12 +16,16 @@ from modules.staking.query import (
 
 HOME = os.getenv("HOME")
 DAEMON = os.getenv("DAEMON")
+DAEMON_HOME = os.getenv("DAEMON_HOME")
+os.environ["node1_home"] = f"{DAEMON_HOME}-1"
+os.environ["node2_home"] = f"{DAEMON_HOME}-2"
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
-# get validator, delegator and dst validator address
-validator = keys_show("validator1", "val", 1)[1]["address"]
-delegator = keys_show("account1", "acc", 1)[1]["address"]
-dst_val_address = keys_show("validator2", "val", 2)[1]["address"]
+# get validator, delegator and dst validator addresses
+node2_home = os.getenv("node2_home")
+validator = keys_show("validator1", "val")[1]["address"]
+delegator = keys_show("account1", "acc")[1]["address"]
+dst_val_address = keys_show("validator2", "val", node2_home)[1]["address"]
 
 # assign the arguments
 sender, amount_to_be_sent = delegator, 5

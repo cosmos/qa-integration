@@ -88,8 +88,8 @@ def query_validator_set():
     except Exception as e:
         return False, e
 
-# `get_public_key` is to get node's tendermint validator info
-def get_public_key(temp_dir):
-    command = f"{DAEMON} tendermint show-validator --home {temp_dir}"
+# `get_validator_pubkey` is to get node's tendermint validator info
+def get_validator_pubkey(val_home_dir):
+    command = f"{DAEMON} tendermint show-validator --home {val_home_dir}"
     key, err = exec_command(command)
     return key, err
