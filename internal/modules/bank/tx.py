@@ -114,8 +114,6 @@ def tx_send(  # pylint: disable=C0330, R0913
         tx_resp = json.loads(tx_resp)
         if len(tx_err) != 0:
             return False, tx_err
-        if tx_resp["code"] != 0:
-            return False, tx_resp
         return True, tx_resp
     except Exception as error:  # pylint: disable=broad-except
         return False, error
