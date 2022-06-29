@@ -34,7 +34,7 @@ def set_periodic_expiration_grant(
     gas=DEFAULT_GAS,
 ):
     try:
-        command = f"{DAEMON} tx feegrant grant {granter_key} {grantee} --spend-limit 100stake --period 3600 --period-limit 10stake --expiration 36000 --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}"
+        command = f"{DAEMON} tx feegrant grant {granter_key} {grantee} --spend-limit 100stake --period 60 --period-limit 10stake --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}"
         Tx, tx_err = exec_command(command)
         Tx = json.loads(Tx)
         if len(tx_err):
