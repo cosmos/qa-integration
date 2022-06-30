@@ -4,6 +4,8 @@ from stats import record_stat, TX_TYPE, QUERY_TYPE
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
+DEFAULT_GAS = 2000000
+
 DAEMON = os.getenv("DAEMON")
 
 HOME = os.getenv("HOME")
@@ -47,6 +49,19 @@ def exec_command(command):
         if test_type and cmd_type:
             record_stat(test_type, cmd_type, "", e)
         return None, e
+
+
+# exec_and_process_output execute given command and process response
+def exec_and_process_output(command, extra_args=""):
+    try:
+        if extra_args != "":
+            command = f"{command} {extra_args}"
+        res, err = exec_command(command)
+        if len(err):
+            return False, err
+        return True, json.loads(res)
+    except Exception as e:
+        return False, e
 
 
 # The utility function `is_tool` is used to verify the package or binary installation.
