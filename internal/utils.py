@@ -58,7 +58,7 @@ def exec_command(command):
         elif len(sub_commands) > 1 and (sub_commands[1] == "tx"):
             cmd_type = TX_TYPE
 
-        stdout, stderr = subprocess.Popen(
+        stdout, stderr = subprocess.Popen(  # pylint: disable=R1732
             command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE
         ).communicate()
         out, error = stdout.strip().decode(), stderr.strip().decode()

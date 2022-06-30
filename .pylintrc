@@ -1,4 +1,2 @@
 [MESSAGES CONTROL]
-disable=invalid-name
-[TYPECHECK]
-disable=bad-option-value
+disable=invalid-name, bad-option-value
