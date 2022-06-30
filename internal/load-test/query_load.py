@@ -17,7 +17,6 @@ logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 p = Parser("Arguments to run the query_load test script", True, False, True)
 args = p.parser.parse_args()
 sender, num_txs = args.sender, int(args.num_txs)
-
 status, val1 = keys_show(sender, "val")
 if not status:
     sys.exit(val1)
@@ -35,7 +34,6 @@ for i in range(0, num_txs):
     else:
         balance = balance_query_response["balances"][0]
         logging.info("Balance :: %s", balance)
-
     # Fetch staking validators
     status, validators_response = query_staking_validators()
     if not status:
