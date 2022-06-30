@@ -1,2 +1,3 @@
 [MESSAGES CONTROL]
 disable=invalid-name, bad-option-value
+min-similarity-lines=8

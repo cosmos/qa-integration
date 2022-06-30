@@ -17,8 +17,7 @@ p = Parser(
     True,
     True,
 )
-args = p.parser.parse_args()
-sender, receiver, num_txs = args.sender, args.receiver, int(args.num_txs)
+sender, receiver, num_txs = p.get_args()
 amount_to_be_sent = 1000000
 
 # query account sequence

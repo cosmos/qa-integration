@@ -23,13 +23,8 @@ p = Parser(
     True,
     True,
 )
-args = p.parser.parse_args()
-sender, receiver, num_txs, amount_to_be_sent = (
-    args.sender,
-    args.receiver,
-    int(args.num_txs),
-    1000000,
-)
+sender, receiver, num_txs = p.get_args()
+amount_to_be_sent = 1000000
 
 if sender == receiver:
     sys.exit(
