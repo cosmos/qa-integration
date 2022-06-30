@@ -145,6 +145,6 @@ Number of failed {log_text}: {num_failed_txs} ({(num_failed_txs/num_txs)*100}%)\
 
         stats_log += "-----------------------------"
         logging.info(stats_log)
-        file = open("stats.txt", "w")
-        file.write(stats_log)
-        file.close()
+        with open("stats.txt", "w", encoding="utf8") as file:
+            file.write(stats_log)
+            file.close()

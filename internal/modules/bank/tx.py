@@ -36,7 +36,7 @@ def create_unsigned_txs(from_address, to_address, amount, file_name):
         )
         if not status:
             return status, unsigned_tx
-        with open(f"{HOME}/{file_name}", "w") as outfile:
+        with open(HOME + "/" + file_name, "w", encoding="utf8") as outfile:
             json.dump(unsigned_tx, outfile)
         return True, unsigned_tx
     except Exception as error:  # pylint: disable=broad-except
@@ -61,7 +61,7 @@ def sign_and_broadcast_txs(unsigned_file, signed_file, from_address, sequence):
         status, sign_tx = tx_sign(unsigned_file, from_address, sequence, DEFAULT_GAS)
         if not status:
             return status, sign_tx
-        with open(f"{HOME}/{signed_file}", "w") as outfile:
+        with open(HOME + "/" + signed_file, "w", encoding="utf8") as outfile:
             json.dump(sign_tx, outfile)
 
         status, broadcast_response = tx_broadcast(signed_file, DEFAULT_GAS, "block")

@@ -161,13 +161,13 @@ def create_multi_messages(num_msgs, file_name):
         file_name (_str_): file path to modify messages.
     """
     messages = []
-    with open(f"{HOME}/{file_name}", "r+") as file:
+    with open(HOME + "/" + file_name, "r+", encoding="utf8") as file:
         file_data = json.load(file)
         messages.append(file_data["body"]["messages"][-1])
     for _i in range(num_msgs):
         messages.append(messages[-1])
 
-    with open(f"{HOME}/{file_name}", "r+") as file:
+    with open(HOME + "/" + file_name, "r+", encoding="utf8") as file:
         file_data = json.load(file)
         file_data["body"]["messages"] = messages
         file.seek(0)

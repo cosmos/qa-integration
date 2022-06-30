@@ -19,6 +19,7 @@ def query_staking_validators():
     try:
         command = f"{DAEMON} q staking validators --node {RPC} --chain-id {CHAINID} --output json"
         validators, validatorserr = exec_command(command)
+        print(f"staking validators command: {command}")
         if len(validatorserr) != 0:
             return False, validatorserr
         return True, json.loads(validators)
@@ -39,7 +40,8 @@ def query_staking_delegations(delegator, validator):
     """
     try:
         command = f"""{DAEMON} q staking delegation {delegator} {validator} \
-            --node {RPC} --chain-id {CHAINID} --output json"""
+--node {RPC} --chain-id {CHAINID} --output json"""
+        print(f"staking delegation command: {command}")
         delegations, delegationerr = exec_command(command)
         if len(delegationerr) != 0:
             return False, delegationerr
