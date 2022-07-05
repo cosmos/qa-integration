@@ -53,6 +53,7 @@ def tx_send(
     from_address,
     to_address,
     amount,
+    extra_args="",
     gas=DEFAULT_GAS,
     unsigned=False,
     sequence=None,
@@ -70,6 +71,8 @@ def tx_send(
 
             else:
                 command = f"{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}"
+                if extra_args != "":
+                   command = f"{command} {extra_args}"
             Tx, Txerr = exec_command(command)
             Tx = json.loads(Tx)
             if len(Txerr):
