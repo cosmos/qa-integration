@@ -3,7 +3,7 @@ import json, os
 import re
 from utils import exec_command, execute_tx_by_type
 from modules.staking.query import (
-    get_validator_pubkey,
+    fetch_validator_pubkey_from_node,
 )
 
 DAEMON = os.getenv("DAEMON")
@@ -45,13 +45,13 @@ def tx_unbond(from_key, validator_addr, amount, gas=DEFAULT_GAS):
 
 # tx_create_validator is to create new validator initialized with a self-delegation to it.
 def tx_create_validator(
-    from_key, amount, moniker, temp_dir, gas=DEFAULT_GAS, unsigned=False, sequence=None
+    from_key, amount, moniker, node_dir, gas=DEFAULT_GAS, unsigned=False, sequence=None
 ):
     try:
-        public_key, err = get_validator_pubkey(temp_dir)
+        public_key, err = fetch_validator_pubkey_from_node(node_dir)
         if err:
             return False, err
-        
+
         if sequence is not None:
             command = f"{DAEMON} tx staking create-validator --amount {amount}{DENOM} --commission-max-change-rate 0.1 --commission-max-rate 0.2 --commission-rate 0.1 --from {from_key} --min-self-delegation 1 --moniker {moniker} --pubkey {public_key}  --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --sequence {sequence} --gas {gas}"
         else:

@@ -9,9 +9,9 @@ CHAINID = os.getenv("CHAINID")
 def query_staking_validators():
     try:
         command = f"{DAEMON} q staking validators --node {RPC} --chain-id {CHAINID} --output json"
-        validators, validatorserr = exec_command(command)
-        if len(validatorserr):
-            return False, validatorserr
+        validators, validators_err = exec_command(command)
+        if len(validators_err):
+            return False, validators_err
         return True, json.loads(validators)
     except Exception as e:
         return False, e
@@ -21,9 +21,9 @@ def query_staking_validators():
 def query_delegator_delegations(delegator, validator):
     try:
         command = f"{DAEMON} q staking delegation {delegator} {validator} --node {RPC} --chain-id {CHAINID} --output json"
-        delegations, delegationerr = exec_command(command)
-        if len(delegationerr):
-            return False, delegationerr
+        delegations, delegation_err = exec_command(command)
+        if len(delegation_err):
+            return False, delegation_err
         return True, json.loads(delegations)
     except Exception as e:
         return False, e
@@ -57,10 +57,10 @@ def query_delegator_redelegation(delegator_addr, src_validator_addr, dst_validat
 def query_unbonding_delegation(delegator_addr, validator_addr):
     try:
         command = f"{DAEMON} q staking unbonding-delegation {delegator_addr} {validator_addr} --node {RPC} --chain-id {CHAINID} --output json"
-        redelegations, err = exec_command(command)
+        unbond_delegations, err = exec_command(command)
         if len(err):
             return False, err
-        return True, json.loads(redelegations)
+        return True, json.loads(unbond_delegations)
     except Exception as e:
         return False, e
 
@@ -81,15 +81,15 @@ def query_validator(validator_addr):
 def query_validator_set():
     try:
         command = f"{DAEMON} q staking validators --node {RPC} --chain-id {CHAINID} --output json"
-        validator, err = exec_command(command)
+        validators, err = exec_command(command)
         if len(err):
             return False, err
-        return True, json.loads(validator)
+        return True, json.loads(validators)
     except Exception as e:
         return False, e
 
-# `get_validator_pubkey` is to get node's tendermint validator info
-def get_validator_pubkey(val_home_dir):
+# `fetch_validator_pubkey_from_node` is to get node's tendermint validator info
+def fetch_validator_pubkey_from_node(val_home_dir):
     command = f"{DAEMON} tendermint show-validator --home {val_home_dir}"
     key, err = exec_command(command)
     return key, err
