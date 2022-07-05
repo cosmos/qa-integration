@@ -91,7 +91,6 @@ def periodic_grant():
     # periodic grant
     status, grant = set_periodic_expiration_grant("account1", grantee)
     assert status, f"tx_hash of periodic grant_tx :: {grant['txhash']}"
-
     time.sleep(3)
 
     # query grants to check if the periodic time is set or not
@@ -101,6 +100,26 @@ def periodic_grant():
     else:
         if periodic_grant["allowance"]["period"] is not None:
             logging.info(f"set periodic grant tx!!!")
+    spend_limit_before = int(
+        periodic_grant["allowance"]["basic"]["spend_limit"][0]["amount"]
+    )
+
+    # send tx
+    extra_args = f"--fee-account {granter} --fees {fees}stake"
+    status, send = tx_send(grantee, receiver, amount_to_sent, extra_args)
+    assert status, f"error inde send tx b/w grantee and granter : {send}"
+    time.sleep(3)
+
+    # query grants to check if the spend limti has changed or not.
+    status, periodic_grant = query_feegrant_grant(granter, grantee)
+    assert status, f"periodic grant tx failed :: {status}"
+
+    spend_limit_after = int(
+        periodic_grant["allowance"]["basic"]["spend_limit"][0]["amount"]
+    )
+    assert (
+        spend_limit_before - fees
+    ) == spend_limit_after, f"period grant tx was failed!!!"
 
     # revoke tx
     status, revoke = tx_revoke_feegrant("account1", grantee)
