@@ -7,6 +7,7 @@ import json
 import logging
 import subprocess
 from shutil import which
+
 from stats import record_stat, TX_TYPE, QUERY_TYPE
 
 
@@ -64,29 +65,15 @@ def exec_command(command):
         out, error = stdout.strip().decode(), stderr.strip().decode()
         if test_type and cmd_type:
             record_stat(test_type, cmd_type, out, error)
-        return out, error
+        if len(error) != 0:
+            return False, error
+        json_out = json.loads(out)
+        if cmd_type == TX_TYPE and "code" in json_out and json_out["code"] != 0:
+            return False, json_out
+        return True, json_out
     except Exception as error:  # pylint: disable=W0703
         if test_type and cmd_type:
             record_stat(test_type, cmd_type, "", error)
-        return None, error
-
-
-def process_response(command):
-    """
-    The function `process_response` will take command as argument and process
-    the raw response coming from the exec_command function.
-    Args:
-        command (_str_): The command to be exceuted.
-
-    Returns:
-        _tuple_: bool, str|json
-    """
-    try:
-        std_out, std_err = exec_command(command)
-        if len(std_err) != 0:
-            return False, std_err
-        return True, json.loads(std_out)
-    except Exception as error:  # pylint: disable=broad-except
         return False, error
 
 

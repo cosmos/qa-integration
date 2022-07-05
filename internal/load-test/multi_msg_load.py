@@ -18,10 +18,10 @@ NUM_MSGS = int(os.getenv("NUM_MSGS"))
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
 p = Parser(
-    "This program takes inputs for intializing multi messages load test.",
-    True,
-    True,
-    True,
+    desc="This program takes inputs for intializing multi messages load test.",
+    sender=True,
+    receiver=True,
+    num_txs=True,
 )
 sender, receiver, num_txs = p.get_args()
 amount_to_be_sent = 1000000

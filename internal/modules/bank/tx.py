@@ -96,24 +96,17 @@ def tx_send(  # pylint: disable=C0330, R0913
     Returns:
         _tuple_: bool, str|json
     """
-    try:
-        if unsigned:
+    if unsigned:
+        command = f"""{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} \
+            --chain-id {CHAINID} --output json --node {RPC} --generate-only --gas {gas}"""
+    else:
+        if sequence is not None:
             command = f"""{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} \
-                --chain-id {CHAINID} --output json --node {RPC} --generate-only --gas {gas}"""
-        else:
-            if sequence is not None:
-                command = f"""{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} \
-                    --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} \
-                        --output json -y --sequence {sequence} --gas {gas}"""
+                --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} \
+                    --output json -y --sequence {sequence} --gas {gas}"""
 
-            else:
-                command = f"""{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} \
-                    --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} \
-                        --output json -y --gas {gas}"""
-        tx_resp, tx_err = exec_command(command)
-        tx_resp = json.loads(tx_resp)
-        if len(tx_err) != 0:
-            return False, tx_err
-        return True, tx_resp
-    except Exception as error:  # pylint: disable=broad-except
-        return False, error
+        else:
+            command = f"""{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} \
+                --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} \
+                    --output json -y --gas {gas}"""
+    return exec_command(command)

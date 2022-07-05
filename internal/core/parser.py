@@ -12,7 +12,14 @@ class Parser:  # pylint: disable=R0903
     The Parser class is used for argument parser operations.
     """
 
-    def __init__(self, desc, sender=False, receiver=False, num_txs=False):
+    def __init__(  # pylint: disable=R0913
+        self,
+        desc,
+        sender=False,
+        sender_account="account1",
+        receiver=False,
+        num_txs=False,
+    ):
         self.parser = argparse.ArgumentParser(desc)
         self.sender = sender
         self.receiver = receiver
@@ -22,7 +29,7 @@ class Parser:  # pylint: disable=R0903
                 "-s",
                 "--sender",
                 type=account_type,
-                default=keys_show("account1")[1]["address"],
+                default=keys_show(sender_account)[1]["address"],
                 help="Sender bech32 address",
             )
         if self.receiver:

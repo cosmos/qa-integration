@@ -2,7 +2,6 @@
 This module queries staking sub commands.
 """
 import os
-import json
 from internal.utils import exec_command
 
 DAEMON = os.getenv("DAEMON")
@@ -16,14 +15,10 @@ def query_staking_validators():
     Returns:
         _tuple_: (bool, str|json)
     """
-    try:
-        command = f"{DAEMON} q staking validators --node {RPC} --chain-id {CHAINID} --output json"
-        validators, validatorserr = exec_command(command)
-        if len(validatorserr) != 0:
-            return False, validatorserr
-        return True, json.loads(validators)
-    except Exception as error:  # pylint: disable=broad-except
-        return False, error
+    command = (
+        f"{DAEMON} q staking validators --node {RPC} --chain-id {CHAINID} --output json"
+    )
+    return exec_command(command)
 
 
 def query_staking_delegations(delegator, validator):
@@ -37,12 +32,7 @@ def query_staking_delegations(delegator, validator):
     Returns:
         _tuple_: (bool, str|json)
     """
-    try:
-        command = f"""{DAEMON} q staking delegation {delegator} {validator} \
+
+    command = f"""{DAEMON} q staking delegation {delegator} {validator} \
 --node {RPC} --chain-id {CHAINID} --output json"""
-        delegations, delegationerr = exec_command(command)
-        if len(delegationerr) != 0:
-            return False, delegationerr
-        return True, json.loads(delegations)
-    except Exception as error:  # pylint: disable=broad-except
-        return False, error
+    return exec_command(command)

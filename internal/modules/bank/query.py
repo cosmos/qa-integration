@@ -2,7 +2,6 @@
 Querying functions for the bank module.
 """
 import os
-import json
 import sys
 
 from internal.utils import exec_command, print_balance_deductions
@@ -20,14 +19,8 @@ def query_balances(address):
     Returns:
         _tuple_: (boolean,str|json)
     """
-    try:
-        command = f"{DAEMON} q bank balances {address} --node {RPC} --output json"
-        balance, balance_err = exec_command(command)
-        if len(balance_err) != 0:
-            return False, balance_err
-        return True, json.loads(balance)
-    except Exception as error:  # pylint: disable=broad-except
-        return False, error
+    command = f"{DAEMON} q bank balances {address} --node {RPC} --output json"
+    return exec_command(command)
 
 
 def calculate_balance_deductions(

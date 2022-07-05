@@ -4,7 +4,7 @@ This module consists of query commands for auth cosmos-sdk module
 import argparse
 import os
 import sys
-from internal.utils import process_response
+from internal.utils import exec_command
 
 DAEMON = os.getenv("DAEMON")
 RPC = os.getenv("RPC")
@@ -40,7 +40,7 @@ def query_account(address):
         _tuple_: (bool, json|str)
     """
     command = f"{DAEMON} query auth account {address} --node {RPC} --output json"
-    return process_response(command)
+    return exec_command(command)
 
 
 def get_sequences(sender, receiver):

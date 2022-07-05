@@ -14,7 +14,13 @@ from internal.modules.staking.query import (
 from internal.stats.stats import print_stats, clear_data_by_type, QUERY_TYPE
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
-p = Parser("Arguments to run the query_load test script", True, False, True)
+p = Parser(
+    desc="Arguments to run the query_load test script",
+    sender=True,
+    sender_account="validator1",
+    receiver=False,
+    num_txs=True,
+)
 sender, _, num_txs = p.get_args()
 status, val1 = keys_show(sender, "val")
 if not status:
