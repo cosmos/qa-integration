@@ -24,10 +24,10 @@ def tx_submit_proposal(
             return exec_and_process_output(command, extra_args)
         else:
             if sequence != None:
-                command = f"""{DAEMON} tx gov submit-proposal community-pool-spend {proposal_file_or_name} --chain-id {CHAINID} \
+                command = f"""{DAEMON} tx gov submit-proposal {proposal_type} {proposal_file_or_name} --chain-id {CHAINID} \
 --keyring-backend test --from {from_key} --home {DAEMON_HOME}-1 --node {RPC} --output json -y --sequence {sequence} --gas {gas}"""
             else:
-                command = f"""{DAEMON} tx gov submit-proposal community-pool-spend {proposal_file_or_name} --chain-id {CHAINID} --keyring-backend test \
+                command = f"""{DAEMON} tx gov submit-proposal {proposal_type} {proposal_file_or_name} --chain-id {CHAINID} --keyring-backend test \
  --home {DAEMON_HOME}-1 --from {from_key} --node {RPC} --output json -y --gas {gas}"""
             status, tx = exec_and_process_output(command, extra_args)
             if status and tx["code"] != 0:
