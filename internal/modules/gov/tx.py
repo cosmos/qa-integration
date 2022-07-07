@@ -103,6 +103,7 @@ def tx_vote(
     gas=DEFAULT_GAS,
     unsigned=False,
     sequence=None,
+    home=f"{DAEMON_HOME}-1",
     extra_args="",
 ):
     try:
@@ -112,10 +113,10 @@ def tx_vote(
         else:
             if sequence != None:
                 command = f"""{DAEMON} tx gov vote {proposal_id} {option} --chain-id {CHAINID} \
---keyring-backend test --from {from_key} --home {DAEMON_HOME}-1 --node {RPC} --output json -y --sequence {sequence} --gas {gas}"""
+--keyring-backend test --from {from_key} --home {home} --node {RPC} --output json -y --sequence {sequence} --gas {gas}"""
             else:
                 command = f"""{DAEMON} tx gov vote {proposal_id} {option} --chain-id {CHAINID} --keyring-backend test \
- --home {DAEMON_HOME}-1 --from {from_key} --node {RPC} --output json -y --gas {gas}"""
+ --home {home} --from {from_key} --node {RPC} --output json -y --gas {gas}"""
             status, tx = exec_and_process_output(command, extra_args)
             if status and tx["code"] != 0:
                 return False, tx
@@ -132,6 +133,7 @@ def tx_weighted_vote(
     gas=DEFAULT_GAS,
     unsigned=False,
     sequence=None,
+    home=f"{DAEMON_HOME}-1",
     extra_args="",
 ):
     try:
@@ -141,10 +143,10 @@ def tx_weighted_vote(
         else:
             if sequence != None:
                 command = f"""{DAEMON} tx gov weighted-vote {proposal_id} {options} --chain-id {CHAINID} \
---keyring-backend test --from {from_key} --home {DAEMON_HOME}-1 --node {RPC} --output json -y --sequence {sequence} --gas {gas}"""
+--keyring-backend test --from {from_key} --home {home} --node {RPC} --output json -y --sequence {sequence} --gas {gas}"""
             else:
                 command = f"""{DAEMON} tx gov weighted-vote {proposal_id} {options} --chain-id {CHAINID} --keyring-backend test \
- --home {DAEMON_HOME}-1 --from {from_key} --node {RPC} --output json -y --gas {gas}"""
+ --home {home} --from {from_key} --node {RPC} --output json -y --gas {gas}"""
             status, tx = exec_and_process_output(command, extra_args)
             if status and tx["code"] != 0:
                 return False, tx
