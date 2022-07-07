@@ -63,12 +63,10 @@ def grant_tx():
 
     status, grantee_bal_updated = query_balances(grantee)
     assert status, f"error while getting grantee bal :: {status}"
-
     grantee_bal_updated = int(grantee_bal_updated["balances"][0]["amount"])
 
     status, receiver_bal_updated = query_balances(receiver)
     assert status, f"error while getting receiver bal :: {status}"
-
     receiver_bal_updated = int(receiver_bal_updated["balances"][0]["amount"])
 
     if (
@@ -88,7 +86,7 @@ def grant_tx():
 
 
 def periodic_grant():
-    # periodic grant
+    # set periodic grant by passing granter key and grantee address
     status, grant = set_periodic_expiration_grant("account1", grantee)
     assert status, f"tx_hash of periodic grant_tx :: {grant['txhash']}"
     time.sleep(3)

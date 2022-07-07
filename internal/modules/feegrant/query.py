@@ -5,7 +5,7 @@ DAEMON = os.getenv("DAEMON")
 RPC = os.getenv("RPC")
 CHAINID = os.getenv("CHAINID")
 
-# `query_feegrant_grant` query details of a single grant.
+# `query_feegrant_grant` takes grannter and grantee addresses as pramaters and returns json response.
 def query_feegrant_grant(granter, grantee):
     try:
         command = f"{DAEMON} q feegrant grant {granter} {grantee} --node {RPC} --chain-id {CHAINID} --output json"
@@ -16,7 +16,8 @@ def query_feegrant_grant(granter, grantee):
     except Exception as e:
         return False, e
 
-# `query_greantee_grants` query all grants of a grantee.
+
+# `query_greantee_grants` takes grantee address as paramter and returns the grants of grantee in json response.
 def query_greantee_grants(grantee):
     try:
         command = f"{DAEMON} q feegrant grants {grantee} --node {RPC} --chain-id {CHAINID} --output json"

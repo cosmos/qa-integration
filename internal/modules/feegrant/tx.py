@@ -9,7 +9,8 @@ DAEMON_HOME = os.getenv("DAEMON_HOME")
 RPC = os.getenv("RPC")
 DEFAULT_GAS = 2000000
 
-# tx_grant grant authorization to pay fees from your address.
+# `tx_grant` takes granter_key and grantee address as paramaters and executes feegrant grant tx
+# internally and returns the json response.
 def tx_grant(
     granter_key,
     grantee,
@@ -27,7 +28,8 @@ def tx_grant(
     except Exception as e:
         return False, e
 
-# set_periodic_expiration_grant sents periodic expirtaion for grant transaction.
+# `set_periodic_expiration_grant` takes granter_key and grantee address as paramaters and executes grant tx
+# internally and returns the json response.
 def set_periodic_expiration_grant(
     granter_key,
     grantee,
@@ -45,7 +47,8 @@ def set_periodic_expiration_grant(
     except Exception as e:
         return False, e
 
-# tx_revoke revoke fee grant from a granter to a grantee.
+# `tx_revoke_feegrant` takes granter_key and grantee address as paramaters and executes feegrant revoke tx
+# internally and returns the json response.
 def tx_revoke_feegrant(
     granter_key,
     grantee,
