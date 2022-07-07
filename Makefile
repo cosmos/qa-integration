@@ -1,4 +1,4 @@
-NUM_VALS = 2
+NUM_VALS = 3
 
 install-deps:
 	@bash ./scripts/deps/prereq.sh
