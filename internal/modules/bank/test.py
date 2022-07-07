@@ -16,7 +16,9 @@ receiver = keys_show("account2")[1]["address"]
 amount_to_be_sent = 5
 
 if sender == receiver:
-    logging.error(f"Error: The values of arguments sender and receiver are equal make sure to set different values")
+    logging.error(
+        f"Error: The values of arguments sender and receiver are equal make sure to set different values"
+    )
 
 # Fetch balances of sender and receiver accounts before executing the send_tx
 status, sender_balance_old = query_balances(sender)

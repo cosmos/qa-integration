@@ -10,7 +10,7 @@ DAEMON_HOME = os.getenv("DAEMON_HOME")
 RPC = os.getenv("RPC")
 DEFAULT_GAS = 2000000
 
-# The function 'create_unsigned_txs' takes sender(from_address), receiver(to_address), amount and file_name as parameters and call the function tx_send
+# 'create_unsigned_txs' takes sender(from_address), receiver(to_address), amount and file_name as parameters and call the function tx_send
 # internally and stores the json to file_name file.
 def create_unsigned_txs(from_address, to_address, amount, file_name):
     try:
@@ -30,7 +30,7 @@ def create_unsigned_txs(from_address, to_address, amount, file_name):
         return False, e
 
 
-# The function 'sign_and_broadcast_txs' takes unsigned_file, signed_file, from_address and sequence as parameters.
+# 'sign_and_broadcast_txs' takes unsigned_file, signed_file, from_address and sequence as parameters.
 # Signs and the broadcasts the unsigned transactions.
 def sign_and_broadcast_txs(unsigned_file, signed_file, from_address, sequence):
     try:
@@ -48,7 +48,8 @@ def sign_and_broadcast_txs(unsigned_file, signed_file, from_address, sequence):
         return False, e
 
 
-# The function tx_send internally calls the 'tx send' command and return the response in json format.
+# tx_send takes from_address, to_address and amount as paramaters and
+# internally calls the 'tx send' command and return the response in json format.
 def tx_send(
     from_address,
     to_address,
