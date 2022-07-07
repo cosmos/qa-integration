@@ -1,4 +1,3 @@
-from distutils import text_file
 import json, os
 import re
 from utils import exec_command, execute_tx_by_type

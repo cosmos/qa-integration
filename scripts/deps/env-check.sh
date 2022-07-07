@@ -25,3 +25,9 @@ if [ -z $DAEMON ] || [ -z $DENOM ] || [ -z $CHAINID ] || [ -z $DAEMON_HOME ] || 
 then 
     display_usage
 fi
+
+# export daemon home paths
+for (( a=1; a<=$NUM_VALS; a++ ))
+do
+    export NODE_HOME_$a=$DAEMON_HOME-$a
+done
