@@ -9,7 +9,7 @@ CHAINID = os.getenv("CHAINID")
 # internally and returns the json response.
 def query_authz_grants(granter, grantee):
     try:
-        command = f"{DAEMON} q authz grants {granter} {grantee} --node {RPC} --chain-id {CHAINID} --output json"
+        command = f"{DAEMON} q authz grants {granter} {grantee} --node {RPC} --chain-id {CHAINID} --output json --count-total"
         grant, err = exec_command(command)
         if len(err):
             return False, err

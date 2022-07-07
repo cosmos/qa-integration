@@ -41,7 +41,6 @@ def tx_grant_authz(
 ):
     try:
         command = f"{DAEMON} tx authz grant {grantee} send --spend-limit 100stake --from {granter} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}"
-        print(f"commanddddddd.....{command}")
         tx, tx_err = exec_command(command)
         tx = json.loads(tx)
         if len(tx_err):
@@ -72,25 +71,6 @@ def tx_revoke_authz(
     except Exception as e:
         return False, e
 
-# The function tx_send internally calls the 'tx send' command and return the response in json format.
-# def tx_send(
-#     granter,
-#     grantee,
-#     recipient,
-#     amount,
-#     gas=DEFAULT_GAS,
-#     unsigned=True,
-#     sequence=None,
-# ):
-#     try:
-#         if unsigned:
-#             command = f"{DAEMON} tx bank send {granter} {recipient} --from {granter} --chain-id {CHAINID} --output json --node {RPC} --generate-only --gas {gas}" 
-#             Tx, Txerr = exec_command(command)
-#             if len(Txerr):
-#                 return False, Txerr
-#             return True, json.loads(Tx)
-#     except Exception as e:
-#         return False, e
 
 # The function 'create_unsigned_send_tx' takes sender(from_address), receiver(to_address), amount and file_name as parameters and call the function tx_send
 # internally and stores the json to file_name file.
