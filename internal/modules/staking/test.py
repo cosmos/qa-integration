@@ -37,7 +37,7 @@ if sender == validator:
 
 # delegate tx
 status, delegate_tx = tx_delegate("account1", validator, amount_to_be_sent)
-assert status,f"error in delegation tx :: {delegate_tx}"
+assert status, f"error in delegation tx :: {delegate_tx}"
 time.sleep(3)
 
 # query delegation amount
@@ -46,7 +46,7 @@ before_del_amount = query_delegator_delegations(delegator, validator)[1]["balanc
 ]
 
 status, delegateTx = tx_delegate("account1", validator, amount_to_be_sent)
-assert status,f"error in delegation tx :: {delegate_tx}"
+assert status, f"error in delegation tx :: {delegate_tx}"
 time.sleep(3)
 
 # query delegations and match the delagted amount
@@ -72,7 +72,7 @@ before_redel_amount = query_delegator_delegations(delegator, dst_val_address)[1]
 status, redelegate_tx = tx_redelegate(
     "account1", validator, dst_val_address, amount_to_be_sent
 )
-assert status,f"redelegation tx status :: {status}"
+assert status, f"redelegation tx status :: {status}"
 time.sleep(3)
 
 # query redelegated amount and match the amount before and after the tx
@@ -112,7 +112,7 @@ assert len(tx_err), f"init tx res :: {tx}"
 status, create_val_tx = tx_create_validator(
     "account1", amount_to_be_sent, TEMP_VAL, temp_dir_name
 )
-assert status,f"create-validator tx status :: {status}"
+assert status, f"create-validator tx status :: {status}"
 time.sleep(3)
 
 (_, validator) = keys_show("account1", "val")

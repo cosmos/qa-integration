@@ -12,17 +12,18 @@ CHAINID = os.getenv("CHAINID")
 HOME = os.getenv("HOME")
 DAEMON_HOME = os.getenv("DAEMON_HOME")
 RPC = os.getenv("RPC")
-
 DEFAULT_GAS = 2000000
 
-# tx_delegate function internally calls the 'delegate tx' command and return the response in json format.
+# tx_delegate takes from_key, validator address and amount as paramaters and
+# internally executes the 'delegate tx' command and return the response in json format.
 def tx_delegate(from_key, validator_addr, amount, gas=DEFAULT_GAS):
     command = f"{DAEMON} tx staking delegate {validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --output json --node {RPC} --gas {gas}"
     status, res = execute_tx_by_type(command)
     return status, res
 
 
-# tx_redelegate function internally calls the 'redelegate tx' command and return the response in json format.
+# tx_redelegate takes from_key, source and disration validator address as params and
+# internally executes the 'redelegate tx' command and return the response in json format.
 def tx_redelegate(
     from_key,
     src_validator_addr,
@@ -36,16 +37,18 @@ def tx_redelegate(
     return status, res
 
 
-# tx_unbond function internally calls the 'unbond tx' command and return the response in json format.
+# tx_unbond takes from key, valiator address and amount as params and
+# internally executes the 'unbond tx' command and return the response in json format.
 def tx_unbond(from_key, validator_addr, amount, gas=DEFAULT_GAS):
     command = f"{DAEMON} tx staking unbond {validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --output json --node {RPC} --gas {gas}"
     status, res = execute_tx_by_type(command)
     return status, res
 
 
-# tx_create_validator is to create new validator initialized with a self-delegation to it.
+# tx_create_validator takes from key, amount moniker and noded ir as params and
+# internally calls `create-validator` to create a new validator initialized with a self-delegation to it and returns json response.
 def tx_create_validator(
-    from_key, amount, moniker, node_dir, gas=DEFAULT_GAS, unsigned=False, sequence=None
+    from_key, amount, moniker, node_dir, gas=DEFAULT_GAS, sequence=None
 ):
     try:
         public_key, err = fetch_validator_pubkey_from_node(node_dir)
