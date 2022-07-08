@@ -91,28 +91,3 @@ def create_multi_messages(num_msgs, file_name):
         file_data["body"]["messages"] = messages
         file.seek(0)
         json.dump(file_data, file, indent=4)
-
-# `execute_tx_by_type` is used to execute the tx by type.
-def execute_tx_by_type(command, unsigned=False, sequence=None):
-    try:
-        if unsigned:
-            command = f"{command} --generate-only"
-            tx, tx_err = exec_command(command)
-            if len(tx_err):
-                return False, tx_err
-            return True, json.loads(tx)
-        else:
-            if sequence is not None:
-                command = f"{command} --keyring-backend test --home {DAEMON_HOME}-1 -y --sequence {sequence}"
-
-            else:
-                command = f"{command} --keyring-backend test --home {DAEMON_HOME}-1 -y"
-            tx, tx_err = exec_command(command)
-            tx = json.loads(tx)
-            if len(tx_err):
-                return False, tx_err
-            elif tx["code"] != 0:
-                return False, tx
-            return True, tx
-    except Exception as e:
-        return False, e
