@@ -11,13 +11,6 @@ cd $CURPATH
 # check environment variables are set
 . ../deps/env-check.sh
 
-# NUM_VALS represents number of validator nodes
-NUM_VALS=$1
-if [ -z $NUM_VALS ]
-then
-    NUM_VALS=1
-fi
-
 echo "INFO: Number of validator nodes to be paused: $NUM_VALS"
 echo "---------- Stopping systemd service files --------"
 for (( a=1; a<=$NUM_VALS; a++ ))

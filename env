@@ -11,4 +11,4 @@ NUM_MSGS=30
 RPC="http://localhost:16657"
 MONGO_URL="mongodb://localhost:27017/"
 DB_NAME=qa_test
-NUM_VALS=2
+NUM_VALS=3
