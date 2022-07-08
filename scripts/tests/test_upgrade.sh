@@ -20,6 +20,11 @@ then
     NUM_VALS=2
 fi
 
+if [ -z $UPGRADE_WAITING_TIME ]
+then
+    UPGRADE_WAITING_TIME="10s"
+fi
+
 echo "INFO: Building binary with upgraded version"
 cd $HOME
 export REPO=$(basename $GH_URL .git)
@@ -44,7 +49,7 @@ $DAEMON tx gov submit-proposal software-upgrade $UPGRADE_NAME --title $UPGRADE_N
     --description upgrade --upgrade-height $((CURRENT_BLOCK_HEIGHT + 60)) --deposit 10000000$DENOM \
     --from validator1 --yes --keyring-backend test --home $DAEMON_HOME-1 --node $RPC --chain-id $CHAINID
 
-sleep 3s
+sleep 4s
 
 echo "INFO: Voting on created proposal"
 $DAEMON tx gov vote 1 yes --from validator1 --yes --keyring-backend test \
@@ -53,10 +58,15 @@ $DAEMON tx gov vote 1 yes --from validator1 --yes --keyring-backend test \
 echo "INFO: Waiting for proposal to pass and upgrade"
 sleep 60s
 
-QUERY_COMMAND=`curl -s "$RPC/abci_query?path=%22/app/version%22" | jq -r '.result.response.value' | base64 -d && echo`
-count=0
+echo "INFO: Waiting for upgrade setup"
+sleep $UPGRADE_WAITING_TIME
 
-while [[ ($QUERY_COMMAND!=$UPGRADE_VERSION) && (count -le 5) ]]; do
+count=0
+while [[ count -le 5 ]]; do
+    CURRENT_VERSION=$(curl -s "$RPC/abci_query?path=%22/app/version%22" | jq -r '.result.response.value' | base64 -d && echo)
+    if [ "v$CURRENT_VERSION" = "$UPGRADE_VERSION" ]; then
+        break
+    fi
     count=$((count+1))
     sleep 20s
 done
