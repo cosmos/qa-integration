@@ -7,9 +7,9 @@ from internal.core.keys import keys_show
 from internal.utils import validate_num_txs
 
 
-class Parser:  # pylint: disable=R0903
+class ParseTestsDefaultFlags:  # pylint: disable=R0903
     """
-    The Parser class is used for argument parser operations.
+    The ParseTestsDefaultFlags class is used for argument parser operations.
     """
 
     def __init__(  # pylint: disable=R0913

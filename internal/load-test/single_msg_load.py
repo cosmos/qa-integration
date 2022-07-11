@@ -3,13 +3,13 @@ This script test a series of bank transfer transactions with single message betw
 It takes two optional arguments namely -s(sender) and -r(receiver).
 """
 import sys
-from internal.core.parser import Parser
+from internal.core.parser import ParseTestsDefaultFlags
 from internal.stats.stats import clear_data_by_type, print_stats
-from internal.modules.auth.query import get_sequences
+from internal.modules.auth.query import query_account
 from internal.modules.bank.query import calculate_balance_deductions, query_balances
 from internal.modules.bank.tx import tx_send
 
-p = Parser(
+p = ParseTestsDefaultFlags(
     desc="This program takes inputs for intializing single message load test.",
     sender=True,
     receiver=True,
@@ -30,7 +30,15 @@ if not status:
 receiver_balance_old = receiver_balance_old["balances"][0]["amount"]
 
 #### Fetching sequence numbers of to and from accounts
-sender_acc_seq, receiver_acc_seq = get_sequences(sender, receiver)
+status, sender_acc = query_account(sender)
+if not status:
+    sys.exit(sender_acc)
+sender_acc_seq = int(sender_acc["sequence"])
+
+status, receiver_acc = query_account(receiver)
+if not status:
+    sys.exit(receiver_acc)
+receiver_acc_seq = int(receiver_acc["sequence"])
 
 # clearing db data with same test type
 clear_data_by_type()

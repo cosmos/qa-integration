@@ -3,7 +3,7 @@ This script creates a load of 10,000 `send` transactions and floods the network.
 """
 import sys
 import logging
-from internal.core.parser import Parser
+from internal.core.parser import ParseTestsDefaultFlags
 from internal.stats.stats import clear_data_by_type, print_stats
 from internal.modules.auth.query import query_account
 from internal.modules.bank.tx import tx_send
@@ -11,7 +11,7 @@ from internal.modules.bank.tx import tx_send
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
-p = Parser(
+p = ParseTestsDefaultFlags(
     desc="This program takes inputs for intializing send load test.",
     sender=True,
     receiver=True,

@@ -5,9 +5,9 @@ It takes two optional arguments namely -s(sender) and -r(receiver)
 import os
 import sys
 import logging
-from internal.core.parser import Parser
+from internal.core.parser import ParseTestsDefaultFlags
 from internal.stats.stats import clear_data_by_type, print_stats
-from internal.modules.auth.query import get_sequences
+from internal.modules.auth.query import query_account
 from internal.modules.bank.query import calculate_balance_deductions, query_balances
 from internal.modules.bank.tx import sign_and_broadcast_txs, create_unsigned_txs
 from internal.utils import create_multi_messages
@@ -17,7 +17,7 @@ NUM_MSGS = int(os.getenv("NUM_MSGS"))
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
-p = Parser(
+p = ParseTestsDefaultFlags(
     desc="This program takes inputs for intializing multi messages load test.",
     sender=True,
     receiver=True,
@@ -45,7 +45,16 @@ if not status:
 receiver_balance_old = int(receiver_balance_old["balances"][0]["amount"])
 
 # Fetching sequence numbers of to and from accounts
-sender_acc_seq, receiver_acc_seq = get_sequences(sender, receiver)
+#### Fetching sequence numbers of to and from accounts
+status, sender_acc = query_account(sender)
+if not status:
+    sys.exit(sender_acc)
+sender_acc_seq = int(sender_acc["sequence"])
+
+status, receiver_acc = query_account(receiver)
+if not status:
+    sys.exit(receiver_acc)
+receiver_acc_seq = int(receiver_acc["sequence"])
 
 # Generating unsigned transactions with a single transfer message
 status, unsignedTxto = create_unsigned_txs(

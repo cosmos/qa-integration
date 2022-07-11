@@ -4,7 +4,7 @@ It creates a load of 10,000 querires.
 """
 import sys
 import logging
-from internal.core.parser import Parser
+from internal.core.parser import ParseTestsDefaultFlags
 from internal.core.keys import keys_show
 from internal.modules.bank.query import query_balances
 from internal.modules.staking.query import (
@@ -14,7 +14,7 @@ from internal.modules.staking.query import (
 from internal.stats.stats import print_stats, clear_data_by_type, QUERY_TYPE
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
-p = Parser(
+p = ParseTestsDefaultFlags(
     desc="Arguments to run the query_load test script",
     sender=True,
     sender_account="validator1",
