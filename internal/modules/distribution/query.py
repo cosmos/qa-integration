@@ -80,17 +80,6 @@ def query_validator_outstanding_rewards(validator_addr):
     except Exception as e:
         return False,e
 
-
-def query_balance(delegator_addr):
-    try:
-        command = f"{DAEMON} q bank balances {delegator_addr} --node {RPC} --chain-id {CHAINID} --output json"
-        balance,balanceerr = exec_command(command)
-        if len(balanceerr):
-            return False,balanceerr
-        return True,json.loads(balance)
-    except Exception as e:
-        return False,e
-
 def query_delegation(delegator,validator):
     try:
         command = f"{DAEMON} q staking delegation {delegator} {validator} --node {RPC} --chain-id {CHAINID} --output json"

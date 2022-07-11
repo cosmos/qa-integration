@@ -1,48 +1,19 @@
-from distutils.log import info
-import json
-import os,logging,time,subprocess
+import os,logging,time,json,subprocess
 from core.keys import keys_show
-from internal.utils import exec_command
+from modules.distribution.tx import *
+from modules.distribution.query import *
+from modules.bank.query import query_balances
 
-from modules.distribution.tx import (
-    tx_delegate,
-    tx_fund_communitypool,
-    tx_withdraw_addr,
-    tx_withdraw_allrewards,
-    tx_withdraw_commision_rewards,
-    tx_withdraw_rewards
-)
-from modules.distribution.query import (
-    query_balance,
-    query_commission_rewards,
-    query_community_pool,
-    query_delegation,
-    query_delegations,
-    query_params,
-    query_rewards,
-    query_rewards_singleval,
-    query_slashes,
-    query_validator_outstanding_rewards
-)
+logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
-DAEMON_HOME = os.getenv("DAEMON_HOME")
 HOME = os.getenv("HOME")
+DAEMON_HOME = os.getenv("DAEMON_HOME")
 os.environ["node1_home"] = f"{DAEMON_HOME}-1"
 os.environ["node2_home"] = f"{DAEMON_HOME}-2"
 os.environ["node3_home"] = f"{DAEMON_HOME}-3"
-logging.basicConfig(format="%(message)s", level=logging.DEBUG)
-
-cmd = f"sudo -S systemctl stop simd-3"
-tx,tx_err = exec_command(cmd)
-if len(tx_err):
-    logging.error(tx_err)
-# process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
-# process.communicate()
-time.sleep(3)
 
 node2_home = os.getenv("node2_home")
 node3_home = os.getenv("node3_home")
-
 validator1 = keys_show("validator1","val")[1]["address"]
 validator2 = keys_show("validator2","val",node2_home)[1]["address"]
 validator3 = keys_show("validator3","val",node3_home)[1]["address"]
@@ -51,15 +22,18 @@ delegator2 = keys_show("account2","acc")[1]["address"]
 
 amount_to_be_sent = 100
 
+cmd = f"sudo -S systemctl stop simd-3"
+process = subprocess.Popen(cmd.split(), stdout=subprocess.PIPE)
+process.communicate()
+
+logging.info("INFO :: Running distribution module tests")
+
 #query delegations
 status,delegations = query_delegation(delegator1,validator1)
 if not status:
     # delegate tx
     status,delegate_tx = tx_delegate("account1",validator1,amount_to_be_sent)
-    if not status:
-        logging.error(f"error in delegate tx :: {delegate_tx}")
-    else:
-        logging.info(f"delegate tx :: {delegate_tx['txhash']}")
+    assert status, f"error in delegate tx :: {delegate_tx}"
 
 time.sleep(5)
 
@@ -68,147 +42,148 @@ status,delegations = query_delegation(delegator1,validator2)
 if not status:
     # delegate tx 
     status,delegate_tx = tx_delegate("account1",validator2,amount_to_be_sent)
-    if not status:
-        logging.error(f"error in delegate tx :: {delegate_tx}")
+    assert status, f"error in delegate tx :: {delegate_tx}"
+
+time.sleep(10)
+
+def withdraw_rewards_tx():
+    # query balance
+    before_balance = query_balances(delegator1)[1]["balances"][0]["amount"]
+
+    # query rewards
+    rewards = query_rewards_singleval(delegator1,validator1)[1]["rewards"][0]["amount"]
+    # withdraw rewards tx
+    status,rewards_tx = tx_withdraw_rewards("account1",validator1)
+    assert status, f"error in tx withdraw rewards :: {rewards_tx}"
+    time.sleep(3)
+
+    after_balance = query_balances(delegator1)[1]["balances"][0]["amount"]
+
+    if int(after_balance) == (int(before_balance) + int(float(rewards))):
+        logging.info(f"with-draw rewards tx of {delegator1} from {validator1} was successful")
     else:
-        logging.info(f"delegate tx :: {delegate_tx['txhash']}")
+        logging.error("missmatch in rewards")
+    time.sleep(10)
 
-time.sleep(10)
+def withdraw_all_rewards_tx():
+    # query balance
+    before_balance = query_balances(delegator1)[1]["balances"][0]["amount"]
+    # query all rewards
+    all_rewards = query_rewards(delegator1)[1]["rewards"]
+    total = 0
+    for x in all_rewards:
+        rewards = x["reward"][0]["amount"]
+        total = total + (float(rewards))
+    
+    # tx withdraw all rewards
+    status,all_rewards = tx_withdraw_allrewards("account1")
+    assert status, f"error in tx withdraw all rewards :: {all_rewards}"
 
-# query balance
-before_balance = query_balance(delegator1)[1]["balances"][0]["amount"]
-# query rewards
-rewards = query_rewards_singleval(delegator1,validator1)[1]["rewards"][0]["amount"]
-# withdraw rewards tx
-status,rewards_tx = tx_withdraw_rewards("account1",validator1)
-if not status:
-    logging.error(f"error in tx withdraw rewards :: {rewards_tx}")
-else:
-    logging.info(f"tx_hash  :: {rewards_tx['txhash']}")
-time.sleep(3)
-after_balance = query_balance(delegator1)[1]["balances"][0]["amount"]
-if int(after_balance) == (int(before_balance) + int(float(rewards))):
-    logging.info(f"with-draw rewards tx of {delegator1} from {validator1} was successful")
-else:
-    logging.error("missmatch in rewards")
+    after_balance = query_balances(delegator1)[1]["balances"][0]["amount"]
+    if int(after_balance) == int(before_balance) + int(total):
+        logging.info(f"withdraw all rewards of {delegator1} was successful")
+    else:
+        logging.error(f"missmatch in rewards")
+    time.sleep(5)
 
-time.sleep(10)
+def fund_community_pool_tx():
+    # query community pool balance
+    community_pool = query_community_pool()[1]["pool"][0]["amount"]
+    # fund community pool tx 
+    status,fund_pool = tx_fund_communitypool("account1",amount_to_be_sent)
+    assert status, f"error in tx fund community pool :: {fund_pool}"
+    pool = query_community_pool()[1]["pool"][0]["amount"]
+    time.sleep(3)
 
-# query delegations 
-delegations = query_delegations(delegator1)[1]["delegation_responses"]
-# query balance
-before_balance = query_balance(delegator1)[1]["balances"][0]["amount"]
-# query all rewards
-all_rewards = query_rewards(delegator1)[1]["rewards"]
-total = 0
-for x in all_rewards:
-    rewards = x["reward"][0]["amount"]
-    total = total + (float(rewards))
-# tx withdraw all rewards
-status,all_rewards = tx_withdraw_allrewards("account1")
-if not status:
-    logging.error(f"error in tx withdraw all rewards :: {all_rewards}")
-else:
-    logging.info(f"all_rewards tx_hash  :: {all_rewards['txhash']}")
-after_balance = query_balance(delegator1)[1]["balances"][0]["amount"]
-if int(after_balance) == int(before_balance) + int(total):
-    logging.info(f"withdraw all rewards of {delegator1} was successful")
-else:
-    logging.error(f"missmatch in rewards")
+    # fund community pool tx 
+    status,fund_pool = tx_fund_communitypool("account1",amount_to_be_sent)
+    assert status, f"error in tx fund community pool :: {fund_pool}"
+    time.sleep(1)
 
-time.sleep(5)
+    after_pool = query_community_pool()[1]["pool"][0]["amount"]
+    if int(float(pool)) < int(float(after_pool)):
+        logging.info("fund community pool tx was successful")
+    else:
+        logging.error("missmatch in fund community pool")
+    time.sleep(5)
 
-# query balance
-before_balance = query_balance(delegator1)[1]["balances"][0]["amount"]
-# query community pool balance
-community_pool = query_community_pool()[1]["pool"][0]["amount"]
-# fund community pool tx 
-status,fund_pool = tx_fund_communitypool("account1",amount_to_be_sent)
-if not status:
-    logging.error(f"error in tx fund community pool :: {fund_pool}")
-else:
-    logging.info(f"tx_hash :: {fund_pool['txhash']}")
-after_balance = query_balance(delegator1)[1]["balances"][0]["amount"]
-total = int(float(before_balance)) - int(amount_to_be_sent)
-if int(after_balance) == int(before_balance) - int(amount_to_be_sent):
-    logging.info("fund community pool tx was successful")
-else:
-    logging.error("missmatch in fund community pool")
+def set_withdraw_address_tx():
+    # tx set withdraw address
+    status,set_addr = tx_withdraw_addr("account1",delegator2)
+    assert status, f"Error while set withdraw address :: {set_addr}"
 
-time.sleep(5)
+    # query balance
+    before_balance = query_balances(delegator2)[1]["balances"][0]["amount"]
+    # query rewards
+    before_reward = query_rewards_singleval(delegator1,validator1)[1]["rewards"][0]["amount"]
 
-# tx set withdraw address
-status,set_addr = tx_withdraw_addr("account1",delegator2)
-if not status:
-    logging.error(f"Error while set withdraw address :: {set_addr}")
-else:
-    logging.info(f"Set withdraw address tx hash:: {set_addr['txhash']}")
-# query balance
-before_balance = query_balance(delegator2)[1]["balances"][0]["amount"]
-# query rewards
-before_reward = query_rewards_singleval(delegator1,validator1)[1]["rewards"][0]["amount"]
-# tx withdraw rewards
-status,rewards = tx_withdraw_rewards("account2",validator1)
-if not status:
-    logging.error(f"Error in withdraw rewards :: {rewards}")
-else:
-    logging.info(f"withdraw rewards tx: {rewards['txhash']}")
-# query balance
-after_balance = query_balance(delegator2)[1]["balances"][0]["amount"]
-if int(after_balance) == int(before_balance) + int(float(before_reward)):
-    logging.info("Set withdraw rewards tx successfull")
-else:
-    logging.info("Set withdraw rewards tx failed")
+    # tx withdraw rewards
+    status,rewards = tx_withdraw_rewards("account2",validator1)
+    assert status, f"Error in withdraw rewards :: {rewards}"
 
-time.sleep(3)
+    # query balance
+    after_balance = query_balances(delegator2)[1]["balances"][0]["amount"]
+    if int(after_balance) == int(before_balance) + int(float(before_reward)):
+        logging.info("Set withdraw rewards tx successfull")
+    else:
+        logging.info("Set withdraw rewards tx failed")
+    time.sleep(3)
 
-# query params
-path = f"{HOME}/.simd-1/config/"
-with open(path+'genesis.json') as file:
-    data = json.load(file)
-query_params = query_params()[1]
-if data["app_state"]["distribution"]["params"] == query_params:
-    logging.info("querying params was successful")
-else:
-    logging.error("missmatch in params")
+def params_query():
+    # query params
+    path = f"{HOME}/.simd-1/config/"
+    with open(path+'genesis.json') as file:
+        data = json.load(file)
+    query_param = query_params()[1]
 
-time.sleep(5)
+    if data["app_state"]["distribution"]["params"] == query_param:
+        logging.info("querying params was successful")
+    else:
+        logging.error("missmatch in params")
+    time.sleep(5)
 
-# query validator commission
-commission = query_commission_rewards(validator1)[1]["commission"][0]["amount"]
-# withdraw commission rewards
-status,commission_rewards = tx_withdraw_commision_rewards("validator1",validator1)
-if not status:
-    logging.error(f"error in tx withdraw commission rewards :: {commission_rewards}")
-else:
-    logging.info(f"commission tx_hash :: {commission_rewards['txhash']}")
-time.sleep(3)
-rewards =  query_commission_rewards(validator1)[1]["commission"][0]["amount"]
-status,commission_rewards = tx_withdraw_commision_rewards("validator1",validator1)
-if not status:
-    logging.error(f"error in tx withdraw commission rewards :: {commission_rewards}")
-else:
-    logging.info(f"commission tx_hash :: {commission_rewards['txhash']}")
-time.sleep(2)
-after_rewards =  query_commission_rewards(validator1)[1]["commission"][0]["amount"]
-if int(float(after_rewards)) < int(float(rewards)) :
-        logging.info("Commission rewards tx was successful")
-else:
-    logging.error("missmatch in validator commission rewards")
+def commission_rewards_tx():
+    # withdraw commission rewards
+    status,commission_rewards = tx_withdraw_commision_rewards("validator1",validator1)
+    assert status, f"error in tx withdraw commission rewards :: {commission_rewards}"
+    time.sleep(3)
 
-time.sleep(3)
+    # query commission rewards
+    rewards =  query_commission_rewards(validator1)[1]["commission"][0]["amount"]
+    status,commission_rewards = tx_withdraw_commision_rewards("validator1",validator1)
+    assert status, f"error in tx withdraw commission rewards :: {commission_rewards}"
+    time.sleep(2)
 
-# query validator slashes
-slash_count = query_slashes(validator3,1,1000)[1]["slashes"]
-if slash_count:
-    logging.info(f"Querying slashes of {validator3} was successful")
-else:
-    logging.info("missmatch in slashes")
+    after_rewards =  query_commission_rewards(validator1)[1]["commission"][0]["amount"]
 
-# Query validator outstanding rewards
-outstanding_rewards = query_validator_outstanding_rewards(validator1)[1]["rewards"][0]["amount"]
-if len(outstanding_rewards):
-    logging.info(f"Querying {validator1} outstanding rewards was successful")
-else:
-    logging.info("missmatch in validator outstanding rewards")
+    if int(float(after_rewards)) < int(float(rewards)) :
+            logging.info("Commission rewards tx was successful")
+    else:
+        logging.error("missmatch in validator commission rewards")
+    time.sleep(3)
+
+def validator_slashes_query():
+    # query validator slashes
+    slash_count = query_slashes(validator3,1,1000)[1]["slashes"]
+    if slash_count:
+        print(f"Querying slashes of {validator3} was successful")
+    else:
+        print(f"missmatch in slashes")
+
+def validator_outstanding_rewards_query():
+    # Query validator outstanding rewards
+    outstanding_rewards = query_validator_outstanding_rewards(validator1)[1]["rewards"][0]["amount"]
+    if len(outstanding_rewards):
+        logging.info(f"Querying {validator1} outstanding rewards was successful")
+    else:
+        logging.error("missmatch in validator outstanding rewards")
+
+withdraw_rewards_tx()
+withdraw_all_rewards_tx()
+fund_community_pool_tx()
+set_withdraw_address_tx()
+params_query()
+commission_rewards_tx()
+validator_slashes_query()
+validator_outstanding_rewards_query()
 
