@@ -17,8 +17,7 @@ def query_staking_validators():
         return False, e
 
 
-# `query_delegator_delegations` takes delegator and validator address as params and
-# internally calls the `staking delegation` and returns the delagator delegations in json format.
+# `query_delegator_delegations` queries individual delegator redelegations.
 def query_delegator_delegations(delegator, validator):
     try:
         command = f"{DAEMON} q staking delegation {delegator} {validator} --node {RPC} --chain-id {CHAINID} --output json"
@@ -43,8 +42,7 @@ def query_delegator_redelegations(delegator_addr):
         return False, e
 
 
-# `query_delegator_redelegation` takes delegator, source and destinantion validator address as params and
-# internally calls the `staking redelegations` to get redelegation record for an individual delegator between a source and destination validator.
+# `query_delegator_redelegation` queries single redelegation record for an individual delegator between a source and destination validator.
 def query_delegator_redelegation(
     delegator_addr, src_validator_addr, dst_validator_addr
 ):
@@ -58,8 +56,7 @@ def query_delegator_redelegation(
         return False, e
 
 
-# `query_unbonding_delegation` takes delegator and validator address as params and
-# internally calls the `staking unbonding-delefation` to get unbonding delegations for an individual delegator on an individual validator.
+# `query_unbonding_delegation` queries unbonding delegations for an individual delegator on an individual validator.
 def query_unbonding_delegation(delegator_addr, validator_addr):
     try:
         command = f"{DAEMON} q staking unbonding-delegation {delegator_addr} {validator_addr} --node {RPC} --chain-id {CHAINID} --output json"
@@ -71,8 +68,7 @@ def query_unbonding_delegation(delegator_addr, validator_addr):
         return False, e
 
 
-# `query_validator`takes validator address as param and
-# retunrs the details about an individual validator in json format.
+# `query_validator` queries details about an individual validator and return response in json format.
 def query_validator(validator_addr):
     try:
         command = f"{DAEMON} q staking validator {validator_addr} --node {RPC} --chain-id {CHAINID} --output json"
