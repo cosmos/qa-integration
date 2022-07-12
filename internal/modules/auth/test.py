@@ -5,7 +5,7 @@ from modules.auth.query import (
     query_account,
 )
 
-class TestStringMethods(unittest.TestCase):
+class TestQueryAccount(unittest.TestCase):
 
     def test_query_account(self):
         address = keys_show("account1", "acc")[1]["address"]
