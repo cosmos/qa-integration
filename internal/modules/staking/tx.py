@@ -16,36 +16,18 @@ DEFAULT_GAS = 2000000
 # tx_delegate takes from_key, validator address and amount as paramaters and
 # internally executes the 'delegate tx' command and return the response in json format.
 def tx_delegate(
-    from_key,
-    validator_addr,
-    amount,
-    gas=DEFAULT_GAS,
-    unsigned=False,
-    sequence=None,
-    extra_args="",
+    from_key, validator_addr, amount, gas=DEFAULT_GAS, unsigned=False, sequence=None
 ):
-    try:
-        if unsigned:
-            command = f"{DAEMON} tx staking delegate {validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --output json --node {RPC} --gas {gas} --generate-only"
-            tx, tx_err = exec_command(command)
-            if len(tx_err):
-                return False, tx_err
-            return True, json.loads(tx)
-        else:
-            if sequence is not None:
-                command = f"{DAEMON} tx staking delegate {validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --output json --node {RPC} --gas {gas} --keyring-backend test --home {DAEMON_HOME}-1 -y --sequence {sequence}"
+    if unsigned:
+        command = f"{DAEMON} tx staking delegate {validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --output json --node {RPC} --gas {gas} --generate-only"
+        return exec_command(command)
+    else:
+        if sequence is not None:
+            command = f"{DAEMON} tx staking delegate {validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --output json --node {RPC} --gas {gas} --keyring-backend test --home {DAEMON_HOME}-1 -y --sequence {sequence}"
 
-            else:
-                command = f"{DAEMON} tx staking delegate {validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --output json --node {RPC} --gas {gas} --keyring-backend test --home {DAEMON_HOME}-1 -y"
-            tx, tx_err = exec_command(command)
-            tx = json.loads(tx)
-            if len(tx_err):
-                return False, tx_err
-            elif tx["code"] != 0:
-                return False, tx
-            return True, tx
-    except Exception as e:
-        return False, e
+        else:
+            command = f"{DAEMON} tx staking delegate {validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --output json --node {RPC} --gas {gas} --keyring-backend test --home {DAEMON_HOME}-1 -y"
+        return exec_command(command)
 
 
 # tx_redelegate takes from_key, source and disration validator address as params and
@@ -58,30 +40,17 @@ def tx_redelegate(
     gas=DEFAULT_GAS,
     unsigned=False,
     sequence=None,
-    extra_args="",
 ):
-    try:
-        if unsigned:
-            command = f"{DAEMON} tx staking redelegate {src_validator_addr} {dst_validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --output json --node {RPC} --gas {gas} --generate-only"
-            tx, tx_err = exec_command(command)
-            if len(tx_err):
-                return False, tx_err
-            return True, json.loads(tx)
-        else:
-            if sequence is not None:
-                command = f"{DAEMON} tx staking redelegate {src_validator_addr} {dst_validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --output json --node {RPC} --gas {gas} --keyring-backend test --home {DAEMON_HOME}-1 -y --sequence {sequence}"
+    if unsigned:
+        command = f"{DAEMON} tx staking redelegate {src_validator_addr} {dst_validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --output json --node {RPC} --gas {gas} --generate-only"
+        return exec_command(command)
+    else:
+        if sequence is not None:
+            command = f"{DAEMON} tx staking redelegate {src_validator_addr} {dst_validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --output json --node {RPC} --gas {gas} --keyring-backend test --home {DAEMON_HOME}-1 -y --sequence {sequence}"
 
-            else:
-                command = f"{DAEMON} tx staking redelegate {src_validator_addr} {dst_validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --output json --node {RPC} --gas {gas} --keyring-backend test --home {DAEMON_HOME}-1 -y"
-            tx, tx_err = exec_command(command)
-            tx = json.loads(tx)
-            if len(tx_err):
-                return False, tx_err
-            elif tx["code"] != 0:
-                return False, tx
-            return True, tx
-    except Exception as e:
-        return False, e
+        else:
+            command = f"{DAEMON} tx staking redelegate {src_validator_addr} {dst_validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --output json --node {RPC} --gas {gas} --keyring-backend test --home {DAEMON_HOME}-1 -y"
+        return exec_command(command)
 
 
 # tx_unbond takes from key, valiator address and amount as params and
@@ -93,30 +62,17 @@ def tx_unbond(
     gas=DEFAULT_GAS,
     unsigned=False,
     sequence=None,
-    extra_args="",
 ):
-    try:
-        if unsigned:
-            command = f"{DAEMON} tx staking unbond {validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --output json --node {RPC} --gas {gas} --generate-only"
-            tx, tx_err = exec_command(command)
-            if len(tx_err):
-                return False, tx_err
-            return True, json.loads(tx)
-        else:
-            if sequence is not None:
-                command = f"{DAEMON} tx staking unbond {validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --output json --node {RPC} --gas {gas} --keyring-backend test --home {DAEMON_HOME}-1 -y --sequence {sequence}"
+    if unsigned:
+        command = f"{DAEMON} tx staking unbond {validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --output json --node {RPC} --gas {gas} --generate-only"
+        return exec_command(command)
+    else:
+        if sequence is not None:
+            command = f"{DAEMON} tx staking unbond {validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --output json --node {RPC} --gas {gas} --keyring-backend test --home {DAEMON_HOME}-1 -y --sequence {sequence}"
 
-            else:
-                command = f"{DAEMON} tx staking unbond {validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --output json --node {RPC} --gas {gas} --keyring-backend test --home {DAEMON_HOME}-1 -y"
-            tx, tx_err = exec_command(command)
-            tx = json.loads(tx)
-            if len(tx_err):
-                return False, tx_err
-            elif tx["code"] != 0:
-                return False, tx
-            return True, tx
-    except Exception as e:
-        return False, e
+        else:
+            command = f"{DAEMON} tx staking unbond {validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --output json --node {RPC} --gas {gas} --keyring-backend test --home {DAEMON_HOME}-1 -y"
+        return exec_command(command)
 
 
 # tx_create_validator takes from key, amount moniker and noded ir as params and
@@ -128,23 +84,14 @@ def tx_create_validator(
     node_dir,
     gas=DEFAULT_GAS,
     sequence=None,
-    extra_args="",
 ):
-    try:
-        public_key, err = fetch_validator_pubkey_from_node(node_dir)
-        if err:
-            return False, err
+    status, public_key = fetch_validator_pubkey_from_node(node_dir)
+    public_key = json.dumps(public_key)
+    if not status:
+        return False, public_key
 
-        if sequence is not None:
-            command = f"{DAEMON} tx staking create-validator --amount {amount}{DENOM} --commission-max-change-rate 0.1 --commission-max-rate 0.2 --commission-rate 0.1 --from {from_key} --min-self-delegation 1 --moniker {moniker} --pubkey {public_key}  --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --sequence {sequence} --gas {gas}"
-        else:
-            command = f"{DAEMON} tx staking create-validator --amount {amount}{DENOM} --commission-max-change-rate 0.1 --commission-max-rate 0.2 --commission-rate 0.1 --from {from_key} --min-self-delegation 1 --moniker {moniker} --pubkey {public_key}  --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}"
-        tx, tx_err = exec_command(command)
-        tx = json.loads(tx)
-        if len(tx_err):
-            return False, tx_err
-        elif tx["code"] != 0:
-            return False, tx
-        return True, tx
-    except Exception as e:
-        return False, e
+    if sequence is not None:
+        command = f"{DAEMON} tx staking create-validator --amount {amount}{DENOM} --commission-max-change-rate 0.1 --commission-max-rate 0.2 --commission-rate 0.1 --from {from_key} --min-self-delegation 1 --moniker {moniker} --pubkey '{public_key}'  --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --sequence {sequence} --gas {gas}"
+    else:
+        command = f'{DAEMON} tx staking create-validator --amount {amount}{DENOM} --commission-max-change-rate 0.1 --commission-max-rate 0.2 --commission-rate 0.1 --from {from_key} --min-self-delegation 1 --moniker {moniker} --pubkey \'{public_key}\'  --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}'
+    return exec_command(command)
