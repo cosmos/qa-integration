@@ -13,8 +13,7 @@ class TestQueryAccount(unittest.TestCase):
         self.assertTrue(status)
 
     def test_query_account_fail(self):
-        address = keys_show("cosmos1xpcfd7pxfmv6gd50y9mwjq50kwqpqrh5mmw72h")
-        status, response = query_account(address)
+        status, response = query_account("cosmos1xpcfd7pxfmv6gd50y9mwjq50kwqpqrh5mmw72h")
         self.assertFalse(status)
 
 if __name__ == '__main__':
