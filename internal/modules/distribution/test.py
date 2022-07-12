@@ -28,21 +28,15 @@ process.communicate()
 
 logging.info("INFO :: Running distribution module tests")
 
-#query delegations
-status,delegations = query_delegation(delegator1,validator1)
-if not status:
-    # delegate tx
-    status,delegate_tx = tx_delegate("account1",validator1,amount_to_be_sent)
-    assert status, f"error in delegate tx :: {delegate_tx}"
+# delegate tx
+status,delegate_tx = tx_delegate("account1",validator1,amount_to_be_sent)
+assert status, f"error in delegate tx :: {delegate_tx}"
 
-time.sleep(5)
+time.sleep(10)
 
-# query delegations
-status,delegations = query_delegation(delegator1,validator2)
-if not status:
-    # delegate tx 
-    status,delegate_tx = tx_delegate("account1",validator2,amount_to_be_sent)
-    assert status, f"error in delegate tx :: {delegate_tx}"
+# delegate tx 
+status,delegate_tx = tx_delegate("account1",validator2,amount_to_be_sent)
+assert status, f"error in delegate tx :: {delegate_tx}"
 
 time.sleep(10)
 
@@ -109,7 +103,7 @@ def fund_community_pool_tx():
 
 def set_withdraw_address_tx():
     # tx set withdraw address
-    status,set_addr = tx_withdraw_addr("account1",delegator2)
+    status,set_addr = tx_set_withdraw_addr("account1",delegator2)
     assert status, f"Error while set withdraw address :: {set_addr}"
 
     # query balance
@@ -169,6 +163,7 @@ def validator_slashes_query():
         print(f"Querying slashes of {validator3} was successful")
     else:
         print(f"missmatch in slashes")
+    time.sleep(3)
 
 def validator_outstanding_rewards_query():
     # Query validator outstanding rewards
@@ -177,12 +172,13 @@ def validator_outstanding_rewards_query():
         logging.info(f"Querying {validator1} outstanding rewards was successful")
     else:
         logging.error("missmatch in validator outstanding rewards")
+    time.sleep(3)
 
+params_query()
 withdraw_rewards_tx()
-withdraw_all_rewards_tx()
 fund_community_pool_tx()
 set_withdraw_address_tx()
-params_query()
+withdraw_all_rewards_tx()
 commission_rewards_tx()
 validator_slashes_query()
 validator_outstanding_rewards_query()

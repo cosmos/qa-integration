@@ -1,101 +1,48 @@
-import json
-import os
-
-from click import command
-
+import json,os
 from utils import exec_command
 
 DAEMON = os.getenv('DAEMON')
 RPC = os.getenv('RPC')
 CHAINID = os.getenv('CHAINID')
 
-
+# query_commissio_rewards fetches validator commission rewards and return response in json formate
 def query_commission_rewards(validator_addr):
-    try:
-        command = f"{DAEMON} q distribution commission {validator_addr} --node {RPC} --chain-id {CHAINID} --output json"
-        commission,commissionerr = exec_command(command)
-        if len(commissionerr):
-            return False, commissionerr
-        return True,json.loads(commission)
-    except Exception as e:
-        return False,e
+    command = f"{DAEMON} q distribution commission {validator_addr} --node {RPC} --chain-id {CHAINID} --output json"
+    return exec_command(command)
 
+# query_community_pool fetches community pool fund and return response in json formate
 def query_community_pool():
-    try:
-        command = f"{DAEMON} q distribution community-pool --node {RPC} --chain-id {CHAINID} --output json"
-        pool,pool_err = exec_command(command)
-        if len(pool_err):
-            return False,pool_err
-        return True,json.loads(pool)
-    except Exception as e:
-        return False,e
+    command = f"{DAEMON} q distribution community-pool --node {RPC} --chain-id {CHAINID} --output json"
+    return exec_command(command)
 
+# query_params fetches distribution module params and returns response in json formate
 def query_params():
-    try:
-        command = f"{DAEMON} q distribution params --node {RPC} --chain-id {CHAINID} --output json"
-        params,paramserr = exec_command(command)
-        if len(paramserr):
-            return False,paramserr
-        return True,json.loads(params)
-    except Exception as e:
-        return False,e
+    command = f"{DAEMON} q distribution params --node {RPC} --chain-id {CHAINID} --output json"
+    return exec_command(command)
 
 def query_rewards_singleval(delegator_addr,validator_addr):
-    try:
-        command = f"{DAEMON} q distribution rewards {delegator_addr} {validator_addr} --node {RPC} --chain-id {CHAINID} --output json"
-        rewards,rewardserr = exec_command(command)
-        if len(rewardserr):
-            return False,rewardserr
-        return True,json.loads(rewards)
-    except Exception as e:
-        return False,e
+   command = f"{DAEMON} q distribution rewards {delegator_addr} {validator_addr} --node {RPC} --chain-id {CHAINID} --output json"
+   return exec_command(command)
 
+# query_rewards fetches rewards and returns response in json formate
 def query_rewards(delegator_addr):
-    try:
-        command = f"{DAEMON} q distribution rewards {delegator_addr} --node {RPC} --chain-id {CHAINID} --output json"
-        rewards,rewardserr = exec_command(command)
-        if len(rewardserr):
-            return False,rewardserr
-        return True,json.loads(rewards)
-    except Exception as e:
-        return False,e
+    command = f"{DAEMON} q distribution rewards {delegator_addr} --node {RPC} --chain-id {CHAINID} --output json"
+    return exec_command(command)
 
+# query_slashes fetches validator's slashes info and returns response in json formate
 def query_slashes(validator_addr,start_height,end_height):
-    try:
-        command = f"{DAEMON} q distribution slashes {validator_addr} {start_height} {end_height} --node {RPC} --chain-id {CHAINID} --output json"
-        slashes,slasherr = exec_command(command)
-        if len(slasherr):
-            return False,slasherr
-        return True,json.loads(slashes)
-    except Exception as e:
-        return False,e
+   command = f"{DAEMON} q distribution slashes {validator_addr} {start_height} {end_height} --node {RPC} --chain-id {CHAINID} --output json"
+   return exec_command(command)
 
+# query_validator_outstanding_rewards fetches validator's outstanding rewards and returns response in json formate
 def query_validator_outstanding_rewards(validator_addr):
-    try:
-        command = f"{DAEMON} q distribution validator-outstanding-rewards {validator_addr} --node {RPC} --chain-id {CHAINID} --output json"
-        valrewards,valrewardserr = exec_command(command)
-        if len(valrewardserr):
-            return False,valrewardserr
-        return True,json.loads(valrewards)
-    except Exception as e:
-        return False,e
+    command = f"{DAEMON} q distribution validator-outstanding-rewards {validator_addr} --node {RPC} --chain-id {CHAINID} --output json"
+    return exec_command(command)
 
 def query_delegation(delegator,validator):
-    try:
-        command = f"{DAEMON} q staking delegation {delegator} {validator} --node {RPC} --chain-id {CHAINID} --output json"
-        delegation,delegationerr = exec_command(command)
-        if len(delegationerr):
-            return False,delegationerr
-        return True,json.loads(delegation)
-    except Exception as e:
-        return False,e
+    command = f"{DAEMON} q staking delegation {delegator} {validator} --node {RPC} --chain-id {CHAINID} --output json"
+    return exec_command(command)
 
 def query_delegations(delegator):
-    try:
-        command = f"{DAEMON} q staking delegations {delegator} --node {RPC} --chain-id {CHAINID} --output json"
-        delegations,delegationserr = exec_command(command)
-        if len(delegationserr):
-            return False,delegationserr
-        return True,json.loads(delegations)
-    except Exception as e:
-        return False,e
+    command = f"{DAEMON} q staking delegations {delegator} --node {RPC} --chain-id {CHAINID} --output json"
+    return exec_command(command)

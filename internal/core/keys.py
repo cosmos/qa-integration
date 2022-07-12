@@ -1,9 +1,12 @@
-import os, json
+"""
+This module contains all the functions calling keys sub-commands
+"""
+import os,json
+from internal.utils import exec_command
 
-from utils import exec_command
+DAEMON = os.getenv("DAEMON")
+DAEMON_HOME = os.getenv("DAEMON_HOME")
 
-DAEMON = os.getenv('DAEMON')
-DAEMON_HOME = os.getenv('DAEMON_HOME')
 
 # The function `keys_show` will return the key details in json format.
 def keys_show(account, type = "acc",home=f"{DAEMON_HOME}-1"):
