@@ -40,3 +40,23 @@ def query_account(address):
     """
     command = f"{DAEMON} query auth account {address} --node {RPC} --output json"
     return exec_command(command)
+
+
+def query_accounts():
+    """query accounts function will output the information of all accounts.
+
+    Returns:
+        _tuple_: (bool, json|str)
+    """
+    command = f"{DAEMON} query auth accounts --node {RPC} --output json"
+    return exec_command(command)
+
+
+def query_params():
+    """query params function will output the information of all params.
+
+    Returns:
+        _tuple_: (bool, json|str)
+    """
+    command = f"{DAEMON} query auth params --node {RPC} --output json"
+    return exec_command(command)
