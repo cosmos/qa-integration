@@ -84,9 +84,9 @@ def is_tool(binary):
     return which(binary) is not None
 
 
-def validate_num_txs(num_x):
+def is_positive_int(num_x):
     """
-    validate_num_txs will validate num_txs value
+    is_positive_int will validate num_txs value
     Args:
         num_x (_int_)
 
@@ -101,43 +101,6 @@ def validate_num_txs(num_x):
             "The argument NUM_TXS should be positive integer"
         )
     return int(num_x)
-
-
-def num_txs_type(num_x):
-    """
-    num_txs_type is a user-defined type.
-    Args:
-        num_x (_unit_): int
-
-    Raises:
-        argparse.ArgumentTypeError
-
-    Returns:
-        _int_: int
-    """
-    if int(num_x) < 1000:
-        raise argparse.ArgumentTypeError("The argument NUM_TXS should be 1000 or more")
-    return int(num_x)
-
-
-def node_type(num_x):
-    """
-    node_type is a user-defined type.
-    Args:
-        num_x (_int_): int
-
-    Raises:
-        argparse.ArgumentTypeError
-
-    Returns:
-        _int_: _int_
-    """
-    num_x = int(num_x)
-    if num_x < 2:
-        raise argparse.ArgumentTypeError(
-            f"The number of nodes should be atleast 2, you have entered {num_x}"
-        )
-    return num_x
 
 
 def create_multi_messages(num_msgs, file_name):

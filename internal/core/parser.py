@@ -4,7 +4,7 @@ The Parser class is used for argument parser operations.
 import argparse
 from internal.modules.auth.query import account_type
 from internal.core.keys import keys_show
-from internal.utils import validate_num_txs
+from internal.utils import is_positive_int
 
 
 class ParseTestsDefaultFlags:  # pylint: disable=R0903
@@ -44,7 +44,7 @@ class ParseTestsDefaultFlags:  # pylint: disable=R0903
             self.parser.add_argument(
                 "-n",
                 "--num_txs",
-                type=validate_num_txs,
+                type=is_positive_int,
                 default=10000,
                 help="Number of transactions to be made, should be positive integer",
             )
