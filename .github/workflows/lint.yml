@@ -17,7 +17,7 @@ jobs:
       - uses: marian-code/python-lint-annotate@v3
         with:
           python-root-list: "./internal"
-          # extra-pylint-options: "--rcfile="
+          extra-pylint-options: "--rcfile=.pylintrc"
           use-pylint: true
           use-pycodestyle: false
           use-flake8: false
