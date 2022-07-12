@@ -16,9 +16,5 @@ class TestQueryAccount(unittest.TestCase):
         status, response = query_account("cosmos1xpcfd7pxfmv6gd50y9mwjq50kwqpqrh5mmw72h")
         self.assertFalse(status)
 
-    def test_query_account_fail_fake(self):
-        status, response = query_account("cosmos1xpcfd7pxfmv6gd50y9mwjq50kwqpqrh5mmw72h")
-        self.assertTrue(status)
-
 if __name__ == '__main__':
     unittest.main()
