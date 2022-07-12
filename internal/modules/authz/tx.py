@@ -19,17 +19,8 @@ def execute_authz_tx(
     tx_file,
     gas=DEFAULT_GAS,
 ):
-    try:
         command = f"{DAEMON} tx authz exec {tx_file} --from {grantee_key} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}"
-        tx, tx_err = exec_command(command)
-        tx = json.loads(tx)
-        if len(tx_err):
-            return False, tx_err
-        elif tx["code"] != 0:
-            return False, tx
-        return True, tx
-    except Exception as e:
-        return False, e
+        return exec_command(command)
 
 
 # `tx_grant_authz` takes the granter and grantee as parameters and executes the authz grant tx
@@ -39,17 +30,8 @@ def tx_grant_authz(
     grantee,
     gas=DEFAULT_GAS,
 ):
-    try:
         command = f"{DAEMON} tx authz grant {grantee} send --spend-limit 100stake --from {granter} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}"
-        tx, tx_err = exec_command(command)
-        tx = json.loads(tx)
-        if len(tx_err):
-            return False, tx_err
-        elif tx["code"] != 0:
-            return False, tx
-        return True, tx
-    except Exception as e:
-        return False, e
+        return exec_command(command)
 
 
 # `tx_revoke_authz` takes the granter and grantee as parameters and executes the authz revoke tx
@@ -59,17 +41,8 @@ def tx_revoke_authz(
     grantee,
     gas=DEFAULT_GAS,
 ):
-    try:
         command = f"{DAEMON} tx authz revoke {grantee} /cosmos.bank.v1beta1.MsgSend --from {granter} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}"
-        tx, tx_err = exec_command(command)
-        tx = json.loads(tx)
-        if len(tx_err):
-            return False, tx_err
-        elif tx["code"] != 0:
-            return False, tx
-        return True, tx
-    except Exception as e:
-        return False, e
+        return exec_command(command)
 
 
 # The function 'create_unsigned_send_tx' takes sender(from_address), receiver(to_address), amount and file_name as parameters and call the function tx_send
