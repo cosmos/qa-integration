@@ -86,12 +86,12 @@ def tx_create_validator(
     sequence=None,
 ):
     status, public_key = fetch_validator_pubkey_from_node(node_dir)
-    public_key = json.dumps(public_key)
+    public_key = json.dumps(public_key, separators=(",", ":"))
     if not status:
         return False, public_key
 
     if sequence is not None:
-        command = f"{DAEMON} tx staking create-validator --amount {amount}{DENOM} --commission-max-change-rate 0.1 --commission-max-rate 0.2 --commission-rate 0.1 --from {from_key} --min-self-delegation 1 --moniker {moniker} --pubkey '{public_key}'  --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --sequence {sequence} --gas {gas}"
+        command = f"{DAEMON} tx staking create-validator --amount {amount}{DENOM} --commission-max-change-rate 0.1 --commission-max-rate 0.2 --commission-rate 0.1 --from {from_key} --min-self-delegation 1 --moniker {moniker} --pubkey {public_key}  --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --sequence {sequence} --gas {gas}"
     else:
-        command = f'{DAEMON} tx staking create-validator --amount {amount}{DENOM} --commission-max-change-rate 0.1 --commission-max-rate 0.2 --commission-rate 0.1 --from {from_key} --min-self-delegation 1 --moniker {moniker} --pubkey \'{public_key}\'  --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}'
+        command = f"{DAEMON} tx staking create-validator --amount {amount}{DENOM} --commission-max-change-rate 0.1 --commission-max-rate 0.2 --commission-rate 0.1 --from {from_key} --min-self-delegation 1 --moniker {moniker} --pubkey {public_key}  --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}"
     return exec_command(command)
