@@ -5,13 +5,13 @@ from modules.auth.query import (
     query_account,
 )
 
-class TestQueryAccount(unittest.TestCase):
+class TestAuthModuleTxsQueries(unittest.TestCase):
 
     def test_query_account(self):
-        status, address = keys_show("account1", "acc")[1]["address"]
+        status, key = keys_show("account1", "acc")
         self.assertTrue(status)
-
-        status, response = query_account(address)
+        self.assertTrue(key)
+        status, response = query_account(key[1]["address"])
         self.assertTrue(status)
 
     def test_query_account_fail(self):
