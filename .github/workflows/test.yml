@@ -1,71 +1,71 @@
-name: Load Tests 
-#  Load Tests workflow runs various load tests
-#  This workflow run on workflow_dispatch & on every pull request
-on:
-  pull_request:
-  workflow_dispatch:
+# name: Load Tests 
+# #  Load Tests workflow runs various load tests
+# #  This workflow run on workflow_dispatch & on every pull request
+# on:
+#   pull_request:
+#   workflow_dispatch:
 
-jobs:
-  test-multi-msg:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: multi msg load test
-        run: |
-          make test-multi-msg
-        env:
-          IS_PUBLIC: false
-      - uses: harupy/comment-on-pr@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          filename: ../../stats.txt
-        if: github.event_name == 'pull_request'
+# jobs:
+#   test-multi-msg:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v3
+#       - name: multi msg load test
+#         run: |
+#           make test-multi-msg
+#         env:
+#           IS_PUBLIC: false
+#       - uses: harupy/comment-on-pr@master
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         with:
+#           filename: ../../stats.txt
+#         if: github.event_name == 'pull_request'
   
-  test-query-load:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: query load test
-        run: |
-          make test-query-load
-        env:
-          IS_PUBLIC: false
-      - uses: harupy/comment-on-pr@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          filename: ../../stats.txt
-        if: github.event_name == 'pull_request'
+#   test-query-load:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v3
+#       - name: query load test
+#         run: |
+#           make test-query-load
+#         env:
+#           IS_PUBLIC: false
+#       - uses: harupy/comment-on-pr@master
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         with:
+#           filename: ../../stats.txt
+#         if: github.event_name == 'pull_request'
 
-  test-send-load:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: send msg load test
-        run: |
-          make test-send-load
-        env:
-          IS_PUBLIC: false
-      - uses: harupy/comment-on-pr@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          filename: ../../stats.txt
-        if: github.event_name == 'pull_request'
+#   test-send-load:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v3
+#       - name: send msg load test
+#         run: |
+#           make test-send-load
+#         env:
+#           IS_PUBLIC: false
+#       - uses: harupy/comment-on-pr@master
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         with:
+#           filename: ../../stats.txt
+#         if: github.event_name == 'pull_request'
   
-  test-single-msg:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: single msg load test
-        run: |
-          make test-single-msg
-        env:
-          IS_PUBLIC: false
-      - uses: harupy/comment-on-pr@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          filename: ../../stats.txt
-        if: github.event_name == 'pull_request'
+#   test-single-msg:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v3
+#       - name: single msg load test
+#         run: |
+#           make test-single-msg
+#         env:
+#           IS_PUBLIC: false
+#       - uses: harupy/comment-on-pr@master
+#         env:
+#           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#         with:
+#           filename: ../../stats.txt
+#         if: github.event_name == 'pull_request'
