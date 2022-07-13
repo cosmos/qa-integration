@@ -1,0 +1,32 @@
+name: Lint
+#  Lint workflow checks lint issues
+#  This workflow run on workflow_dispatch & on every pull request
+on:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - run: make install-deps
+      - uses: marian-code/python-lint-annotate@v3
+        with:
+          python-root-list: "./internal"
+          extra-pylint-options: "--rcfile=.pylintrc"
+          use-pylint: true
+          use-pycodestyle: false
+          use-flake8: false
+          use-black: false
+          use-mypy: false
+          use-isort: false
+          use-vulture: false
+          use-pydocstyle: false
+          python-version: "3.8"
+        env:
+          PYTHONPATH: ./internal
+      - run: make lint

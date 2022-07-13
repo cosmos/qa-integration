@@ -53,7 +53,7 @@ def grant_tx():
     # send tx
     extra_args = f"--fee-account {granter} --fees {fees}stake"
     status, send = tx_send(grantee, receiver, amount_to_sent, extra_args)
-    assert status, f"error inde send tx b/w grantee and granter : {send}"
+    assert status, f"error in send tx b/w grantee and granter : {send}"
     time.sleep(3)
 
     # query new balances of granter, grantee and reciver

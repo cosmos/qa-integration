@@ -1,3 +1,6 @@
+"""
+This module setup the MongoDb configuration and Connection.
+"""
 import os
 from pymongo import MongoClient
 
