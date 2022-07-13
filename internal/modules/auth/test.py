@@ -9,8 +9,6 @@ class TestAuthModuleTxsQueries(unittest.TestCase):
 
     def test_query_account(self):
         status, key = keys_show("account1", "acc")
-        print("status", status)
-        print("key", key)
         self.assertTrue(status)
         self.assertTrue(key)
         status, response = query_account(key["address"])
