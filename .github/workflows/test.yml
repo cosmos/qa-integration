@@ -69,13 +69,3 @@ jobs:
         with:
           filename: ../../stats.txt
         if: github.event_name == 'pull_request'
-
-  test-all-modules:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: all modules integration tests
-        run: |
-          make test-all-modules
-        env:
-          IS_PUBLIC: false
