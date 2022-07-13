@@ -40,7 +40,7 @@ assert status, f"error in delegate tx :: {delegate_tx}"
 
 time.sleep(10)
 
-def withdraw_rewards_tx():
+def test_withdraw_rewards_tx():
     # query balance
     before_balance = query_balances(delegator1)[1]["balances"][0]["amount"]
 
@@ -59,7 +59,7 @@ def withdraw_rewards_tx():
         logging.error("missmatch in rewards")
     time.sleep(10)
 
-def withdraw_all_rewards_tx():
+def test_withdraw_all_rewards_tx():
     # query balance
     before_balance = query_balances(delegator1)[1]["balances"][0]["amount"]
     # query all rewards
@@ -80,7 +80,7 @@ def withdraw_all_rewards_tx():
         logging.error(f"missmatch in rewards")
     time.sleep(5)
 
-def fund_community_pool_tx():
+def test_fund_community_pool_tx():
     # query community pool balance
     community_pool = query_community_pool()[1]["pool"][0]["amount"]
     # fund community pool tx 
@@ -101,7 +101,7 @@ def fund_community_pool_tx():
         logging.error("missmatch in fund community pool")
     time.sleep(5)
 
-def set_withdraw_address_tx():
+def test_set_withdraw_address_tx():
     # tx set withdraw address
     status,set_addr = tx_set_withdraw_addr("account1",delegator2)
     assert status, f"Error while set withdraw address :: {set_addr}"
@@ -123,7 +123,7 @@ def set_withdraw_address_tx():
         logging.info("Set withdraw rewards tx failed")
     time.sleep(3)
 
-def params_query():
+def test_params_query():
     # query params
     path = f"{HOME}/.simd-1/config/"
     with open(path+'genesis.json') as file:
@@ -136,7 +136,7 @@ def params_query():
         logging.error("missmatch in params")
     time.sleep(5)
 
-def commission_rewards_tx():
+def test_commission_rewards_tx():
     # withdraw commission rewards
     status,commission_rewards = tx_withdraw_commision_rewards("validator1",validator1)
     assert status, f"error in tx withdraw commission rewards :: {commission_rewards}"
@@ -156,7 +156,7 @@ def commission_rewards_tx():
         logging.error("missmatch in validator commission rewards")
     time.sleep(3)
 
-def validator_slashes_query():
+def test_validator_slashes_query():
     # query validator slashes
     slash_count = query_slashes(validator3,1,1000)[1]["slashes"]
     if slash_count:
@@ -165,7 +165,7 @@ def validator_slashes_query():
         print(f"missmatch in slashes")
     time.sleep(3)
 
-def validator_outstanding_rewards_query():
+def test_validator_outstanding_rewards_query():
     # Query validator outstanding rewards
     outstanding_rewards = query_validator_outstanding_rewards(validator1)[1]["rewards"][0]["amount"]
     if len(outstanding_rewards):
@@ -174,12 +174,12 @@ def validator_outstanding_rewards_query():
         logging.error("missmatch in validator outstanding rewards")
     time.sleep(3)
 
-params_query()
-withdraw_rewards_tx()
-fund_community_pool_tx()
-set_withdraw_address_tx()
-withdraw_all_rewards_tx()
-commission_rewards_tx()
-validator_slashes_query()
-validator_outstanding_rewards_query()
+test_params_query()
+test_withdraw_rewards_tx()
+test_fund_community_pool_tx()
+test_set_withdraw_address_tx()
+test_withdraw_all_rewards_tx()
+test_commission_rewards_tx()
+test_validator_slashes_query()
+test_validator_outstanding_rewards_query()
 
