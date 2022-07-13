@@ -8,7 +8,9 @@ from modules.auth.query import (
 class TestQueryAccount(unittest.TestCase):
 
     def test_query_account(self):
-        address = keys_show("account1", "acc")[1]["address"]
+        status, address = keys_show("account1", "acc")[1]["address"]
+        self.assertTrue(status)
+
         status, response = query_account(address)
         self.assertTrue(status)
 
