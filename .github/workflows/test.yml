@@ -1,4 +1,4 @@
-name: Load Tests 
+name: Load Tests
 #  Load Tests workflow runs various load tests
 #  This workflow run on workflow_dispatch & on every pull request
 on:
@@ -54,7 +54,7 @@ jobs:
           filename: ../../stats.txt
         if: github.event_name == 'pull_request'
   
-  test-single-msg:
+  test-single-msg-load:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -69,13 +69,3 @@ jobs:
         with:
           filename: ../../stats.txt
         if: github.event_name == 'pull_request'
-
-  test-all-modules:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: all modules integration tests
-        run: |
-          make test-all-modules
-        env:
-          IS_PUBLIC: false
