@@ -52,7 +52,6 @@ def query_delegator_redelegation(
 ):
 
     command = f"{DAEMON} q staking redelegation {delegator_addr} {src_validator_addr} {dst_validator_addr} --node {RPC} --chain-id {CHAINID} --output json"
-    print(f"comanadddddddddd...........{command}")
     return exec_command(command)
 
 
@@ -89,9 +88,7 @@ def query_validator(validator_addr):
 
 # `query_validator_set` returns details about all validators on a network in the form of json.
 def query_validator_set():
-    command = (
-        f"{DAEMON} q staking validators --node {RPC} --chain-id {CHAINID} --output json --count-total"
-    )
+    command = f"{DAEMON} q staking validators --node {RPC} --chain-id {CHAINID} --output json --count-total"
     return exec_command(command)
 
 

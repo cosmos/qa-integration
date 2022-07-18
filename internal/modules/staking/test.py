@@ -11,6 +11,8 @@ from modules.staking.tx import (
 )
 from modules.staking.query import (
     query_delegator_delegation,
+    query_delegator_delegations,
+    query_delegations_of_validator,
     query_unbonding_delegation,
     query_unbonding_delegations,
     query_unbonding_delegations_from,
@@ -57,8 +59,19 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         after_del_amount = query_delegator_delegation(delegator, val_addr)[1][
             "balance"
         ]["amount"]
-
         self.assertEqual((int(before_del_amount) + amount), int(after_del_amount))
+
+        # query delegator delegations
+        status, delegations = query_delegator_delegations(delegator)
+        self.assertTrue(status)
+        count = int(delegations["pagination"]["total"])
+        self.assertNotEqual(count, 0)
+
+        # query delegations of validator
+        status, delegations_of_val = query_delegations_of_validator(val_addr)
+        self.assertTrue(status)
+        count = int(delegations_of_val["pagination"]["total"])
+        self.assertNotEqual(count, 0)
 
     # redelegation tx
     def test_redelegate_tx(self):
@@ -67,9 +80,9 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         time.sleep(3)
 
         # query redelegated amount
-        before_redel_amount = query_delegator_delegation(delegator, dst_val_address)[
-            1
-        ]["balance"]["amount"]
+        before_redel_amount = query_delegator_delegation(delegator, dst_val_address)[1][
+            "balance"
+        ]["amount"]
 
         # redelegation tx
         status, redelegate_tx = tx_redelegate(
@@ -84,21 +97,23 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         ]["amount"]
         self.assertEqual((int(before_redel_amount) + amount), int(after_redel_amount))
 
-        # query delegator reledegation
-        status, redelegation = query_delegator_redelegation(delegator, val_addr, dst_val_address)
+        # query delegator redelegation
+        status, redelegation = query_delegator_redelegation(
+            delegator, val_addr, dst_val_address
+        )
         self.assertTrue(status)
 
-         # query delegator reledegations
+        # query delegator redelegations
         status, redelegations = query_delegator_redelegations(delegator)
         self.assertTrue(status)
         count = int(redelegations["pagination"]["total"])
-        self.assertEqual(count,1)
+        self.assertEqual(count, 1)
 
-        # query delegator reledegations from a validator
+        # query delegator redelegations from a validator
         status, redelegations_from_val = query_delegator_redelegations_from(val_addr)
         self.assertTrue(status)
         count = int(redelegations_from_val["pagination"]["total"])
-        self.assertEqual(count,1)
+        self.assertEqual(count, 1)
 
     # unbond tx
     def test_unbond_tx(self):
@@ -115,13 +130,13 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         status, unbond_delegations = query_unbonding_delegations(delegator)
         self.assertTrue(status)
         count = int(unbond_delegations["pagination"]["total"])
-        self.assertNotEqual(count,0)
+        self.assertNotEqual(count, 0)
 
         # query unbond unbond_delegations from a validator
         status, unbond_del_of_val = query_unbonding_delegations_from(val_addr)
         self.assertTrue(status)
         count = int(unbond_del_of_val["pagination"]["total"])
-        self.assertEqual(count,1)
+        self.assertEqual(count, 1)
 
     # create validator
     def test_create_validator(self):
@@ -150,7 +165,7 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         status, validator_set = query_validator_set()
         self.assertTrue(status)
         count = int(validator_set["pagination"]["total"])
-        self.assertEqual(count,4)
+        self.assertEqual(count, 4)
 
         # clean tmp dir
         temp_dir.cleanup()
