@@ -35,7 +35,7 @@ test-all: setup-chain
 
 test-all-modules: setup-chain
 	@echo "Running all individual module tests..."
-	TEST_TYPE=module bash ./scripts/tests/all_modules.sh -n 50
+	TEST_TYPE=module bash ./scripts/tests/all_modules.sh
 	$(MAKE) stop-chain
 
 test-multi-msg: setup-chain

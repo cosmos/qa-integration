@@ -1,0 +1,20 @@
+name: All Modules 
+#  Load Tests workflow runs individual module tests
+#  This workflow run on pushes to master, workflow_dispatch & on every pull request
+on:
+  pull_request:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+jobs:
+  test-all-modules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: all modules integration tests
+        run: |
+          make test-all-modules
+        env:
+          IS_PUBLIC: false
