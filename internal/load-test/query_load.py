@@ -9,7 +9,7 @@ from internal.core.parser import ParseTestsDefaultFlags
 from internal.core.keys import keys_show
 from internal.modules.bank.query import query_balances
 from internal.modules.staking.query import (
-    query_delegator_delegations,
+    query_delegator_delegation,
     query_staking_validators,
 )
 from internal.stats.stats import print_stats, clear_data_by_type, QUERY_TYPE
@@ -47,7 +47,7 @@ for i in range(0, num_txs):
         logging.error(validators_response)
 
     # Fetch staking delegations
-    status, delegations_response = query_delegator_delegations(sender, val1)
+    status, delegations_response = query_delegator_delegation(sender, val1)
     if not status:
         logging.error(delegations_response)
 

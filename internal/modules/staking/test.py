@@ -10,9 +10,11 @@ from modules.staking.tx import (
     tx_create_validator,
 )
 from modules.staking.query import (
-    query_delegator_delegations,
+    query_delegator_delegation,
     query_unbonding_delegation,
+    query_unbonding_delegations,
     query_validator,
+    query_validator_set,
 )
 
 HOME = env.HOME
@@ -39,7 +41,7 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         time.sleep(3)
 
         # query delegation amount
-        before_del_amount = query_delegator_delegations(delegator, val_addr)[1][
+        before_del_amount = query_delegator_delegation(delegator, val_addr)[1][
             "balance"
         ]["amount"]
 
@@ -48,7 +50,7 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         time.sleep(3)
 
         # query delegations and match the delagted amount
-        after_del_amount = query_delegator_delegations(delegator, val_addr)[1][
+        after_del_amount = query_delegator_delegation(delegator, val_addr)[1][
             "balance"
         ]["amount"]
 
@@ -61,7 +63,7 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         time.sleep(3)
 
         # query redelegated amount
-        before_redel_amount = query_delegator_delegations(delegator, dst_val_address)[
+        before_redel_amount = query_delegator_delegation(delegator, dst_val_address)[
             1
         ]["balance"]["amount"]
 
@@ -73,7 +75,7 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         time.sleep(3)
 
         # query redelegated amount and match the amount before and after the tx
-        after_redel_amount = query_delegator_delegations(delegator, dst_val_address)[1][
+        after_redel_amount = query_delegator_delegation(delegator, dst_val_address)[1][
             "balance"
         ]["amount"]
         self.assertEqual((int(before_redel_amount) + amount), int(after_redel_amount))
@@ -88,6 +90,12 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         status, unbond_amount = query_unbonding_delegation(delegator, val_addr)
         unbond_balance = unbond_amount["entries"][0]["balance"]
         self.assertEqual(amount, int(unbond_balance))
+
+        # query unbond unbond_delegations
+        status, unbond_delegations = query_unbonding_delegations(delegator)
+        self.assertTrue(status)
+        l=len(unbond_delegations)
+        self.assertNotEqual(l,0)
 
     # create validator
     def test_create_validator(self):
@@ -107,11 +115,16 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
 
         (_, validator) = keys_show("account1", "val")
 
-        # query unbond tx and check the unbonded amount
+        # query created validator
         status, validator_res = query_validator(validator["address"])
         self.assertTrue(status)
         val_name = validator_res["description"]["moniker"]
         self.assertEqual(val_name, TEMP_VAL)
+
+        status, validator_set = query_validator_set()
+        self.assertTrue(status)
+        val_set=len(validator_set)
+        self.assertNotEqual(val_set,0)
 
         # clean tmp dir
         temp_dir.cleanup()
