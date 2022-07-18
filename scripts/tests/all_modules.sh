@@ -19,6 +19,6 @@ for f in *; do
     if [[ -d "$f" && -f "./$f/test.py" ]]; then
         # Will not run if no directories are available
         # or no test file found in module
-        python3 ./$f/test.py $1 $2 $3 $4 $5 $6
+        python3 ./$f/test.py
     fi
 done
