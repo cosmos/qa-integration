@@ -12,6 +12,7 @@ set +a
 # set pythonpath environment with absolute path of internal directory
 cd ../..
 export PYTHONPATH=$PWD:$PWD/internal
+export GOROOT=/usr/local/go
 export GOPATH=$HOME/go
 export GOBIN=$GOPATH/bin
 export PATH=$PATH:/usr/local/go/bin:$GOBIN

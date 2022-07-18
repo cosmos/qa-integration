@@ -21,7 +21,6 @@ else
   wget -q https://dl.google.com/go/go$goversion.linux-amd64.tar.gz
   tar -xf go$goversion.linux-amd64.tar.gz
   sudo cp -R go /usr/local
-  echo "GOROOT=$GOROOT"
   go_path=`which go`
   if [ ! -z "$go_path" ]; then
     sudo cp go/bin/go $go_path
