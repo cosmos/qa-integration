@@ -1,6 +1,6 @@
 import os, sys, time, logging
 from core.keys import keys_show
-from internal.utils import DAEMON, exec_command
+from internal.utils import exec_command, env
 import tempfile
 import unittest
 from modules.staking.tx import (
@@ -15,57 +15,48 @@ from modules.staking.query import (
     query_validator,
 )
 
-HOME = os.getenv("HOME")
-DAEMON = os.getenv("DAEMON")
-DAEMON_HOME = os.getenv("DAEMON_HOME")
-NODE2_HOME = os.getenv("NODE2_HOME")
+HOME = env.HOME
+DAEMON = env.DAEMON
+DAEMON_HOME = env.DAEMON_HOME
+NODE2_HOME = env.get("NODE2_HOME")
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
 # get validator, delegator and dst validator addresses
-validator = keys_show("validator1", "val")[1]["address"]
+val_addr = keys_show("validator1", "val")[1]["address"]
 delegator = keys_show("account1", "acc")[1]["address"]
 dst_val_address = keys_show("validator2", "val", NODE2_HOME)[1]["address"]
 
 # assign the arguments
-sender, amount_to_be_sent = delegator, 5
-
-if sender == validator:
-    sys.exit(
-        'Error: The values of arguments "sender" and "receiver" are equal make sure to set different values'
-    )
+amount = 5
 
 
 class TestStakingModuleTxsQueries(unittest.TestCase):
 
     # delegate tx
     def test_delegate_tx(self):
-        status, delegate_tx = tx_delegate("account1", validator, amount_to_be_sent)
+        status, delegate_tx = tx_delegate("account1", val_addr, amount)
         self.assertTrue(status)
         time.sleep(3)
 
         # query delegation amount
-        before_del_amount = query_delegator_delegations(delegator, validator)[1][
+        before_del_amount = query_delegator_delegations(delegator, val_addr)[1][
             "balance"
         ]["amount"]
 
-        status, delegateTx = tx_delegate("account1", validator, amount_to_be_sent)
+        status, delegateTx = tx_delegate("account1", val_addr, amount)
         self.assertTrue(status)
         time.sleep(3)
 
         # query delegations and match the delagted amount
-        after_del_amount = query_delegator_delegations(delegator, validator)[1][
+        after_del_amount = query_delegator_delegations(delegator, val_addr)[1][
             "balance"
         ]["amount"]
 
-        self.assertEqual(
-            (int(before_del_amount) + amount_to_be_sent), int(after_del_amount)
-        )
+        self.assertEqual((int(before_del_amount) + amount), int(after_del_amount))
 
     # redelegation tx
     def test_redelegate_tx(self):
-        status, delegate_tx = tx_delegate(
-            "account1", dst_val_address, amount_to_be_sent
-        )
+        status, delegate_tx = tx_delegate("account1", dst_val_address, amount)
         self.assertTrue(status)
         time.sleep(3)
 
@@ -76,7 +67,7 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
 
         # redelegation tx
         status, redelegate_tx = tx_redelegate(
-            "account1", validator, dst_val_address, amount_to_be_sent
+            "account1", val_addr, dst_val_address, amount
         )
         self.assertTrue(status)
         time.sleep(3)
@@ -85,20 +76,18 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         after_redel_amount = query_delegator_delegations(delegator, dst_val_address)[1][
             "balance"
         ]["amount"]
-        self.assertEqual(
-            (int(before_redel_amount) + amount_to_be_sent), int(after_redel_amount)
-        )
+        self.assertEqual((int(before_redel_amount) + amount), int(after_redel_amount))
 
     # unbond tx
     def test_unbond_tx(self):
-        status, unbond_tx = tx_unbond("account1", validator, amount_to_be_sent)
+        status, unbond_tx = tx_unbond("account1", val_addr, amount)
         self.assertTrue(status)
         time.sleep(3)
 
         # query unbond tx and check the unbonded amount
-        status, unbond_amount = query_unbonding_delegation(delegator, validator)
+        status, unbond_amount = query_unbonding_delegation(delegator, val_addr)
         unbond_balance = unbond_amount["entries"][0]["balance"]
-        self.assertEqual(amount_to_be_sent, int(unbond_balance))
+        self.assertEqual(amount, int(unbond_balance))
 
     # create validator
     def test_create_validator(self):
@@ -111,7 +100,7 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         assert len(tx_err), f"node init failed :: {tx_err}"
 
         status, create_val_tx = tx_create_validator(
-            "account1", amount_to_be_sent, TEMP_VAL, temp_dir_name
+            "account1", amount, TEMP_VAL, temp_dir_name
         )
         self.assertTrue(status)
         time.sleep(3)

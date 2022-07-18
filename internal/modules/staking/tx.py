@@ -1,17 +1,16 @@
 import json, os
-import re
-from utils import exec_command
+from utils import exec_command, env
 from modules.staking.query import (
     fetch_validator_pubkey_from_node,
 )
 
-DAEMON = os.getenv("DAEMON")
-DENOM = os.getenv("DENOM")
-CHAINID = os.getenv("CHAINID")
-HOME = os.getenv("HOME")
-DAEMON_HOME = os.getenv("DAEMON_HOME")
-RPC = os.getenv("RPC")
-DEFAULT_GAS = 2000000
+DAEMON = env.DAEMON
+DENOM = env.DENOM
+CHAINID = env.CHAINID
+HOME = env.HOME
+DAEMON_HOME = env.DAEMON_HOME
+RPC = env.RPC
+DEFAULT_GAS = env.DEFAULT_GAS
 
 # tx_delegate takes from_key, validator address and amount as paramaters and
 # internally executes the 'delegate tx' command and return the response in json format.

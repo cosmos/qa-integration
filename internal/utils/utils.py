@@ -4,6 +4,7 @@ This module contains all util functions.
 import json
 import logging
 import subprocess
+import os
 from shutil import which
 from utils import env
 
@@ -15,7 +16,7 @@ logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 HOME = env.HOME
 DAEMON = env.DAEMON
 DAEMON_HOME = env.DAEMON_HOME
-DEFAULT_GAS = 2000000
+DEFAULT_GAS = env.DEFAULT_GAS
 
 
 def print_balance_deductions(wallet, diff):
