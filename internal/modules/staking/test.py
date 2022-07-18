@@ -86,7 +86,7 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         ]["amount"]
         assert (int(before_redel_amount) + amount_to_be_sent) == int(
             after_redel_amount
-        ), f"tx failed! mismatch in redelegation amount!!!"
+        ), f"redelegation tx failed! mismatch in redelegation amount!!!"
 
     # unbond tx
     def test_unbond_tx(self):
@@ -107,7 +107,7 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
 
         command = f"{DAEMON} init testvalidator --home {temp_dir_name}"
         tx, tx_err = exec_command(command)
-        assert len(tx_err), f"init tx res :: {tx}"
+        assert len(tx_err), f"node init failed :: {tx_err}"
 
         status, create_val_tx = tx_create_validator(
             "account1", amount_to_be_sent, TEMP_VAL, temp_dir_name
@@ -118,9 +118,9 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         (_, validator) = keys_show("account1", "val")
 
         # query unbond tx and check the unbonded amount
-        status, validator_tx = query_validator(validator["address"])
+        status, validator_res = query_validator(validator["address"])
         self.assertTrue(status)
-        val_name = validator_tx["description"]["moniker"]
+        val_name = validator_res["description"]["moniker"]
         assert val_name == TEMP_VAL, f"no validator found with name {TEMP_VAL}"
 
         # clean tmp dir
