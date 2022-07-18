@@ -4,7 +4,6 @@ The Parser class is used for argument parser operations.
 import argparse
 from internal.modules.auth.query import account_type
 from internal.core.keys import keys_show
-from internal.utils import is_positive_int
 
 
 class ParseTestsDefaultFlags:  # pylint: disable=R0903
