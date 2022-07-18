@@ -28,21 +28,21 @@ def query_delegator_delegation(delegator, validator):
 # `query_delegator_delegations` queries delegations for an individual delegator on all validators.  ---- this
 def query_delegator_delegations(delegator):
     command = f"""{DAEMON} q staking delegations {delegator} \
---node {RPC} --chain-id {CHAINID} --output json"""
+--node {RPC} --chain-id {CHAINID} --output json --count-total"""
     return exec_command(command)
 
 
 # `query_delegations_of_validator` queries delegations on an individual validator.  ---- this
 def query_delegations_of_validator(validator_addr):
     command = f"""{DAEMON} q staking delegations-to {validator_addr} \
---node {RPC} --chain-id {CHAINID} --output json"""
+--node {RPC} --chain-id {CHAINID} --output json --count-total"""
     return exec_command(command)
 
 
 # `query_delegator_redelegations` takes delegator address ad params and
 # internally calls the `staking redelegations` and returns response of an individual delegator in json format.
 def query_delegator_redelegations(delegator_addr):
-    command = f"{DAEMON} q staking redelegations {delegator_addr} --node {RPC} --chain-id {CHAINID} --output json"
+    command = f"{DAEMON} q staking redelegations {delegator_addr} --node {RPC} --chain-id {CHAINID} --output json --count-total"
     return exec_command(command)
 
 
@@ -52,13 +52,14 @@ def query_delegator_redelegation(
 ):
 
     command = f"{DAEMON} q staking redelegation {delegator_addr} {src_validator_addr} {dst_validator_addr} --node {RPC} --chain-id {CHAINID} --output json"
+    print(f"comanadddddddddd...........{command}")
     return exec_command(command)
 
 
 # `query_delegator_redelegations_from` queries delegations that are redelegating from a validator. ------------this
 def query_delegator_redelegations_from(src_validator_addr):
 
-    command = f"{DAEMON} q staking redelegations-from {src_validator_addr} --node {RPC} --chain-id {CHAINID} --output json"
+    command = f"{DAEMON} q staking redelegations-from {src_validator_addr} --node {RPC} --chain-id {CHAINID} --output json --count-total"
     return exec_command(command)
 
 
@@ -70,13 +71,13 @@ def query_unbonding_delegation(delegator_addr, validator_addr):
 
 # `query_unbonding_delegations` queries unbonding delegations for an individual delegator.  ------------- this
 def query_unbonding_delegations(delegator_addr):
-    command = f"{DAEMON} q staking unbonding-delegations {delegator_addr} --node {RPC} --chain-id {CHAINID} --output json"
+    command = f"{DAEMON} q staking unbonding-delegations {delegator_addr} --node {RPC} --chain-id {CHAINID} --output json --count-total"
     return exec_command(command)
 
 
 # `query_unbonding_delegations_from` queries delegations that are unbonding from a validator.  ------------- this
 def query_unbonding_delegations_from(validator_addr):
-    command = f"{DAEMON} q staking unbonding-delegations-from {validator_addr} --node {RPC} --chain-id {CHAINID} --output json"
+    command = f"{DAEMON} q staking unbonding-delegations-from {validator_addr} --node {RPC} --chain-id {CHAINID} --output json --count-total"
     return exec_command(command)
 
 
@@ -89,7 +90,7 @@ def query_validator(validator_addr):
 # `query_validator_set` returns details about all validators on a network in the form of json.
 def query_validator_set():
     command = (
-        f"{DAEMON} q staking validators --node {RPC} --chain-id {CHAINID} --output json"
+        f"{DAEMON} q staking validators --node {RPC} --chain-id {CHAINID} --output json --count-total"
     )
     return exec_command(command)
 
