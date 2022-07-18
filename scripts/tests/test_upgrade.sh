@@ -25,6 +25,8 @@ then
     UPGRADE_WAITING_TIME="10s"
 fi
 
+cd $CURPATH
+
 # testing all txs and queries
 bash ./all_modules.sh
 
