@@ -18,7 +18,7 @@ from modules.staking.query import (
 HOME = os.getenv("HOME")
 DAEMON = os.getenv("DAEMON")
 DAEMON_HOME = os.getenv("DAEMON_HOME")
-NODE2_HOME = os.getenv("NODE_HOME_2")
+NODE2_HOME = os.getenv("NODE2_HOME")
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
 # get validator, delegator and dst validator addresses
@@ -56,9 +56,10 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         after_del_amount = query_delegator_delegations(delegator, validator)[1][
             "balance"
         ]["amount"]
-        assert (int(before_del_amount) + amount_to_be_sent) == int(
-            after_del_amount
-        ), f"mismatch in delegation amount!!!"
+
+        self.assertEqual(
+            (int(before_del_amount) + amount_to_be_sent), int(after_del_amount)
+        )
 
     # redelegation tx
     def test_redelegate_tx(self):
@@ -84,9 +85,9 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         after_redel_amount = query_delegator_delegations(delegator, dst_val_address)[1][
             "balance"
         ]["amount"]
-        assert (int(before_redel_amount) + amount_to_be_sent) == int(
-            after_redel_amount
-        ), f"redelegation tx failed! mismatch in redelegation amount!!!"
+        self.assertEqual(
+            (int(before_redel_amount) + amount_to_be_sent), int(after_redel_amount)
+        )
 
     # unbond tx
     def test_unbond_tx(self):
@@ -121,7 +122,7 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         status, validator_res = query_validator(validator["address"])
         self.assertTrue(status)
         val_name = validator_res["description"]["moniker"]
-        assert val_name == TEMP_VAL, f"no validator found with name {TEMP_VAL}"
+        self.assertEqual(val_name, TEMP_VAL)
 
         # clean tmp dir
         temp_dir.cleanup()
@@ -130,4 +131,3 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
 if __name__ == "__main__":
     logging.info("INFO: running staking module tests")
     unittest.main()
-    logging.info("PASS: all staking module tests")

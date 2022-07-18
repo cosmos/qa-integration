@@ -1,22 +1,22 @@
 """
 This module contains all util functions.
 """
-import argparse
-import os
 import json
 import logging
 import subprocess
 from shutil import which
+from utils import env
 
 from stats import record_stat, TX_TYPE, QUERY_TYPE
 
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
-DAEMON = os.getenv("DAEMON")
-HOME = os.getenv("HOME")
-DAEMON_HOME = os.getenv("DAEMON_HOME")
+HOME = env.HOME
+DAEMON = env.DAEMON
+DAEMON_HOME = env.DAEMON_HOME
 DEFAULT_GAS = 2000000
+
 
 def print_balance_deductions(wallet, diff):
     """
@@ -48,7 +48,7 @@ def exec_command(command):
         _tuple_: str, str
     """
     try:
-        test_type = os.getenv("TEST_TYPE") if os.getenv("TEST_TYPE") else None
+        test_type = env.TEST_TYPE
         # getting command type
         sub_commands = command.split()
         cmd_type = None
@@ -83,25 +83,6 @@ def is_tool(binary):
     The utility function `is_tool` is used to verify the package or binary installation.
     """
     return which(binary) is not None
-
-
-def is_positive_int(num_x):
-    """
-    is_positive_int will validate num_txs value
-    Args:
-        num_x (_int_)
-
-    Raises:
-        argparse.ArgumentTypeError
-
-    Returns:
-        _int_: _int_
-    """
-    if int(num_x) < 1:
-        raise argparse.ArgumentTypeError(
-            "The argument NUM_TXS should be positive integer"
-        )
-    return int(num_x)
 
 
 def create_multi_messages(num_msgs, file_name):

@@ -12,6 +12,7 @@ set +a
 # set pythonpath environment with absolute path of internal directory
 cd ../..
 export PYTHONPATH=$PWD:$PWD/internal
+export GOROOT=/usr/local/go
 export GOPATH=$HOME/go
 export GOBIN=$GOPATH/bin
 export PATH=$PATH:/usr/local/go/bin:$GOBIN
@@ -34,5 +35,11 @@ fi
 # export daemon home paths
 for (( a=1; a<=$NUM_VALS; a++ ))
 do
-    export NODE_HOME_$a=$DAEMON_HOME-$a
+    export "NODE${a}_HOME"=$DAEMON_HOME-$a
 done
+
+# set NUM_TXS env if not found
+if [[ -z $NUM_TXS || $(( $NUM_TXS )) -le 0 ]]
+then
+    export NUM_TXS=50
+fi
