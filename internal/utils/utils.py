@@ -4,7 +4,6 @@ This module contains all util functions.
 import json
 import logging
 import subprocess
-import os
 from shutil import which
 from utils import env
 
