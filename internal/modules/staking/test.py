@@ -98,7 +98,7 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         # query unbond tx and check the unbonded amount
         status, unbond_amount = query_unbonding_delegation(delegator, validator)
         unbond_balance = unbond_amount["entries"][0]["balance"]
-        assert amount_to_be_sent == int(unbond_balance), f"error in unbond tx!!!"
+        self.assertEqual(amount_to_be_sent, int(unbond_balance))
 
     # create validator
     def test_create_validator(self):
