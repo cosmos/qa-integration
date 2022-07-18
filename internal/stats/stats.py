@@ -1,6 +1,10 @@
-import json, logging
-from db import db
+"""
+This module has functions to store stats in mongodb
+"""
+import json
+import logging
 import utils
+from internal.db import db
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
@@ -10,12 +14,25 @@ QUERY_TYPE = "query"
 
 
 def insert_stat(data):
+    """
+    This function will store the test results in DB.
+    Args:
+        data (_dict_): _Test data_
+    """
     _ = db[COL_NAME].insert_one(data)
 
 
 def record_stat(test_type, cmd_type, output, err):
+    """
+    This function parses the transctin response and stores in DB
+    Args:
+        test_type (_str_): _str_
+        cmd_type (_str_): _str_
+        output (_str_ | dict): _dict_ | _str_
+        err (_str_): _bool_
+    """
     if err:
-        logging.error(f"ERROR: {err}")
+        logging.error("ERROR: %s", err)
         stat = {
             "test_type": test_type,
             "cmd_type": cmd_type,
@@ -28,12 +45,12 @@ def record_stat(test_type, cmd_type, output, err):
         return
 
     out = json.loads(output)
-    if type(out) is dict and "code" in out:
+    if isinstance(out, dict) and "code" in out:
         if out["code"] != 0:
-            logging.error(f"ERROR: {out}")
+            logging.error("ERROR: %s", out)
             error_type = out["raw_log"]
             split_raw_log = error_type.split(":")
-            if len(split_raw_log):
+            if len(split_raw_log) > 0:
                 error_type = split_raw_log[-1].strip()
             stat = {
                 "test_type": test_type,
@@ -66,11 +83,17 @@ def record_stat(test_type, cmd_type, output, err):
 
 
 def clear_data_by_type():
+    """
+    Clears the DB data by given test type
+    """
     if utils.env.TEST_TYPE:
         db[COL_NAME].delete_many({"test_type": utils.env.TEST_TYPE})
 
 
 def print_stats(cmd_type=TX_TYPE):
+    """
+    This function prints the stats from DB.
+    """
     test_type = utils.env.TEST_TYPE
     if test_type:
         log_text = "transactions" if cmd_type == TX_TYPE else "queries"
@@ -117,10 +140,11 @@ Number of failed {log_text}: {num_failed_txs} ({(num_failed_txs/num_txs)*100}%)\
                 if item["_id"] == "unknown":
                     stats_log += f"Runtime errors: {item['count']}\n"
                 else:
-                    stats_log += f"Failed with code {item['_id']} ({item['items'][0]['error_type']}): {item['count']}\n"
+                    stats_log += f"""Failed with code {item['_id']} \
+                    ({item['items'][0]['error_type']}): {item['count']}\n"""
 
         stats_log += "-----------------------------"
         logging.info(stats_log)
-        file = open("stats.txt", "w")
-        file.write(stats_log)
-        file.close()
+        with open("stats.txt", "w", encoding="utf8") as file:
+            file.write(stats_log)
+            file.close()
