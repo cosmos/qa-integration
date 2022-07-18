@@ -1,5 +1,8 @@
 NUM_VALS = 2
 
+docker-build:
+	@bash ./scripts/build_binary.sh
+	
 install-deps:
 	@bash ./scripts/deps/prereq.sh
 
