@@ -69,13 +69,3 @@ jobs:
         with:
           filename: ../../stats.txt
         if: github.event_name == 'pull_request'
-  
-  test-upgrade:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: test software upgrade
-        run: |
-          make test-upgrade
-        env:
-          IS_PUBLIC: false

@@ -30,7 +30,7 @@ cd $CURPATH
 # testing all txs and queries
 bash ./all_modules.sh
 
-echo "INFO: Building binary with upgraded version"
+echo "INFO: Building binary with upgrade version: $UPGRADE_VERSION"
 cd $HOME
 export REPO=$(basename $GH_URL .git)
 if [ ! -d $REPO ]
@@ -51,7 +51,7 @@ CURRENT_BLOCK_HEIGHT=$($DAEMON status --node $RPC | jq '.SyncInfo.latest_block_h
 
 echo "INFO: Submitting software upgrade proposal for upgrade: $UPGRADE_NAME"
 $DAEMON tx gov submit-proposal software-upgrade $UPGRADE_NAME --title $UPGRADE_NAME \
-    --description upgrade --upgrade-height $((CURRENT_BLOCK_HEIGHT + 60)) --deposit 10000000$DENOM \
+    --description upgrade --upgrade-height $((CURRENT_BLOCK_HEIGHT + 80)) --deposit 10000000$DENOM \
     --from validator1 --yes --keyring-backend test --home $DAEMON_HOME-1 --node $RPC --chain-id $CHAINID
 
 sleep 4s
@@ -78,5 +78,5 @@ done
 
 if [[ $count -eq 6 ]]; then
     echo "ERROR: Upgrade failed with binary issues"
-    exit 0
+    exit 1
 fi

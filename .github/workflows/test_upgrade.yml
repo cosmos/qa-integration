@@ -1,5 +1,5 @@
-name: All Modules 
-#  All Modules workflow runs individual module tests
+name: Upgrade Test
+#  Upgrade Test workflow tests software upgrade
 #  This workflow run on pushes to master, workflow_dispatch & on every pull request
 on:
   pull_request:
@@ -9,12 +9,12 @@ on:
       - master
 
 jobs:
-  test-all-modules:
+  test-upgrade:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: all modules integration tests
+      - name: test software upgrade
         run: |
-          make test-all-modules
+          make test-upgrade
         env:
           IS_PUBLIC: false
