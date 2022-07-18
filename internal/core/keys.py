@@ -1,11 +1,10 @@
 """
 This module contains all the functions calling keys sub-commands
 """
-import os
-from internal.utils import exec_command
+from internal.utils import exec_command, env
 
-DAEMON = os.getenv("DAEMON")
-DAEMON_HOME = os.getenv("DAEMON_HOME")
+DAEMON = env.DAEMON
+DAEMON_HOME = env.DAEMON_HOME
 
 
 def keys_show(account, acc_type="acc"):

@@ -12,6 +12,7 @@ set +a
 # set pythonpath environment with absolute path of internal directory
 cd ../..
 export PYTHONPATH=$PWD:$PWD/internal
+export GOROOT=/usr/local/go
 export GOPATH=$HOME/go
 export GOBIN=$GOPATH/bin
 export PATH=$PATH:/usr/local/go/bin:$GOBIN
@@ -24,4 +25,10 @@ display_usage() {
 if [ -z $DAEMON ] || [ -z $DENOM ] || [ -z $CHAINID ] || [ -z $DAEMON_HOME ] || [ -z $GH_URL ] || [ -z $CHAIN_VERSION ] || [ -z $RPC ] || [ -z $MONGO_URL ]
 then 
     display_usage
+fi
+
+# set NUM_TXS env if not found
+if [[ -z $NUM_TXS || $(( $NUM_TXS )) -le 0 ]]
+then
+    export NUM_TXS=50
 fi

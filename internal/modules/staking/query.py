@@ -1,12 +1,11 @@
 """
 This module queries staking sub commands.
 """
-import os
-from internal.utils import exec_command
+from internal.utils import exec_command, env
 
-DAEMON = os.getenv("DAEMON")
-RPC = os.getenv("RPC")
-CHAINID = os.getenv("CHAINID")
+DAEMON = env.DAEMON
+RPC = env.RPC
+CHAINID = env.CHAINID
 
 
 def query_staking_validators():
