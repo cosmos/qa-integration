@@ -25,6 +25,9 @@ then
     UPGRADE_WAITING_TIME="10s"
 fi
 
+# testing all txs and queries
+bash ./all_modules.sh
+
 echo "INFO: Building binary with upgraded version"
 cd $HOME
 export REPO=$(basename $GH_URL .git)
@@ -75,9 +78,3 @@ if [[ $count -eq 6 ]]; then
     echo "ERROR: Upgrade failed with binary issues"
     exit 0
 fi
-
-# moving back to current file folder
-cd $CURPATH
-
-# testing all txs and queries
-bash ./all_modules.sh
