@@ -4,8 +4,8 @@ This module contains all util functions.
 import json
 import logging
 import subprocess
-import utils.env as env
 from shutil import which
+from utils import env
 
 from stats import record_stat, TX_TYPE, QUERY_TYPE
 

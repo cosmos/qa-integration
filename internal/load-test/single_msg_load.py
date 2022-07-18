@@ -2,7 +2,8 @@
 This script test a series of bank transfer transactions with single message between two accounts.
 It takes two optional arguments namely -s(sender) and -r(receiver).
 """
-import sys, time
+import sys
+import time
 import utils
 from internal.core.parser import ParseTestsDefaultFlags
 from internal.stats.stats import clear_data_by_type, print_stats
