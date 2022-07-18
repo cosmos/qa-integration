@@ -19,7 +19,7 @@ else
   sudo apt update
   sudo apt install build-essential jq -y
   wget https://dl.google.com/go/go$goversion.linux-amd64.tar.gz
-  tar -xvf go$goversion.linux-amd64.tar.gz
+  tar -xf go$goversion.linux-amd64.tar.gz
   sudo cp -R go /usr/local
   rm -rf go$goversion.linux-amd64.tar.gz go
 fi
@@ -28,6 +28,7 @@ echo "" >> ~/.bashrc
 echo 'export GOROOT=/usr/local/go' >> ~/.bashrc
 source ~/.bashrc
 mkdir -p $GOPATH/src/github.com
+which go
 go version
 
 if command_exists python3 ; then
