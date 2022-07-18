@@ -4,7 +4,7 @@ install-deps:
 	@bash ./scripts/deps/prereq.sh
 
 lint: install-deps
-	pylint ./internal
+	PYTHONPATH=./internal pylint ./internal
 
 setup-chain: install-deps stop-chain
 	@bash ./scripts/chain/start_chain.sh $(NUM_VALS) 2
@@ -36,7 +36,7 @@ test-all: setup-chain
 
 test-all-modules: setup-chain
 	@echo "Running all individual module tests..."
-	TEST_TYPE=module bash ./scripts/tests/all_modules.sh -n 50
+	TEST_TYPE=module bash ./scripts/tests/all_modules.sh
 	$(MAKE) stop-chain
 
 test-multi-msg: setup-chain

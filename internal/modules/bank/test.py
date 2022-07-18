@@ -1,4 +1,5 @@
 import time, logging
+import unittest
 from core.keys import keys_show
 from modules.bank.tx import (
     tx_send,
@@ -20,42 +21,40 @@ if sender == receiver:
         f"Error: The values of arguments sender and receiver are equal make sure to set different values"
     )
 
-# Fetch balances of sender and receiver accounts before executing the send_tx
-status, sender_balance_old = query_balances(sender)
-if not status:
-    logging.error(sender_balance_old)
-sender_balance_old = int(sender_balance_old["balances"][0]["amount"])
 
-# Fetch balances of receiver
-status, receiver_balance_old = query_balances(receiver)
-if not status:
-    logging.error(receiver_balance_old)
-receiver_balance_old = int(receiver_balance_old["balances"][0]["amount"])
+class TestBankModuleTxsQueries(unittest.TestCase):
+    def test_send_tx(self):
+        # Fetch balances of sender and receiver accounts before executing the send_tx
+        status, sender_balance_old = query_balances(sender)
+        self.assertTrue(status)
+        sender_balance_old = int(sender_balance_old["balances"][0]["amount"])
 
-# send tx
-status, send_tx = tx_send(sender, receiver, amount_to_be_sent)
-if not status:
-    logging.error(f"send tx status:: {status}")
-else:
-    logging.info(f"tx_hash of send :: {send_tx['txhash']}")
+        # Fetch balances of receiver
+        status, receiver_balance_old = query_balances(receiver)
+        self.assertTrue(status)
+        receiver_balance_old = int(receiver_balance_old["balances"][0]["amount"])
 
-time.sleep(3)
+        # send tx
+        status, send_tx = tx_send(sender, receiver, amount_to_be_sent)
+        self.assertTrue(status)
+        time.sleep(3)
 
-# Fetch new balances of sender and receiver accounts after executing send_tx
-status, sender_balance_new = query_balances(sender)
-if not status:
-    logging.error(sender_balance_new)
-sender_balance_new = int(sender_balance_new["balances"][0]["amount"])
+        # Fetch new balances of sender and receiver accounts after executing send_tx
+        status, sender_balance_new = query_balances(sender)
+        self.assertTrue(status)
+        sender_balance_new = int(sender_balance_new["balances"][0]["amount"])
 
-# Fetch balances of receiver
-status, receiver_balance_new = query_balances(receiver)
-if not status:
-    logging.error(receiver_balance_new)
-receiver_balance_new = int(receiver_balance_new["balances"][0]["amount"])
+        # Fetch balances of receiver
+        status, receiver_balance_new = query_balances(receiver)
+        self.assertTrue(status)
+        receiver_balance_new = int(receiver_balance_new["balances"][0]["amount"])
 
-if ((sender_balance_old - amount_to_be_sent) == sender_balance_new) & (
-    (receiver_balance_old + amount_to_be_sent) == receiver_balance_new
-):
-    logging.info(f"send tx is successfull!!")
-else:
-    logging.error(f"send tx failed!!")
+        self.assertEqual((sender_balance_old - amount_to_be_sent), sender_balance_new)
+        self.assertEqual(
+            (receiver_balance_old + amount_to_be_sent), receiver_balance_new
+        )
+
+
+if __name__ == "__main__":
+    logging.info("INFO: running bank module tests")
+    unittest.main()
