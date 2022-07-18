@@ -129,11 +129,6 @@ fi
 echo "INFO: Generating gentxs for validator accounts"
 for (( a=1; a<=$NUM_VALS; a++ ))
 do
-    if [ $a == 1 ]
-    then
-        $DAEMON gentx validator$a 100000000000$DENOM --chain-id $CHAINID  --keyring-backend test --home $DAEMON_HOME-$a
-        continue
-    fi
     $DAEMON gentx validator$a 90000000000$DENOM --chain-id $CHAINID  --keyring-backend test --home $DAEMON_HOME-$a
 done
 echo "INFO: Copying all gentxs to $DAEMON_HOME-1"

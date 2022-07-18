@@ -56,9 +56,15 @@ $DAEMON tx gov submit-proposal software-upgrade $UPGRADE_NAME --title $UPGRADE_N
 
 sleep 4s
 
+PROPOSAL_ID=`$DAEMON q gov proposals --status voting_period -o json --node $RPC | \
+jq -c '.proposals | .[] | select(.content.title == '\"$UPGRADE_NAME\"') | .proposal_id | tonumber'`
+
 echo "INFO: Voting on created proposal"
-$DAEMON tx gov vote 1 yes --from validator1 --yes --keyring-backend test \
-    --home $DAEMON_HOME-1 --node $RPC --chain-id $CHAINID
+for (( a=1; a<=$NUM_VALS; a++ ))
+do
+    $DAEMON tx gov vote $PROPOSAL_ID yes --from validator$a --yes --keyring-backend test \
+    --home $DAEMON_HOME-$a --node $RPC --chain-id $CHAINID
+done
 
 echo "INFO: Waiting for proposal to pass and upgrade"
 sleep 60s
