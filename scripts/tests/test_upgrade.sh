@@ -80,3 +80,5 @@ if [[ $count -eq 6 ]]; then
     echo "ERROR: Upgrade failed with binary issues"
     exit 1
 fi
+
+echo "INFO: Upgrade done successfully"
