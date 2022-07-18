@@ -11,7 +11,9 @@ HOME = env.HOME
 RPC = env.RPC
 
 
-def tx_sign(unsigned_file_name, from_address, sequence, gas="auto"):
+def tx_sign(
+    unsigned_file_name: str, from_address: str, sequence: int = None, gas: str = "auto"
+):
     """The function `tx_sign` will call cosmos-sdk command `tx sign`
         and the returns the response in json format.
 
@@ -25,10 +27,17 @@ def tx_sign(unsigned_file_name, from_address, sequence, gas="auto"):
     Returns:
         _tuple_: (boolean, json|str)
     """
-    command = f"""{DAEMON} tx sign {HOME}/{unsigned_file_name} --from {from_address} \
+    if sequence is not None:
+        command = f"""{DAEMON} tx sign {HOME}/{unsigned_file_name} --from {from_address} \
 --chain-id {CHAINID} --keyring-backend test \
 --home {DAEMON_HOME}-1 --node {RPC} --signature-only=false \
 --sequence {sequence} --gas {gas} --output json"""
+
+    command = f"""{DAEMON} tx sign {HOME}/{unsigned_file_name} --from {from_address} \
+--chain-id {CHAINID} --keyring-backend test \
+--home {DAEMON_HOME}-1 --node {RPC} --signature-only=false \
+--gas {gas} --output json"""
+
     return exec_command(command)
 
 
