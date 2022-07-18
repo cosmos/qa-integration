@@ -18,9 +18,13 @@ else
   echo "Install dependencies"
   sudo apt update
   sudo apt install build-essential jq -y
-  wget https://dl.google.com/go/go$goversion.linux-amd64.tar.gz
+  wget -q https://dl.google.com/go/go$goversion.linux-amd64.tar.gz
   tar -xf go$goversion.linux-amd64.tar.gz
   sudo cp -R go /usr/local
+  go_path=`which go`
+  if [ ! -z "$go_path" ]; then
+    sudo cp go/bin/go $go_path
+  fi
   rm -rf go$goversion.linux-amd64.tar.gz go
 fi
 export GOPATH=$HOME/go
@@ -28,7 +32,6 @@ echo "" >> ~/.bashrc
 echo 'export GOROOT=/usr/local/go' >> ~/.bashrc
 source ~/.bashrc
 mkdir -p $GOPATH/src/github.com
-which go
 go version
 
 if command_exists python3 ; then
