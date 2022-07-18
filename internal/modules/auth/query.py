@@ -2,11 +2,10 @@
 This module consists of query commands for auth cosmos-sdk module
 """
 import argparse
-import os
-from internal.utils import exec_command
+from internal.utils import exec_command, env
 
-DAEMON = os.getenv("DAEMON")
-RPC = os.getenv("RPC")
+DAEMON = env.DAEMON
+RPC = env.RPC
 
 
 def account_type(address):

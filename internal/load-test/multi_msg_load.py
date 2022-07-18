@@ -2,7 +2,6 @@
 This script test a series of bank transfer transactions with multiple messages between two accounts.
 It takes two optional arguments namely -s(sender) and -r(receiver)
 """
-import os
 import sys
 import logging
 from internal.core.parser import ParseTestsDefaultFlags
@@ -10,10 +9,10 @@ from internal.stats.stats import clear_data_by_type, print_stats
 from internal.modules.auth.query import query_account
 from internal.modules.bank.query import calculate_balance_deductions, query_balances
 from internal.modules.bank.tx import sign_and_broadcast_txs, create_unsigned_txs
-from internal.utils import create_multi_messages
+from internal.utils import create_multi_messages, env
 
-HOME = os.getenv("HOME")
-NUM_MSGS = int(os.getenv("NUM_MSGS"))
+num_txs = env.NUM_TXS
+NUM_MSGS = env.NUM_MSGS
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
@@ -21,9 +20,8 @@ p = ParseTestsDefaultFlags(
     desc="This program takes inputs for intializing multi messages load test.",
     sender=True,
     receiver=True,
-    num_txs=True,
 )
-sender, receiver, num_txs = p.get_args()
+sender, receiver = p.get_args()
 amount_to_be_sent = 1000000
 
 if sender == receiver:
