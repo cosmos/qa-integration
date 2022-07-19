@@ -8,6 +8,7 @@ from modules.staking.tx import (
     tx_redelegate,
     tx_unbond,
     tx_create_validator,
+    tx_edit_validator,
 )
 from modules.staking.query import (
     query_delegator_delegation,
@@ -166,6 +167,18 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         self.assertTrue(status)
         count = int(validator_set["pagination"]["total"])
         self.assertEqual(count, 4)
+
+        # edit validator
+        status, edit_val_tx = tx_edit_validator(
+            "account1", "temp_val"
+        )
+        self.assertTrue(status)
+        time.sleep(3)
+
+        status, validator_res = query_validator(validator["address"])
+        self.assertTrue(status)
+        val_name = validator_res["description"]["moniker"]
+        self.assertEqual(val_name, "temp_val")
 
         # clean tmp dir
         temp_dir.cleanup()
