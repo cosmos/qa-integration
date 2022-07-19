@@ -56,6 +56,13 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         count = int(delegations_of_val["pagination"]["total"])
         self.assertNotEqual(count, 0)
 
+        for d in delegations_of_val["delegation_responses"]:
+            del_addr = d["delegation"]["delegator_address"]
+            if del_addr == delegator:
+                count = 1
+                break
+        self.assertEqual(count, 1)
+
     # redelegation tx
     def test_redelegate_tx(self):
         status, delegate_tx = tx_delegate("account1", dst_val_address, amount)
@@ -98,6 +105,13 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         count = int(redelegations_from_val["pagination"]["total"])
         self.assertEqual(count, 1)
 
+        for r in redelegations_from_val["redelegation_responses"]:
+            del_addr = r["redelegation"]["delegator_address"]
+            if del_addr == delegator:
+                count = 1
+                break
+        self.assertEqual(count, 1)
+
     # unbond tx
     def test_unbond_tx(self):
         status, unbond_tx = tx_unbond("account1", val_addr, amount)
@@ -119,6 +133,13 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         status, unbond_del_of_val = query_unbonding_delegations_from(val_addr)
         self.assertTrue(status)
         count = int(unbond_del_of_val["pagination"]["total"])
+        self.assertEqual(count, 1)
+
+        for u in unbond_del_of_val["unbonding_responses"]:
+            del_addr = u["delegator_address"]
+            if del_addr == delegator:
+                count = 1
+                break
         self.assertEqual(count, 1)
 
     # create validator
