@@ -2,11 +2,12 @@ import tempfile, time, os, logging
 from internal.core.keys import keys_show
 from modules.gov.tx import *
 from modules.gov.query import *
+from utils import env
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
-DENOM = os.getenv("DENOM")
-DAEMON_HOME = os.getenv("DAEMON_HOME")
+DENOM = env.DENOM
+DAEMON_HOME = env.DAEMON_HOME
 YES_VOTE = "VOTE_OPTION_YES"
 NO_VOTE = "VOTE_OPTION_NO"
 

@@ -1,10 +1,11 @@
 import os
-from utils import exec_and_process_output, DEFAULT_GAS
+from utils import exec_command, env
 
-DAEMON = os.getenv("DAEMON")
-DAEMON_HOME = os.getenv("DAEMON_HOME")
-RPC = os.getenv("RPC")
-CHAINID = os.getenv("CHAINID")
+DAEMON = env.DAEMON
+DAEMON_HOME = env.DAEMON_HOME
+RPC = env.RPC
+CHAINID = env.CHAINID
+DEFAULT_GAS = env.DEFAULT_GAS
 
 # tx_submit_proposal internally calls the submit proposal transaction with given proposal type
 # and return the response in json format.
@@ -13,26 +14,15 @@ def tx_submit_proposal(
     proposal_file_or_name,
     proposal_type="software-upgrade",
     gas=DEFAULT_GAS,
-    unsigned=False,
-    sequence=None,
     extra_args="",
 ):
     try:
-        if unsigned:
-            command = f"""{DAEMON} tx gov submit-proposal {proposal_type} {proposal_file_or_name} --chain-id {CHAINID} --output json --node {RPC} \
---generate-only --gas {gas}"""
-            return exec_and_process_output(command, extra_args)
-        else:
-            if sequence != None:
-                command = f"""{DAEMON} tx gov submit-proposal {proposal_type} {proposal_file_or_name} --chain-id {CHAINID} \
---keyring-backend test --from {from_key} --home {DAEMON_HOME}-1 --node {RPC} --output json -y --sequence {sequence} --gas {gas}"""
-            else:
-                command = f"""{DAEMON} tx gov submit-proposal {proposal_type} {proposal_file_or_name} --chain-id {CHAINID} --keyring-backend test \
+        command = f"""{DAEMON} tx gov submit-proposal {proposal_type} {proposal_file_or_name} --chain-id {CHAINID} --keyring-backend test \
  --home {DAEMON_HOME}-1 --from {from_key} --node {RPC} --output json -y --gas {gas}"""
-            status, tx = exec_and_process_output(command, extra_args)
-            if status and tx["code"] != 0:
-                return False, tx
-            return status, tx
+        status, tx = exec_command(command, extra_args)
+        if status and tx["code"] != 0:
+            return False, tx
+        return status, tx
     except Exception as e:
         return False, e
 
@@ -42,26 +32,15 @@ def tx_submit_proposal(
 def tx_cancel_software_upgrade(
     from_key,
     gas=DEFAULT_GAS,
-    unsigned=False,
-    sequence=None,
     extra_args="",
 ):
     try:
-        if unsigned:
-            command = f"""{DAEMON} tx gov submit-proposal cancel-software-upgrade --chain-id {CHAINID} --output json --node {RPC} \
---generate-only --gas {gas}"""
-            return exec_and_process_output(command, extra_args)
-        else:
-            if sequence != None:
-                command = f"""{DAEMON} tx gov submit-proposal cancel-software-upgrade --chain-id {CHAINID} \
---keyring-backend test --from {from_key} --home {DAEMON_HOME}-1 --node {RPC} --output json -y --sequence {sequence} --gas {gas}"""
-            else:
-                command = f"""{DAEMON} tx gov submit-proposal cancel-software-upgrade --chain-id {CHAINID} --keyring-backend test \
+        command = f"""{DAEMON} tx gov submit-proposal cancel-software-upgrade --chain-id {CHAINID} --keyring-backend test \
  --home {DAEMON_HOME}-1 --from {from_key} --node {RPC} --output json -y --gas {gas}"""
-            status, tx = exec_and_process_output(command, extra_args)
-            if status and tx["code"] != 0:
-                return False, tx
-            return status, tx
+        status, tx = exec_command(command, extra_args)
+        if status and tx["code"] != 0:
+            return False, tx
+        return status, tx
     except Exception as e:
         return False, e
 
@@ -72,25 +51,15 @@ def tx_deposit(
     proposal_id,
     deposit,
     gas=DEFAULT_GAS,
-    unsigned=False,
-    sequence=None,
     extra_args="",
 ):
     try:
-        if unsigned:
-            command = f"{DAEMON} tx gov deposit {proposal_id} {deposit} --chain-id {CHAINID} --output json --node {RPC} --generate-only --gas {gas}"
-            return exec_and_process_output(command, extra_args)
-        else:
-            if sequence != None:
-                command = f"""{DAEMON} tx gov deposit {proposal_id} {deposit} --chain-id {CHAINID} \
---keyring-backend test --from {from_key} --home {DAEMON_HOME}-1 --node {RPC} --output json -y --sequence {sequence} --gas {gas}"""
-            else:
-                command = f"""{DAEMON} tx gov deposit {proposal_id} {deposit} --chain-id {CHAINID} --keyring-backend test \
+        command = f"""{DAEMON} tx gov deposit {proposal_id} {deposit} --chain-id {CHAINID} --keyring-backend test \
  --home {DAEMON_HOME}-1 --from {from_key} --node {RPC} --output json -y --gas {gas}"""
-            status, tx = exec_and_process_output(command, extra_args)
-            if status and tx["code"] != 0:
-                return False, tx
-            return status, tx
+        status, tx = exec_command(command, extra_args)
+        if status and tx["code"] != 0:
+            return False, tx
+        return status, tx
     except Exception as e:
         return False, e
 
@@ -101,26 +70,16 @@ def tx_vote(
     proposal_id,
     option,
     gas=DEFAULT_GAS,
-    unsigned=False,
-    sequence=None,
     home=f"{DAEMON_HOME}-1",
     extra_args="",
 ):
     try:
-        if unsigned:
-            command = f"{DAEMON} tx gov vote {proposal_id} {option} --chain-id {CHAINID} --output json --node {RPC} --generate-only --gas {gas}"
-            return exec_and_process_output(command, extra_args)
-        else:
-            if sequence != None:
-                command = f"""{DAEMON} tx gov vote {proposal_id} {option} --chain-id {CHAINID} \
---keyring-backend test --from {from_key} --home {home} --node {RPC} --output json -y --sequence {sequence} --gas {gas}"""
-            else:
-                command = f"""{DAEMON} tx gov vote {proposal_id} {option} --chain-id {CHAINID} --keyring-backend test \
+        command = f"""{DAEMON} tx gov vote {proposal_id} {option} --chain-id {CHAINID} --keyring-backend test \
  --home {home} --from {from_key} --node {RPC} --output json -y --gas {gas}"""
-            status, tx = exec_and_process_output(command, extra_args)
-            if status and tx["code"] != 0:
-                return False, tx
-            return status, tx
+        status, tx = exec_command(command, extra_args)
+        if status and tx["code"] != 0:
+            return False, tx
+        return status, tx
     except Exception as e:
         return False, e
 
@@ -131,25 +90,15 @@ def tx_weighted_vote(
     proposal_id,
     options,
     gas=DEFAULT_GAS,
-    unsigned=False,
-    sequence=None,
     home=f"{DAEMON_HOME}-1",
     extra_args="",
 ):
     try:
-        if unsigned:
-            command = f"{DAEMON} tx gov weighted-vote {proposal_id} {options} --chain-id {CHAINID} --output json --node {RPC} --generate-only --gas {gas}"
-            return exec_and_process_output(command, extra_args)
-        else:
-            if sequence != None:
-                command = f"""{DAEMON} tx gov weighted-vote {proposal_id} {options} --chain-id {CHAINID} \
---keyring-backend test --from {from_key} --home {home} --node {RPC} --output json -y --sequence {sequence} --gas {gas}"""
-            else:
-                command = f"""{DAEMON} tx gov weighted-vote {proposal_id} {options} --chain-id {CHAINID} --keyring-backend test \
+        command = f"""{DAEMON} tx gov weighted-vote {proposal_id} {options} --chain-id {CHAINID} --keyring-backend test \
  --home {home} --from {from_key} --node {RPC} --output json -y --gas {gas}"""
-            status, tx = exec_and_process_output(command, extra_args)
-            if status and tx["code"] != 0:
-                return False, tx
-            return status, tx
+        status, tx = exec_command(command, extra_args)
+        if status and tx["code"] != 0:
+            return False, tx
+        return status, tx
     except Exception as e:
         return False, e

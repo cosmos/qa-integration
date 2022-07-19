@@ -1,7 +1,10 @@
-import os
+"""
+This module setup the MongoDb configuration and Connection.
+"""
 from pymongo import MongoClient
+import utils
 
-URI = os.getenv("MONGO_URL")
-DB_NAME = os.getenv("DB_NAME") if os.getenv("DB_NAME") else "qa_test"
+URI = utils.env.URI
+DB_NAME = utils.env.DB_NAME
 mongo_client = MongoClient(URI)
 db = mongo_client[DB_NAME]

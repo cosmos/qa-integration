@@ -18,16 +18,9 @@ cd $CURPATH
 # check environment variables are set
 . ../deps/env-check.sh
 
-# NUM_VALS represents number of validator nodes to bootstrap the network.
-NUM_VALS=$1
-if [ -z $NUM_VALS ]
-then
-    NUM_VALS=2
-fi
-
 # NUM_ACCOUNTS represents number of accounts to initialize while bootstropping the chain. 
 # These are the additional accounts along with the validator accounts.
-NUM_ACCOUNTS=$2
+NUM_ACCOUNTS=$1
 echo "INFO: Setting up $NUM_VALS validator nodes and $NUM_ACCOUNTS accounts"
 cd $HOME
 mkdir -p "$GOBIN"
