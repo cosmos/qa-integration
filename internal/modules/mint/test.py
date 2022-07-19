@@ -1,10 +1,10 @@
 import logging,time,json,unittest
 from modules.mint.query import *
+from internal.utils import env
 
+HOME = env.HOME
+DAEMON_HOME = env.DAEMON_HOME
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
-
-HOME = os.getenv("HOME")
-DAEMON_HOME = os.getenv("DAEMON_HOME")
 
 logging.info("INFO :: Running mint module test scripts")
 
