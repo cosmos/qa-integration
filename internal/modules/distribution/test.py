@@ -80,13 +80,13 @@ class TestDistributionModuleTxsQueries(unittest.TestCase):
         
         # query community pool fund
         pool_fund = query_community_pool()[1]["pool"][0]["amount"]
-        time.sleep(3)
+        time.sleep(5)
 
         # fund community pool tx 
         status,fund_pool = tx_fund_communitypool("account1",amount_to_be_sent)
         self.assertTrue(status)
         self.assertTrue(fund_pool)
-        time.sleep(3)
+        time.sleep(5)
 
         after_pool_fund = query_community_pool()[1]["pool"][0]["amount"]
         self.assertLess(float(pool_fund),float(after_pool_fund))
@@ -133,7 +133,7 @@ class TestDistributionModuleTxsQueries(unittest.TestCase):
         # query commission rewards
         rewards =  query_commission_rewards(validator1)[1]["commission"][0]["amount"]
 
-        time.sleep(3)
+        time.sleep(5)
         status,commission_rewards = tx_withdraw_commision_rewards("validator1",validator1)
         self.assertTrue(status)
         self.assertTrue(commission_rewards)
@@ -147,13 +147,13 @@ class TestDistributionModuleTxsQueries(unittest.TestCase):
     def test_validator_slashes_query(self):
         # query validator slashes
         slash_count = query_slashes(validator3,1,1000)[1]["slashes"]
-        assert slash_count, f"missmatch in slashes"
+        self.assertNotEqual(slash_count,0,"missmatch in slashes")
         time.sleep(3)
     
     def test_validator_outstanding_rewards_query(self):
         # Query validator outstanding rewards
         outstanding_rewards = query_validator_outstanding_rewards(validator1)[1]["rewards"][0]["amount"]
-        assert outstanding_rewards, f"missmatch in validator outstanding rewards"
+        self.assertNotEqual(outstanding_rewards,0,"missmatch in validator outstanding rewards")
         time.sleep(3)
 
 if __name__ == '__main__':
