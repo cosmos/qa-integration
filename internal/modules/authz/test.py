@@ -7,11 +7,7 @@ from modules.bank.query import (
     query_balances,
 )
 from modules.authz.tx import *
-from modules.authz.query import (
-    query_authz_grants,
-    query_authz_grantee_grants,
-    query_authz_granter_grants,
-)
+from modules.authz.query import *
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
