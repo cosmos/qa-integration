@@ -27,6 +27,17 @@ then
     display_usage
 fi
 
+if [ -z $NUM_VALS ]
+then
+    NUM_VALS = 3
+fi
+
+# export daemon home paths
+for (( a=1; a<=$NUM_VALS; a++ ))
+do
+    export "NODE${a}_HOME"=$DAEMON_HOME-$a
+done
+
 # set NUM_TXS env if not found
 if [[ -z $NUM_TXS || $(( $NUM_TXS )) -le 0 ]]
 then

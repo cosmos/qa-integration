@@ -14,6 +14,8 @@ logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
 HOME = env.HOME
 DAEMON = env.DAEMON
+DAEMON_HOME = env.DAEMON_HOME
+DEFAULT_GAS = env.DEFAULT_GAS
 
 
 def print_balance_deductions(wallet, diff):
