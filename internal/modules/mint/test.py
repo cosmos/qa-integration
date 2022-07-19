@@ -11,7 +11,7 @@ logging.info("INFO :: Running mint module test scripts")
 class TestMintModuleQueries(unittest.TestCase):
 
     def test_params_query(self):
-         # query params
+        # query params
         path = f"{HOME}/.simd-1/config/"
         with open(path+'genesis.json') as file:
             data = json.load(file)
