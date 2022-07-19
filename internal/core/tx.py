@@ -2,14 +2,13 @@
 This module contains functions calling the `tx` commands.
 """
 import logging
-import os
-from internal.utils import exec_command
+from internal.utils import exec_command, env
 
-CHAINID = os.getenv("CHAINID")
-DAEMON = os.getenv("DAEMON")
-DAEMON_HOME = os.getenv("DAEMON_HOME")
-HOME = os.getenv("HOME")
-RPC = os.getenv("RPC")
+CHAINID = env.CHAINID
+DAEMON = env.DAEMON
+DAEMON_HOME = env.DAEMON_HOME
+HOME = env.HOME
+RPC = env.RPC
 
 
 def tx_sign(unsigned_file_name, from_address, sequence, gas="auto"):
