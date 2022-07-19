@@ -1,4 +1,4 @@
-import json, os
+import json
 from utils import exec_command, env
 from modules.staking.query import (
     fetch_validator_pubkey_from_node,

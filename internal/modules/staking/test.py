@@ -1,28 +1,10 @@
-import os, sys, time, logging
+import time, logging
 from core.keys import keys_show
 from internal.utils import exec_command, env
 import tempfile
 import unittest
-from modules.staking.tx import (
-    tx_delegate,
-    tx_redelegate,
-    tx_unbond,
-    tx_create_validator,
-    tx_edit_validator,
-)
-from modules.staking.query import (
-    query_delegator_delegation,
-    query_delegator_delegations,
-    query_delegations_of_validator,
-    query_unbonding_delegation,
-    query_unbonding_delegations,
-    query_unbonding_delegations_from,
-    query_validator,
-    query_validator_set,
-    query_delegator_redelegation,
-    query_delegator_redelegations,
-    query_delegator_redelegations_from,
-)
+from modules.staking.tx import *
+from modules.staking.query import *
 
 HOME = env.HOME
 DAEMON = env.DAEMON
@@ -169,9 +151,7 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         self.assertEqual(count, 4)
 
         # edit validator
-        status, edit_val_tx = tx_edit_validator(
-            "account1", "temp_val"
-        )
+        status, edit_val_tx = tx_edit_validator("account1", "temp_val")
         self.assertTrue(status)
         time.sleep(3)
 
