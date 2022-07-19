@@ -7,7 +7,7 @@ DAEMON = env.DAEMON
 RPC = env.RPC
 CHAINID = env.CHAINID
 
-# `query_delegator_delegation` queries individual delegator delegations.
+# `query_delegator_delegation` queries individual delegator's delegation associated with a validator.
 def query_delegator_delegation(delegator, validator):
     """
     The function `query_delegator_delegation` fetches the information
