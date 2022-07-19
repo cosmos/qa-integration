@@ -1,19 +1,16 @@
 import os
-import sys, time, logging
+import time, logging
 import tempfile
 import unittest
 from core.keys import keys_show
 from modules.bank.query import (
     query_balances,
 )
-from modules.authz.tx import (
-    tx_grant_authz,
-    create_unsigned_send_tx,
-    execute_authz_tx,
-    tx_revoke_authz,
-)
+from modules.authz.tx import *
 from modules.authz.query import (
     query_authz_grants,
+    query_authz_grantee_grants,
+    query_authz_granter_grants,
 )
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
@@ -22,15 +19,10 @@ logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 granter = keys_show("account1")[1]["address"]
 grantee = keys_show("account2")[1]["address"]
 receiver = keys_show("validator1")[1]["address"]
-amount_to_be_sent = 5
+amount = 5
 
 temp = tempfile.TemporaryFile()
 temp_file = f"{temp.name}.json"
-
-if granter == grantee:
-    sys.exit(
-        'Error: The values of arguments "granter" and "grantee" are equal make sure to set different values'
-    )
 
 
 class TestAuthzModuleTxsQueries(unittest.TestCase):
@@ -42,9 +34,24 @@ class TestAuthzModuleTxsQueries(unittest.TestCase):
 
         status, grants = query_authz_grants(granter, grantee)
         self.assertTrue(status)
-
         spend_limit = grants["grants"][0]["authorization"]["spend_limit"][0]["amount"]
-        assert spend_limit != "", "error in grant authorization to {grantee}!!!"
+        self.assertIsNotNone(spend_limit)
+
+        # test grants granted to a grantee
+        status, grantee_grants = query_authz_grantee_grants(grantee)
+        self.assertTrue(status)
+        count = int(grantee_grants["pagination"]["total"])
+        self.assertNotEqual(count, 0)
+        granter_addr = grantee_grants["grants"][0]["granter"]
+        self.assertEqual(granter_addr, granter)
+
+        # test grants granted granted by a granter
+        status, granter_grants = query_authz_granter_grants(granter)
+        self.assertTrue(status)
+        count = int(granter_grants["pagination"]["total"])
+        self.assertNotEqual(count, 0)
+        grantee_addr = granter_grants["grants"][0]["grantee"]
+        self.assertEqual(grantee_addr, grantee)
 
     def test_exec_tx(self):
         # query old balances of granter and reciver
@@ -58,7 +65,7 @@ class TestAuthzModuleTxsQueries(unittest.TestCase):
 
         # Generating unsigned transactions with a single transfer message
         status, unsignedTxto = create_unsigned_send_tx(
-            granter, receiver, amount_to_be_sent, temp_file
+            granter, receiver, amount, temp_file
         )
         self.assertTrue(status)
         time.sleep(3)
@@ -76,22 +83,19 @@ class TestAuthzModuleTxsQueries(unittest.TestCase):
         status, receiver_bal_updated = query_balances(receiver)
         self.assertTrue(status)
         receiver_bal_updated = int(receiver_bal_updated["balances"][0]["amount"])
-
-        assert ((granter_bal_old - amount_to_be_sent) == granter_bal_updated) & (
-            receiver_bal_old + amount_to_be_sent == receiver_bal_updated
-        ), f"error while executing tx on behalf of granter!!!"
+        self.assertEqual((granter_bal_old - amount), granter_bal_updated)
+        self.assertEqual((receiver_bal_old + amount), receiver_bal_updated)
 
     def test_revoke_tx(self):
         # revoke authz grants
-        status, tx = tx_revoke_authz(granter, grantee)
+        status, tx_res = tx_revoke_authz(granter, grantee)
         self.assertTrue(status)
         time.sleep(3)
 
         status, grants = query_authz_grants(granter, grantee)
         self.assertTrue(status)
-
-        a = grants["pagination"]["total"]
-        assert len(grants), f"authz revoke tx failed!!!"
+        count = int(grants["pagination"]["total"])
+        self.assertEqual(count, 0)
 
         # close and remove temp file
         temp.close()
@@ -99,4 +103,5 @@ class TestAuthzModuleTxsQueries(unittest.TestCase):
 
 
 if __name__ == "__main__":
+    logging.info("INFO: running authz module tests")
     unittest.main()
