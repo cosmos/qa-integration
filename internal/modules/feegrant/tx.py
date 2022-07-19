@@ -1,13 +1,12 @@
-import os
-from utils import exec_command
+from utils import exec_command, env
 
-DAEMON = os.getenv("DAEMON")
-DENOM = os.getenv("DENOM")
-CHAINID = os.getenv("CHAINID")
-HOME = os.getenv("HOME")
-DAEMON_HOME = os.getenv("DAEMON_HOME")
-RPC = os.getenv("RPC")
-DEFAULT_GAS = 2000000
+DAEMON = env.DAEMON
+DENOM = env.DENOM
+CHAINID = env.CHAINID
+HOME = env.HOME
+DAEMON_HOME = env.DAEMON_HOME
+RPC = env.RPC
+DEFAULT_GAS = env.DEFAULT_GAS
 
 # `tx_grant` takes granter_key and grantee address as paramaters and executes feegrant grant tx
 # internally and returns the json response.

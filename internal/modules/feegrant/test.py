@@ -1,35 +1,23 @@
 import sys, time, logging
 import unittest
 from core.keys import keys_show
-from modules.feegrant.tx import (
-    tx_grant,
-    tx_revoke_feegrant,
-    set_periodic_expiration_grant,
-)
-from modules.feegrant.query import (
-    query_feegrant_grant,
-)
+from modules.feegrant.tx import *
+from modules.feegrant.query import *
+
 from modules.bank.tx import (
-    DEFAULT_GAS,
     tx_send,
 )
 from modules.bank.query import (
     query_balances,
 )
 
-# logging.basicConfig(format="%(message)s", level=logging.DEBUG)
-
 # get account addresses
 granter = keys_show("account1")[1]["address"]
 grantee = keys_show("account2")[1]["address"]
 receiver = keys_show("validator1")[1]["address"]
-amount_to_sent = 5
-fees = 2
 
-if granter == grantee:
-    sys.exit(
-        'Error: The values of arguments "granter" and "grantee" are equal make sure to set different values'
-    )
+amount = 5
+fees = 2
 
 
 class TestFeegrantModuleTxsQueries(unittest.TestCase):
@@ -54,7 +42,7 @@ class TestFeegrantModuleTxsQueries(unittest.TestCase):
 
         # send tx
         extra_args = f"--fee-account {granter} --fees {fees}stake"
-        status, response = tx_send(grantee, receiver, amount_to_sent, extra_args)
+        status, response = tx_send(grantee, receiver, amount, extra_args)
         self.assertTrue(status)
         time.sleep(3)
 
@@ -71,11 +59,9 @@ class TestFeegrantModuleTxsQueries(unittest.TestCase):
         self.assertTrue(status)
         receiver_bal_updated = int(receiver_bal_updated["balances"][0]["amount"])
 
-        assert (
-            ((granter_bal_old - fees) == granter_bal_updated)
-            & ((grantee_bal_old - amount_to_sent) == grantee_bal_updated)
-            & (receiver_bal_old + amount_to_sent == receiver_bal_updated)
-        ), f"error in grant tx!!!"
+        self.assertEqual((granter_bal_old - fees), granter_bal_updated)
+        self.assertEqual((grantee_bal_old - amount), grantee_bal_updated)
+        self.assertEqual((receiver_bal_old + amount), receiver_bal_updated)
 
         # revoke tx
         status, response = tx_revoke_feegrant("account1", grantee)
@@ -97,7 +83,7 @@ class TestFeegrantModuleTxsQueries(unittest.TestCase):
 
         # send tx
         extra_args = f"--fee-account {granter} --fees {fees}stake"
-        status, response = tx_send(grantee, receiver, amount_to_sent, extra_args)
+        status, response = tx_send(grantee, receiver, amount, extra_args)
         self.assertTrue(status)
         time.sleep(3)
 
@@ -108,9 +94,15 @@ class TestFeegrantModuleTxsQueries(unittest.TestCase):
         spend_limit_after = int(
             periodic_grant["allowance"]["basic"]["spend_limit"][0]["amount"]
         )
-        assert (
-            spend_limit_before - fees
-        ) == spend_limit_after, f"period grant tx was failed!!!"
+        self.assertEqual((spend_limit_before - fees), spend_limit_after)
+
+        # test grants of grantee
+        status, grantee_grants = query_greantee_grants(grantee)
+        self.assertTrue(status)
+        count = int(grantee_grants["pagination"]["total"])
+        self.assertNotEqual(count, 0)
+        granter_addr = grantee_grants["allowances"][0]["granter"]
+        self.assertEqual(granter_addr, granter)
 
         # revoke tx
         status, response = tx_revoke_feegrant("account1", grantee)
@@ -122,4 +114,3 @@ class TestFeegrantModuleTxsQueries(unittest.TestCase):
 if __name__ == "__main__":
     logging.info("INFO: running feegrant module tests")
     unittest.main()
-    logging.info("PASS: all feegrant module tests")
