@@ -3,7 +3,7 @@ This module has functions to store stats in mongodb
 """
 import json
 import logging
-import os
+import utils
 from internal.db import db
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
@@ -86,15 +86,15 @@ def clear_data_by_type():
     """
     Clears the DB data by given test type
     """
-    if os.getenv("TEST_TYPE"):
-        db[COL_NAME].delete_many({"test_type": os.getenv("TEST_TYPE")})
+    if utils.env.TEST_TYPE:
+        db[COL_NAME].delete_many({"test_type": utils.env.TEST_TYPE})
 
 
 def print_stats(cmd_type=TX_TYPE):
     """
     This function prints the stats from DB.
     """
-    test_type = os.getenv("TEST_TYPE")
+    test_type = utils.env.TEST_TYPE
     if test_type:
         log_text = "transactions" if cmd_type == TX_TYPE else "queries"
         num_txs = db[COL_NAME].count_documents(

@@ -9,13 +9,6 @@ cd $CURPATH
 # check environment variables are set
 . ../deps/env-check.sh
 
-# NUM_VALS represents number of validator nodes
-NUM_VALS=$1
-if [ -z $NUM_VALS ]
-then
-    NUM_VALS=1
-fi
-
 echo "INFO: Number of validator nodes for status checks:  : $NUM_VALS"
 IP="$(dig +short myip.opendns.com @resolver1.opendns.com)"
 if [[ -z $IP || "$IS_PUBLIC" == "false" ]]

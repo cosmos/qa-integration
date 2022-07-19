@@ -3,19 +3,22 @@ This script test a series of bank transfer transactions with single message betw
 It takes two optional arguments namely -s(sender) and -r(receiver).
 """
 import sys
+import time
+import utils
 from internal.core.parser import ParseTestsDefaultFlags
 from internal.stats.stats import clear_data_by_type, print_stats
 from internal.modules.auth.query import query_account
 from internal.modules.bank.query import calculate_balance_deductions, query_balances
 from internal.modules.bank.tx import tx_send
 
+num_txs = utils.env.NUM_TXS
+
 p = ParseTestsDefaultFlags(
     desc="This program takes inputs for intializing single message load test.",
     sender=True,
     receiver=True,
-    num_txs=True,
 )
-sender, receiver, num_txs = p.get_args()
+sender, receiver = p.get_args()
 amount_to_be_sent = 1000000
 
 # Fetch Balances from sender receiver
@@ -50,6 +53,8 @@ for i in range(num_txs):
     status, sTxfrom = tx_send(
         receiver, sender, amount_to_be_sent, 100000, False, seqfrom
     )
+
+time.sleep(1)
 
 #### Print Balances ####
 calculate_balance_deductions(sender, receiver, sender_balance_old, receiver_balance_old)

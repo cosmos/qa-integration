@@ -1,13 +1,12 @@
 """
 Querying functions for the bank module.
 """
-import os
 import sys
 
-from internal.utils import exec_command, print_balance_deductions
+from internal.utils import exec_command, print_balance_deductions, env
 
-DAEMON = os.getenv("DAEMON")
-RPC = os.getenv("RPC")
+DAEMON = env.DAEMON
+RPC = env.RPC
 
 
 def query_balances(address):
