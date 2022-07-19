@@ -2,6 +2,20 @@ NUM_VALS = 2
 
 docker-build:
 	@bash ./scripts/build_binary.sh
+
+start-docker-chain: docker-build
+	docker-compose up -d
+
+stop-docker-chain:
+	docker-compose stop 
+
+clean-docker-chain:
+	docker-compose down -v
+
+restart-docker-chain:
+	docker-compose restart 
+
+
 	
 install-deps:
 	@bash ./scripts/deps/prereq.sh
