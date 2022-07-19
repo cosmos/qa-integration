@@ -1,14 +1,14 @@
 """
 This module contains all the functions calling keys sub-commands
 """
-import os
-from internal.utils import exec_command
+from internal.utils import exec_command, env
 
-DAEMON = os.getenv("DAEMON")
-DAEMON_HOME = os.getenv("DAEMON_HOME")
+DAEMON = env.DAEMON
+DAEMON_HOME = env.DAEMON_HOME
 
 
-def keys_show(account, acc_type="acc"):
+# The function `keys_show` will return the key details in json format.
+def keys_show(account, acc_type="acc", home=f"{DAEMON_HOME}-1"):
     """The function `keys_show` will return the key details in json format.
 
     Args:
@@ -19,6 +19,6 @@ def keys_show(account, acc_type="acc"):
     Returns:
         _type_: _description_
     """
-    command = f"""{DAEMON} keys show {account} --home {DAEMON_HOME}-1 --bech {acc_type} \
+    command = f"""{DAEMON} keys show {account} --home {home} --bech {acc_type} \
             --keyring-backend test --output json"""
     return exec_command(command)

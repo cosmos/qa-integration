@@ -7,6 +7,7 @@ set -e
 
 # get absolute parent directory path of current file
 CURPATH=`dirname $(realpath "$0")`
+echo $CURPATH
 cd $CURPATH
 
 # check environment variables are set
@@ -19,11 +20,25 @@ then
     NUM_VALS=2
 fi
 
+if [ -z $UPGRADE_WAITING_TIME ]
+then
+    UPGRADE_WAITING_TIME="10s"
+fi
+
+cd $CURPATH
+
+# testing all txs and queries
+bash ./all_modules.sh
+
+echo "INFO: Building binary with upgrade version: $UPGRADE_VERSION"
 cd $HOME
 export REPO=$(basename $GH_URL .git)
-rm -rf $REPO
-git clone $GH_URL && cd $REPO
-git fetch && git checkout $UPGRADE_VERSION
+if [ ! -d $REPO ]
+then
+    git clone $GH_URL
+fi
+cd $REPO
+git fetch --all && git checkout $UPGRADE_VERSION
 make build
 for (( a=1; a<=$NUM_VALS; a++ ))
 do
@@ -31,3 +46,45 @@ do
     mkdir -p "$DAEMON_HOME-$a"/cosmovisor/upgrades/$UPGRADE_NAME/bin
     cp ~/$REPO/build/$DAEMON "$DAEMON_HOME-$a"/cosmovisor/upgrades/$UPGRADE_NAME/bin/
 done
+
+CURRENT_BLOCK_HEIGHT=$($DAEMON status --node $RPC | jq '.SyncInfo.latest_block_height|tonumber')
+
+echo "INFO: Submitting software upgrade proposal for upgrade: $UPGRADE_NAME"
+$DAEMON tx gov submit-proposal software-upgrade $UPGRADE_NAME --title $UPGRADE_NAME \
+    --description upgrade --upgrade-height $((CURRENT_BLOCK_HEIGHT + 80)) --deposit 10000000$DENOM \
+    --from validator1 --yes --keyring-backend test --home $DAEMON_HOME-1 --node $RPC --chain-id $CHAINID
+
+sleep 4s
+
+PROPOSAL_ID=`$DAEMON q gov proposals --status voting_period -o json --node $RPC | \
+jq -c '.proposals | .[] | select(.content.title == '\"$UPGRADE_NAME\"') | .proposal_id | tonumber'`
+
+echo "INFO: Voting on created proposal"
+for (( a=1; a<=$NUM_VALS; a++ ))
+do
+    $DAEMON tx gov vote $PROPOSAL_ID yes --from validator$a --yes --keyring-backend test \
+    --home $DAEMON_HOME-$a --node $RPC --chain-id $CHAINID
+done
+
+echo "INFO: Waiting for proposal to pass and upgrade"
+sleep 60s
+
+echo "INFO: Waiting for upgrade setup"
+sleep $UPGRADE_WAITING_TIME
+
+count=0
+while [[ count -le 5 ]]; do
+    CURRENT_VERSION=$(curl -s "$RPC/abci_query?path=%22/app/version%22" | jq -r '.result.response.value' | base64 -d && echo)
+    if [ "v$CURRENT_VERSION" = "$UPGRADE_VERSION" ]; then
+        break
+    fi
+    count=$((count+1))
+    sleep 20s
+done
+
+if [[ $count -eq 6 ]]; then
+    echo "ERROR: Upgrade failed with binary issues"
+    exit 1
+fi
+
+echo "INFO: Upgrade done successfully"
