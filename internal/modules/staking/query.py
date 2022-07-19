@@ -68,7 +68,7 @@ def query_unbonding_delegation(delegator_addr, validator_addr):
     return exec_command(command)
 
 
-# `query_unbonding_delegations` queries unbonding delegations for an individual delegator.
+# `query_unbonding_delegations` queries unbonding delegations of a delegator.
 def query_unbonding_delegations(delegator_addr):
     command = f"{DAEMON} q staking unbonding-delegations {delegator_addr} --node {RPC} --chain-id {CHAINID} --output json --count-total"
     return exec_command(command)
