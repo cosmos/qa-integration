@@ -69,19 +69,3 @@ def tx_set_withdraw_addr(from_key,withdraw_addr,gas={DEFAULT_GAS},unsigned = Fal
         else:
             command = f"{DAEMON} tx distribution set-withdraw-addr {withdraw_addr} --from {from_key} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y"
     return exec_command(command)
-
-# tx_delegate takes from_key, validator address and amount as paramaters and
-# internally executes the 'delegate tx' command and return the response in json format.
-def tx_delegate(
-    from_key, validator_addr, amount, gas=DEFAULT_GAS, unsigned=False, sequence=None
-):
-    if unsigned:
-        command = f"{DAEMON} tx staking delegate {validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --output json --node {RPC} --gas {gas} --generate-only"
-        return exec_command(command)
-    else:
-        if sequence is not None:
-            command = f"{DAEMON} tx staking delegate {validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --output json --node {RPC} --gas {gas} --keyring-backend test --home {DAEMON_HOME}-1 -y --sequence {sequence}"
-
-        else:
-            command = f"{DAEMON} tx staking delegate {validator_addr} {amount}{DENOM} --from {from_key} --chain-id {CHAINID} --output json --node {RPC} --gas {gas} --keyring-backend test --home {DAEMON_HOME}-1 -y"
-        return exec_command(command)
