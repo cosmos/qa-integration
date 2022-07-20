@@ -1,4 +1,4 @@
-import logging,time,json,unittest
+import logging, time, json, unittest
 from modules.mint.query import *
 from internal.utils import env
 
@@ -8,28 +8,33 @@ logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
 logging.info("INFO :: Running mint module test scripts")
 
-class TestMintModuleQueries(unittest.TestCase):
 
+class TestMintModuleQueries(unittest.TestCase):
     def test_params_query(self):
         # query params
         path = f"{HOME}/.simd-1/config/"
-        with open(path+'genesis.json') as file:
+        with open(path + "genesis.json") as file:
             data = json.load(file)
 
         query_param = query_params()[1]
 
-        assert (data["app_state"]["mint"]["params"] == query_param), f"missmatch in params"
+        assert (
+            data["app_state"]["mint"]["params"] == query_param
+        ), "missmatch in params"
         time.sleep(3)
 
     def test_inflation_query(self):
-        status,inflation = query_inflation()
-        assert status, f"Querying minting inflation was failed"
+        status, inflation = query_inflation()
+        self.assertTrue(status)
+        self.assertGreaterEqual(inflation, 0, "Querying minting inflation was failed")
         time.sleep(3)
 
     def test_annual_provision_query(self):
-        status,provision = query_annual_provision()
-        assert status, f"Querying minting annual provision was failed"
+        status, provision = query_annual_provision()
+        self.assertTrue(status)
+        self.assertIsNotNone(provision, "Querying minting annual provision was failed")
         time.sleep(3)
 
-if __name__ == '__main__':
-    unittest.main() 
+
+if __name__ == "__main__":
+    unittest.main()
