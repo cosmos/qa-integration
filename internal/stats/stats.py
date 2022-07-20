@@ -44,7 +44,7 @@ def record_stat(test_type, cmd_type, output, err):
         insert_stat(stat)
         return
 
-    out = json.loads(output)
+    out = output
     if isinstance(out, dict) and "code" in out:
         if out["code"] != 0:
             logging.error("ERROR: %s", out)

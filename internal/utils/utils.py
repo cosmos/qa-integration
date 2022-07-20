@@ -64,15 +64,17 @@ def exec_command(command):
             command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE
         ).communicate()
         out, error = stdout.strip().decode(), stderr.strip().decode()
-        if test_type and cmd_type:
-            record_stat(test_type, cmd_type, out, error)
         if len(error) != 0:
             return False, error
-        json_out = json.loads(out)
-        if cmd_type == TX_TYPE and "code" in json_out and json_out["code"] != 0:
-            return False, json_out
-        return True, json_out
+        if out[0] == "{" or out[0] == "[":
+            out = json.loads(out)
+        if test_type and cmd_type:
+            record_stat(test_type, cmd_type, out, error)
+        if cmd_type == TX_TYPE and "code" in out and out["code"] != 0:
+            return False, out
+        return True, out
     except Exception as error:  # pylint: disable=W0703
+
         if test_type and cmd_type:
             record_stat(test_type, cmd_type, "", error)
         return False, error

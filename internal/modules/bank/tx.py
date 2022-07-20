@@ -14,7 +14,9 @@ RPC = env.RPC
 DEFAULT_GAS = 2000000
 
 
-def create_unsigned_txs(from_address, to_address, amount, file_name):
+def create_unsigned_txs(
+    from_address: str, to_address: str, amount: str, file_name: str
+):
     """
     The function 'create_unsigned_txs' takes sender(from_address), receiver(to_address), amount
     and file_name as parameters and call the function tx_send internally and stores the json to

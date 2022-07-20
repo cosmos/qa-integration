@@ -32,8 +32,8 @@ def tx_sign(
 --chain-id {CHAINID} --keyring-backend test \
 --home {DAEMON_HOME}-1 --node {RPC} --signature-only=false \
 --sequence {sequence} --gas {gas} --output json"""
-
-    command = f"""{DAEMON} tx sign {HOME}/{unsigned_file_name} --from {from_address} \
+    else:
+        command = f"""{DAEMON} tx sign {HOME}/{unsigned_file_name} --from {from_address} \
 --chain-id {CHAINID} --keyring-backend test \
 --home {DAEMON_HOME}-1 --node {RPC} --signature-only=false \
 --gas {gas} --output json"""
