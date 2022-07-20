@@ -8,9 +8,11 @@ import json
 from core.keys import keys_show
 from internal.core.tx import tx_sign
 from internal.modules.auth.tx import tx_decode, tx_encode
-from internal.modules.bank.tx import create_unsigned_txs, tx_send
+from internal.modules.bank.tx import create_unsigned_txs
 from modules.auth.query import (
     query_account,
+    query_accounts,
+    query_params,
 )
 
 HOME = os.getenv("HOME")
@@ -41,6 +43,22 @@ class TestAuthModuleTxsQueries(unittest.TestCase):
         """
         status, _ = query_account("cosmos1xpcfd7pxfmv6gd50y9mwjq50kwqpqrh5mmw72h")
         self.assertFalse(status)
+
+    def test_query_accounts(self):
+        """
+        The function `test_query_accounts` will query accounts
+        and test balance
+        """
+        status, _ = query_accounts()
+        self.assertTrue(status)
+
+    def test_query_params(self):
+        """
+        The function `test_query_params` will query params
+        and test gas
+        """
+        status, _ = query_params()
+        self.assertTrue(status)
 
     def test_tx_encode(self):
         """

@@ -1,7 +1,6 @@
 """
 This module has functions to store stats in mongodb
 """
-import json
 import logging
 import utils
 from internal.db import db
