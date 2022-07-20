@@ -22,17 +22,20 @@ temp_file = f"{temp.name}.json"
 
 
 class TestAuthzModuleTxsQueries(unittest.TestCase):
-    def test_authz_grant(self):
+    @classmethod
+    def setUpClass(cls):
         # grant tx
         status, grant = tx_grant_authz(granter, grantee)
-        self.assertTrue(status)
+        assert status, "error in authz grant tx!!!"
         time.sleep(3)
 
+    def test_authz_grant(self):
         status, grants = query_authz_grants(granter, grantee)
         self.assertTrue(status)
         spend_limit = grants["grants"][0]["authorization"]["spend_limit"][0]["amount"]
         self.assertIsNotNone(spend_limit)
 
+    def test_query_authz_grants(self):
         # test grants granted to a grantee
         status, grantee_grants = query_authz_grantee_grants(grantee)
         self.assertTrue(status)
