@@ -6,14 +6,14 @@ import os
 import json
 
 from core.keys import keys_show
-from internal.core.tx import tx_sign
-from internal.modules.auth.tx import tx_decode, tx_encode
-from internal.modules.bank.tx import create_unsigned_txs
 from modules.auth.query import (
     query_account,
     query_accounts,
     query_params,
 )
+from internal.core.tx import tx_sign
+from internal.modules.auth.tx import tx_decode, tx_encode
+from internal.modules.bank.tx import create_unsigned_txs
 
 HOME = os.getenv("HOME")
 DEFAULT_GAS = 2000000

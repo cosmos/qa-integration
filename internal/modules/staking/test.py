@@ -6,7 +6,6 @@ import logging
 import tempfile
 import unittest
 from core.keys import keys_show
-from internal.utils import exec_command, env
 from modules.staking.tx import (
     tx_delegate,
     tx_redelegate,
@@ -18,6 +17,7 @@ from modules.staking.query import (
     query_unbonding_delegation,
     query_validator,
 )
+from internal.utils import exec_command, env
 
 HOME = env.HOME
 DAEMON = env.DAEMON
@@ -108,7 +108,7 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         """
         test_create_validator
         """
-        temp_dir = tempfile.TemporaryDirectory()
+        temp_dir = tempfile.TemporaryDirectory()  # pylint: disable=R1732
         temp_dir_name = temp_dir.name
         TEMP_VAL = "validator-10000"
 
