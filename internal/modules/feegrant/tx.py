@@ -19,9 +19,9 @@ def tx_grant(
     return exec_command(command)
 
 
-# `set_periodic_expiration_grant` takes granter_key and grantee address as paramaters and executes grant tx
+# `set_periodic_grant` takes granter_key and grantee address as paramaters and executes grant tx
 # internally and returns the json response.
-def set_periodic_expiration_grant(
+def set_periodic_grant(
     granter_key,
     grantee,
     gas=DEFAULT_GAS,

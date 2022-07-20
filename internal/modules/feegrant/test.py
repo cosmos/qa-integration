@@ -21,11 +21,19 @@ fees = 2
 
 
 class TestFeegrantModuleTxsQueries(unittest.TestCase):
-    def test_grant_tx(self):
+    @classmethod
+    def setUpClass(cls):
         # grant tx
         status, response = tx_grant("account1", grantee)
-        self.assertTrue(status)
+        assert status
         time.sleep(3)
+
+        # set periodic grant by passing granter key and grantee address
+        status, response = set_periodic_grant("account1", grantee)
+        assert status
+        time.sleep(3)
+
+    def test_grant_tx(self):
 
         # query old balances of granter, grantee and reciver
         status, granter_bal_old = query_balances(granter)
@@ -63,22 +71,13 @@ class TestFeegrantModuleTxsQueries(unittest.TestCase):
         self.assertEqual((grantee_bal_old - amount), grantee_bal_updated)
         self.assertEqual((receiver_bal_old + amount), receiver_bal_updated)
 
-        # revoke tx
-        status, response = tx_revoke_feegrant("account1", grantee)
-        self.assertTrue(status)
-        time.sleep(3)
-
     def test_periodic_grant(self):
-        # set periodic grant by passing granter key and grantee address
-        status, response = set_periodic_expiration_grant("account1", grantee)
-        self.assertTrue(status)
-        time.sleep(3)
 
         # query grants to check if the periodic time is set or not
         status, periodic_grant = query_feegrant_grant(granter, grantee)
         self.assertTrue(status)
         spend_limit_before = int(
-            periodic_grant["allowance"]["basic"]["spend_limit"][0]["amount"]
+            periodic_grant["allowance"]["spend_limit"][0]["amount"]
         )
 
         # send tx
@@ -91,10 +90,10 @@ class TestFeegrantModuleTxsQueries(unittest.TestCase):
         status, periodic_grant = query_feegrant_grant(granter, grantee)
         self.assertTrue(status)
 
-        spend_limit_after = int(
-            periodic_grant["allowance"]["basic"]["spend_limit"][0]["amount"]
-        )
+        spend_limit_after = int(periodic_grant["allowance"]["spend_limit"][0]["amount"])
         self.assertEqual((spend_limit_before - fees), spend_limit_after)
+
+    def test_query_feegrants(self):
 
         # test grants of grantee
         status, grantee_grants = query_greantee_grants(grantee)
@@ -104,11 +103,16 @@ class TestFeegrantModuleTxsQueries(unittest.TestCase):
         granter_addr = grantee_grants["allowances"][0]["granter"]
         self.assertEqual(granter_addr, granter)
 
+    def test_revoke_feegrant_tx(self):
         # revoke tx
         status, response = tx_revoke_feegrant("account1", grantee)
         self.assertTrue(status)
-
         time.sleep(3)
+
+        status, grantee_grants = query_greantee_grants(grantee)
+        self.assertTrue(status)
+        count = int(grantee_grants["pagination"]["total"])
+        self.assertEqual(count, 0)
 
 
 if __name__ == "__main__":

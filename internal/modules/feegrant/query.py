@@ -10,7 +10,7 @@ def query_feegrant_grant(granter, grantee):
     return exec_command(command)
 
 
-# `query_greantee_grants` queries all grants of a grantee
+# `query_greantee_grants` queries all grants of a grantee.
 def query_greantee_grants(grantee):
     command = f"{DAEMON} q feegrant grants {grantee} --node {RPC} --chain-id {CHAINID} --output json --count-total"
     return exec_command(command)
