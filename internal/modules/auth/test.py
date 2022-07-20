@@ -60,9 +60,9 @@ class TestAuthModuleTxsQueries(unittest.TestCase):
         status, _ = query_params()
         self.assertTrue(status)
 
-    def test_tx_encode(self):
+    def test_tx_encode_and_decode(self):
         """
-        The function `test_tx_encode` will encode a transaction.
+        The function `test_tx_encode_and_decode` will encode and decode a transaction.
         """
         status, from_account = keys_show("account1", "acc")
         self.assertTrue(status)
