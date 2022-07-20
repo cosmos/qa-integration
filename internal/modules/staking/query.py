@@ -56,7 +56,7 @@ def query_delegator_redelegation(
 
 
 # `query_delegator_redelegations_from` queries delegations that are redelegating from a validator.
-def query_delegator_redelegations_from(src_validator_addr):
+def query_redelegations_from_val(src_validator_addr):
 
     command = f"{DAEMON} q staking redelegations-from {src_validator_addr} --node {RPC} --chain-id {CHAINID} --output json --count-total"
     return exec_command(command)
@@ -75,7 +75,7 @@ def query_unbonding_delegations(delegator_addr):
 
 
 # `query_unbonding_delegations_from` queries delegations that are unbonding from a validator.
-def query_unbonding_delegations_from(validator_addr):
+def query_unbondings_from_val(validator_addr):
     command = f"{DAEMON} q staking unbonding-delegations-from {validator_addr} --node {RPC} --chain-id {CHAINID} --output json --count-total"
     return exec_command(command)
 
