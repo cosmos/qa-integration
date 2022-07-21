@@ -1,4 +1,4 @@
-NUM_VALS = 2
+NUM_VALS = 3
 
 docker-build:
 	@bash ./scripts/build_binary.sh
@@ -25,18 +25,18 @@ lint: install-deps
 	PYTHONPATH=./internal pylint ./internal
 
 setup-chain: install-deps stop-chain
-	@bash ./scripts/chain/start_chain.sh $(NUM_VALS) 2
+	@bash ./scripts/chain/start_chain.sh 2
 	@echo "Waiting for chain to start..."
 	@sleep 7
 
 pause-chain:
-	@bash ./scripts/chain/pause_nodes.sh $(NUM_VALS)
+	@bash ./scripts/chain/pause_nodes.sh
 
 resume-chain:
-	@bash ./scripts/chain/resume_nodes.sh $(NUM_VALS)
+	@bash ./scripts/chain/resume_nodes.sh
 
 stop-chain:
-	@bash ./scripts/chain/shutdown_nodes.sh $(NUM_VALS)
+	@bash ./scripts/chain/shutdown_nodes.sh
 
 test-all:
 	# @bash ./scripts/chain/node_status.sh $(NUM_VALS)
@@ -74,15 +74,15 @@ test-multi-msg:
 
 test-query-load: start-docker-chain
 	@echo "Running query load test..."
-	TEST_TYPE=query-load bash ./scripts/tests/query_load.sh -n 50
+	TEST_TYPE=query-load bash ./scripts/tests/query_load.sh
 	$(MAKE) stop-docker-chain
 
 test-send-load: start-docker-chain
 	@echo "Running send msg load test..."
-	TEST_TYPE=send-load bash ./scripts/tests/send_load.sh -n 50
+	TEST_TYPE=send-load bash ./scripts/tests/send_load.sh
 	$(MAKE) stop-docker-chain
 
 test-single-msg: start-docker-chain
 	@echo "Running single msg load test..."
-	TEST_TYPE=single-msg-load bash ./scripts/tests/single_msg_load.sh -n 50
+	TEST_TYPE=single-msg-load bash ./scripts/tests/single_msg_load.sh
 	$(MAKE) stop-docker-chain

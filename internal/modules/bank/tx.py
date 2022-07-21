@@ -2,9 +2,8 @@
 The functions in this module calls Bank transaction subcommands.
 """
 import json
-import os
 from internal.core.tx import tx_broadcast, tx_sign
-from internal.utils import exec_command
+from internal.utils import exec_command, env
 
 DAEMON = os.getenv("DAEMON")
 DENOM = os.getenv("DENOM")
