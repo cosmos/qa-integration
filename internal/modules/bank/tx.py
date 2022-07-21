@@ -9,7 +9,7 @@ from internal.utils import exec_command
 DAEMON = os.getenv("DAEMON")
 DENOM = os.getenv("DENOM")
 CHAINID = os.getenv("CHAINID")
-HOME = os.getenv("HOME")
+NODE_HOME = os.getenv("NODE_HOME")
 DAEMON_HOME = os.getenv("DAEMON_HOME")
 RPC = os.getenv("RPC")
 DEFAULT_GAS = 2000000
@@ -36,7 +36,7 @@ def create_unsigned_txs(from_address, to_address, amount, file_name):
         )
         if not status:
             return status, unsigned_tx
-        with open(HOME + "/" + file_name, "w", encoding="utf8") as outfile:
+        with open(NODE_HOME+"/" + file_name, "w", encoding="utf8") as outfile:
             json.dump(unsigned_tx, outfile)
         return True, unsigned_tx
     except Exception as error:  # pylint: disable=broad-except
@@ -61,7 +61,7 @@ def sign_and_broadcast_txs(unsigned_file, signed_file, from_address, sequence):
         status, sign_tx = tx_sign(unsigned_file, from_address, sequence, DEFAULT_GAS)
         if not status:
             return status, sign_tx
-        with open(HOME + "/" + signed_file, "w", encoding="utf8") as outfile:
+        with open(NODE_HOME+"/" + signed_file, "w", encoding="utf8") as outfile:
             json.dump(sign_tx, outfile)
 
         status, broadcast_response = tx_broadcast(signed_file, DEFAULT_GAS, "block")
@@ -102,11 +102,11 @@ def tx_send(  # pylint: disable=C0330, R0913
     else:
         if sequence is not None:
             command = f"""{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} \
-                --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} \
+                --chain-id {CHAINID} --keyring-backend test --home /app --node {RPC} \
                     --output json -y --sequence {sequence} --gas {gas}"""
 
         else:
             command = f"""{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} \
-                --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} \
+                --chain-id {CHAINID} --keyring-backend test --home /app --node {RPC} \
                     --output json -y --gas {gas}"""
     return exec_command(command)

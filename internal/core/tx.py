@@ -26,9 +26,9 @@ def tx_sign(unsigned_file_name, from_address, sequence, gas="auto"):
     Returns:
         _tuple_: (boolean, json|str)
     """
-    command = f"""{DAEMON} tx sign {HOME}/{unsigned_file_name} --from {from_address} \
+    command = f"""{DAEMON} tx sign /app/{unsigned_file_name} --from {from_address} \
 --chain-id {CHAINID} --keyring-backend test \
---home {DAEMON_HOME}-1 --node {RPC} --signature-only=false \
+--home /app --node {RPC} --signature-only=false \
 --sequence {sequence} --gas {gas} --output json"""
     return exec_command(command)
 
@@ -52,6 +52,6 @@ def tx_broadcast(signed_file, gas, broadcast_mode="sync"):
 
     if broadcast_mode == "block":
         logging.info("Waiting for transaction for being broadcasted")
-    command = f"""{DAEMON} tx broadcast {HOME}/{signed_file} --output json \
+    command = f"""{DAEMON} tx broadcast /app/{signed_file} --output json \
 --chain-id {CHAINID} --gas {gas} --node {RPC} --broadcast-mode {broadcast_mode}"""
     return exec_command(command)

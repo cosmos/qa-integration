@@ -15,6 +15,7 @@ logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
 DAEMON = os.getenv("DAEMON")
 HOME = os.getenv("HOME")
+NODE_HOME = os.getenv("NODE_HOME")
 
 
 def print_balance_deductions(wallet, diff):
@@ -59,10 +60,15 @@ def exec_command(command):
         elif len(sub_commands) > 1 and (sub_commands[1] == "tx"):
             cmd_type = TX_TYPE
 
+       
+        container_name = os.getenv("CONTAINER_NAME")
+        a = "docker exec -it {} sh -c \"{}\"".format(container_name,command)
         stdout, stderr = subprocess.Popen(  # pylint: disable=R1732
-            command.split(), stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            a,  shell=True, 
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE
         ).communicate()
         out, error = stdout.strip().decode(), stderr.strip().decode()
+
         if test_type and cmd_type:
             record_stat(test_type, cmd_type, out, error)
         if len(error) != 0:
@@ -111,13 +117,13 @@ def create_multi_messages(num_msgs, file_name):
         file_name (_str_): file path to modify messages.
     """
     messages = []
-    with open(HOME + "/" + file_name, "r+", encoding="utf8") as file:
+    with open(NODE_HOME+"/" + file_name, "r+", encoding="utf8") as file:
         file_data = json.load(file)
         messages.append(file_data["body"]["messages"][-1])
     for _i in range(num_msgs):
         messages.append(messages[-1])
 
-    with open(HOME + "/" + file_name, "r+", encoding="utf8") as file:
+    with open(NODE_HOME+"/" + file_name, "r+", encoding="utf8") as file:
         file_data = json.load(file)
         file_data["body"]["messages"] = messages
         file.seek(0)

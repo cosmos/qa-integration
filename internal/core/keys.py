@@ -19,6 +19,5 @@ def keys_show(account, acc_type="acc"):
     Returns:
         _type_: _description_
     """
-    command = f"""{DAEMON} keys show {account} --home {DAEMON_HOME}-1 --bech {acc_type} \
-            --keyring-backend test --output json"""
+    command = f"""{DAEMON} keys show {account} --home /app --bech {acc_type} --keyring-backend test --output json"""
     return exec_command(command)

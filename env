@@ -8,6 +8,6 @@ CHAIN_VERSION='v0.45.4'
 UPGRADE_NAME=test
 UPGRADE_VERSION='v0.46.0'
 NUM_MSGS=30
-RPC="http://localhost:16657"
+RPC="http://localhost:26657"
 MONGO_URL="mongodb://localhost:27017/"
 DB_NAME=qa_test

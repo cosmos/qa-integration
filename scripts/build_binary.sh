@@ -4,13 +4,14 @@ GOV_DEFAULT_PERIOD="60s"
 DOWNTIME_JAIL_DURATION="60s"
 UNBONDING_PERIOD="60s"
 EVIDENCE_AGE="60000000000"
+NUM_ACCOUNTS=2
 
 set -e
 source ./env 
 
 REPO=$DAEMON-$CHAIN_VERSION
 
-echo "[INFO]>> Clone the repo $GH_URL into $REPO"
+echo "INFO: Clone the repo $GH_URL into $REPO"
 if [ ! -d $REPO ]
 then
     git clone -b $CHAIN_VERSION --single-branch $GH_URL $REPO
@@ -38,24 +39,22 @@ RUN make build
 FROM alpine:edge
 
 # Install deps 
-RUN apk add --update ca-certificates python3 jq bash pylint python3-pip
+RUN apk add --update ca-certificates python3 jq bash 
 WORKDIR /root
-
-EXPOSE 26656 26657 1317 9090
 
 COPY --from=build-env /project/build/$DAEMON /usr/bin/$DAEMON
 COPY --from=build-env /go/bin/cosmovisor /usr/bin/cosmovisor
 
 cmd [\"$DAEMON\",\"start\",\"--home\",\"/app\"]" > ${DAEMON}_Dockerfile
 
-echo "[INFO]>> Build the docker images with ${DAEMON}_Dockerfile and version ${CHAIN_VERSION}"
+echo "INFO: Build the docker images with ${DAEMON}_Dockerfile and version ${CHAIN_VERSION}"
 
 IMAGE=qa$DAEMON$CHAIN_VERSION
 if test ! -z "$(docker images -q $IMAGE:latest)"
 then 
-    echo "[INFO]>> docker image $IMAGE is already exists"
+    echo "INFO: docker image $IMAGE is already exists"
 else
-    docker build -t $IMAGE -f ./${DAEMON}_Dockerfile./$REPO
+    docker build -t $IMAGE -f ./${DAEMON}_Dockerfile ./$REPO
 fi
 
 # check version
@@ -90,9 +89,20 @@ do
     docker run -it -v $PWD/localnet/$IMAGE-$a:/node$a --rm $IMAGE sh -c "$DAEMON keys add validator${a} --keyring-backend test --home /node${a}" > /dev/null 
 done
 
+# create accounts if second argument is passed
+if [ -z $NUM_ACCOUNTS ] || [ "$NUM_ACCOUNTS" -eq 0 ]
+then
+    echo "INFO: Second argument was empty, not setting up additional account"
+else
+    echo "INFO: Creating $NUM_ACCOUNTS additional accounts"
+    for (( a=1; a<=$NUM_ACCOUNTS; a++ ))
+    do
+        docker run -it -v $PWD/localnet/$IMAGE-1:/node1 --rm $IMAGE sh -c "$DAEMON keys add account${a} --keyring-backend test --home /node1" > /dev/null 
+    done
+fi
 
-echo "[INFO]>> Setting up genesis"
-echo "[INFO]>> Adding validator accounts to genesis"
+echo "INFO: Setting up genesis"
+echo "INFO: Adding validator accounts to genesis"
 for (( a=1; a<=$NUM_VALS; a++ ))
 do
     if [ $a == 1 ]
@@ -107,32 +117,43 @@ do
     docker run -it -e VALADDR="validator$a" -e DENOM="$DENOM" -e DAEMON="$DAEMON" -v $PWD/localnet/$IMAGE-1:/node1 -v $PWD/localnet/$IMAGE-$a:/node2 --rm $IMAGE sh -c "/node1/run.sh"
 done
 
+echo "INFO: Adding additional accounts to genesis"
+if [ -z $NUM_ACCOUNTS ]
+then
+    echo "INFO: Second argument was empty, not setting up additional account"
+else
+    for (( a=1; a<=$NUM_ACCOUNTS; a++ ))
+    do
+        docker run -it -v $PWD/localnet/$IMAGE-1:/node1 --rm $IMAGE sh -c "$DAEMON add-genesis-account account$a 1000000000000$DENOM --keyring-backend test --home /node1"
+    done
+fi
 
-echo "[INFO]>> Generating gentxs for validator accounts"
+
+echo "INFO: Generating gentxs for validator accounts"
 for (( a=1; a<=$NUM_VALS; a++ ))
 do
     docker run -it -v $PWD/localnet/$IMAGE-$a:/node$a --rm $IMAGE sh -c "$DAEMON gentx validator$a 90000000000$DENOM --chain-id $CHAINID --keyring-backend test --home /node${a}"
 done
 
-echo "[INFO]>> Copying all gentxs to $PWD/localnet/$IMAGE-1"
+echo "INFO: Copying all gentxs to $PWD/localnet/$IMAGE-1"
 for (( a=2; a<=$NUM_VALS; a++ ))
 do
     cp $PWD/localnet/$IMAGE-$a/config/gentx/*.json $PWD/localnet/$IMAGE-1/config/gentx/
 done
 
-echo "[INFO]>> Collecting gentxs into $PWD/localnet/$IMAGE-1"
-docker run -it -v $PWD/localnet/$IMAGE-1:/node1 --rm $IMAGE sh -c "$DAEMON collect-gentxs --home /node1"
+echo "INFO: Collecting gentxs into $PWD/localnet/$IMAGE-1"
+docker run -it -v $PWD/localnet/$IMAGE-1:/node1 --rm $IMAGE sh -c "$DAEMON collect-gentxs --home /node1"  > /dev/null 
 
 DAEMON_HOME=$PWD/localnet/$IMAGE
 
-echo "[INFO]>> Updating genesis values"
+echo "INFO: Updating genesis values"
 sed -i "s/172800000000000/${EVIDENCE_AGE}/g" $DAEMON_HOME-1/config/genesis.json
 sed -i "s/172800s/${GOV_DEFAULT_PERIOD}/g" $DAEMON_HOME-1/config/genesis.json
 sed -i "s/stake/$DENOM/g" $DAEMON_HOME-1/config/genesis.json
 sed -i 's/"downtime_jail_duration": "600s"/"downtime_jail_duration": "'${DOWNTIME_JAIL_DURATION}'"/' $DAEMON_HOME-1/config/genesis.json
 sed -i 's/"unbonding_time": "1814400s"/"unbonding_time": "'${UNBONDING_PERIOD}'"/' $DAEMON_HOME-1/config/genesis.json
 
-echo "[INFO]>> Distribute genesis.json of $IMAGE-1 to remaining nodes"
+echo "INFO: Distribute genesis.json of $IMAGE-1 to remaining nodes"
 for (( a=2; a<=$NUM_VALS; a++ ))
 do
     cp -v $DAEMON_HOME-1/config/genesis.json $PWD/localnet/$IMAGE-$a/config/
@@ -141,10 +162,20 @@ done
 # updating config.toml
 for (( a=1; a<=$NUM_VALS; a++ ))
 do
+    DIFF=$(($a - 1))
+    INC=$(($DIFF * 4))
+    RPC=$((26657 + $INC)) #increment rpc ports
+    LADDR=$((16656 + $INC)) #increment laddr ports
+    GRPC=$((9092 + $INC)) #increment grpc poprt
+    WGRPC=$((9093 + $INC)) #increment web grpc port
     echo "INFO: Updating validator-$a chain config"
-    sed -i 's#tcp://127.0.0.1:26657#tcp://0.0.0.0:26657#g' $DAEMON_HOME-$a/config/config.toml
+    sed -i 's#tcp://127.0.0.1:26657#tcp://0.0.0.0:'${RPC}'#g' $DAEMON_HOME-$a/config/config.toml
+    sed -i 's#tcp://0.0.0.0:26656#tcp://0.0.0.0:'${LADDR}'#g' $DAEMON_HOME-$a/config/config.toml
     sed -i '/allow_duplicate_ip =/c\allow_duplicate_ip = true' $DAEMON_HOME-$a/config/config.toml
     sed -i '/pprof_laddr =/c\# pprof_laddr = "localhost:6060"' $DAEMON_HOME-$a/config/config.toml
+    sed -i 's#0.0.0.0:9090#0.0.0.0:'${GRPC}'#g' $DAEMON_HOME-$a/config/app.toml
+    sed -i 's#0.0.0.0:9091#0.0.0.0:'${WGRPC}'#g' $DAEMON_HOME-$a/config/app.toml
+    sed -i 's#enable = true#enable = false#g' $DAEMON_HOME-$a/config/app.toml
     sed -i '/max_num_inbound_peers =/c\max_num_inbound_peers = 140' $DAEMON_HOME-$a/config/config.toml
     sed -i '/max_num_outbound_peers =/c\max_num_outbound_peers = 110' $DAEMON_HOME-$a/config/config.toml
     sed -i '/skip_timeout_commit = false/c\skip_timeout_commit = true' $DAEMON_HOME-$a/config/config.toml
@@ -158,12 +189,15 @@ docker run -it -e DAEMON="$DAEMON" -e NUM_VALS=$NUM_VALS -e IMAGE="$IMAGE" -v $P
 
 ## Creating the docker-compose with yq 
 DEFAULT_DC_IP="192.168.10"
-RPCPORT=26656
-GRPCPORT=26657
-LCDPORT=1317
-PPROF=6060
 for (( a=1; a<=$NUM_VALS; a++ ))
 do
+    DIFF=$(($a - 1))
+    INC=$(($DIFF * 2))
+    RPC=$((26657 + $INC)) #increment rpc ports
+    LADDR=$((16656 + $INC)) #increment laddr ports
+    GRPC=$((9092 + $INC)) #increment grpc poprt
+    WGRPC=$((9093 + $INC)) #increment web grpc port
+    LCD=$((1317 + $INC)) #increment web grpc port
     ## Replace docker image 
     cp dc-template.yaml /tmp/$IMAGE-$a.yaml
     yq e -i ".services.node.container_name = \"${IMAGE}node${a}\"" /tmp/$IMAGE-$a.yaml
@@ -172,16 +206,14 @@ do
     yq e -i ".services.node.networks.localnet.ipv4_address = \"$DEFAULT_DC_IP.$IP_INCR\"" /tmp/$IMAGE-$a.yaml
     yq e -i ".services.node.volumes[0] = \"./localnet/${IMAGE}-${a}:/app:Z\"" /tmp/$IMAGE-$a.yaml
     ## PORTS 
-    yq e -i ".services.node.ports[0] = \"${RPCPORT}-${GRPCPORT}:26656-26657\"" /tmp/$IMAGE-$a.yaml
-    yq e -i ".services.node.ports[1] = \"${LCDPORT}:1317\"" /tmp/$IMAGE-$a.yaml
-    yq e -i ".services.node.ports[2] = \"${PPROF}:9090\"" /tmp/$IMAGE-$a.yaml
+    
+    yq e -i ".services.node.ports[0] = \"${LADDR}:${LADDR}\"" /tmp/$IMAGE-$a.yaml
+    yq e -i ".services.node.ports[1] = \"${LCD}:${LCD}\"" /tmp/$IMAGE-$a.yaml
+    yq e -i ".services.node.ports[2] = \"${GRPC}:${GRPC}\"" /tmp/$IMAGE-$a.yaml
+    yq e -i ".services.node.ports[3] = \"${WGRPC}:${WGRPC}\"" /tmp/$IMAGE-$a.yaml
+    yq e -i ".services.node.ports[4] = \"${RPC}:${RPC}\"" /tmp/$IMAGE-$a.yaml
 
-    yq "with(.services;with_entries(.key |= \"${IMAGE}node${a}\"))" -i /tmp/$IMAGE-$a.yaml
-   
-    RPCPORT=$(($RPCPORT + 2))
-    GRPCPORT=$(($GRPCPORT + 2))
-    LCDPORT=$(($LCDPORT + 2))
-    PPROF=$(($PPROF + 2))
+    yq "with(.services;with_entries(.key |= \"node${a}\"))" -i /tmp/$IMAGE-$a.yaml
 
 done
 
