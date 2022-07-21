@@ -74,12 +74,12 @@ def sign_and_broadcast_txs(unsigned_file, signed_file, from_address, sequence):
 
 
 def tx_send(  # pylint: disable=C0330, R0913
-    from_address,
-    to_address,
-    amount,
-    gas=DEFAULT_GAS,
-    unsigned=False,
-    sequence=None,
+    from_address: str,
+    to_address: str,
+    amount: int,
+    gas: int = DEFAULT_GAS,
+    unsigned: bool = False,
+    sequence: int = None,
 ):
     """
     The function tx_send internally calls the 'tx send' command

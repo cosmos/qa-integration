@@ -13,7 +13,7 @@ from modules.auth.query import (
 )
 from internal.core.tx import tx_sign
 from internal.modules.auth.tx import tx_decode, tx_encode
-from internal.modules.bank.tx import create_unsigned_txs
+from internal.modules.bank.tx import create_unsigned_txs, tx_send
 
 
 HOME = os.getenv("HOME")
@@ -31,11 +31,20 @@ class TestAuthModuleTxsQueries(unittest.TestCase):
         """
         The function `setUpClass` will be called before running any test case.
         """
-        status, _ = keys_add("multisigaccount", True)
+        status, multisigaccount = keys_add("multisigaccount", True)
         assert status, "Failed to add multisig account"
+        multi_key_address = multisigaccount["address"]
 
-        status, _ = keys_show("multisigaccount")
-        assert status, "Failed to show multisig account"
+        status, account1 = keys_show("account1")
+        assert status, "Failed to get account1 account details"
+        account1_address = account1["address"]
+
+        status, _ = tx_send(
+            from_address=account1_address,
+            to_address=multi_key_address,
+            amount="1000000",
+        )
+        assert status, "Failed to send coins to multisig account"
 
     def test_query_account(self):
         """
