@@ -10,19 +10,22 @@ command_exists () {
 
 CURPATH=`dirname $(realpath "$0")`
 cd $CURPATH
+source ../../env
 
-if command_exists go ; then
+if command_exists go && [ "$(go version | { read _ _ v _; echo ${v#go}; })" = "$goversion" ] ; then
   echo "Golang is already installed"
 else
   echo "Install dependencies"
   sudo apt update
-  sudo apt-get -y upgrade
   sudo apt install build-essential jq -y
-  source ../env
-  wget https://dl.google.com/go/go$goversion.linux-amd64.tar.gz
-  tar -xvf go$goversion.linux-amd64.tar.gz
-  sudo mv go /usr/local
-  rm go$goversion.linux-amd64.tar.gz
+  wget -q https://dl.google.com/go/go$goversion.linux-amd64.tar.gz
+  tar -xf go$goversion.linux-amd64.tar.gz
+  sudo cp -R go /usr/local
+  go_path=`which go`
+  if [ ! -z "$go_path" ]; then
+    sudo cp go/bin/go $go_path
+  fi
+  rm -rf go$goversion.linux-amd64.tar.gz go
 fi
 export GOPATH=$HOME/go
 echo "" >> ~/.bashrc

@@ -1,13 +1,13 @@
 """
 Querying functions for the bank module.
 """
-import os
 import sys
 
-from internal.utils import exec_command, print_balance_deductions
+from internal.utils import exec_command, print_balance_deductions, env
 
-DAEMON = os.getenv("DAEMON")
-RPC = os.getenv("RPC")
+DAEMON = env.DAEMON
+RPC = env.RPC
+DENOM = env.DENOM
 
 
 def query_balances(address):
@@ -49,3 +49,8 @@ def calculate_balance_deductions(
 
     print_balance_deductions("sender", sender_diff)
     print_balance_deductions("receiver", receiver_diff)
+
+
+def query_total_suuply():
+    command = f"{DAEMON} q bank total --denom={DENOM} --node {RPC} --output json"
+    return exec_command(command)

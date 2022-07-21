@@ -6,6 +6,7 @@ from modules.bank.tx import (
 )
 from modules.bank.query import (
     query_balances,
+    query_total_suuply,
 )
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
@@ -14,7 +15,7 @@ sender = keys_show("account1")[1]["address"]
 receiver = keys_show("account2")[1]["address"]
 
 # assign the arguments
-amount_to_be_sent = 5
+amount = 5
 
 if sender == receiver:
     logging.error(
@@ -35,7 +36,7 @@ class TestBankModuleTxsQueries(unittest.TestCase):
         receiver_balance_old = int(receiver_balance_old["balances"][0]["amount"])
 
         # send tx
-        status, send_tx = tx_send(sender, receiver, amount_to_be_sent)
+        status, send_tx = tx_send(sender, receiver, amount)
         self.assertTrue(status)
         time.sleep(3)
 
@@ -49,10 +50,17 @@ class TestBankModuleTxsQueries(unittest.TestCase):
         self.assertTrue(status)
         receiver_balance_new = int(receiver_balance_new["balances"][0]["amount"])
 
-        self.assertEqual((sender_balance_old - amount_to_be_sent), sender_balance_new)
+        self.assertEqual((sender_balance_old - amount), sender_balance_new)
         self.assertEqual(
-            (receiver_balance_old + amount_to_be_sent), receiver_balance_new
+            (receiver_balance_old + amount), receiver_balance_new
         )
+
+    def test_query_total_supply(self):
+        # test total supply
+        status, res = query_total_suuply()
+        self.assertTrue(status)
+        toatl_supply = res["amount"]
+        self.assertIsNotNone(toatl_supply)
 
 
 if __name__ == "__main__":

@@ -16,6 +16,7 @@ GH_URL=https://github.com/cosmos/cosmos-sdk
 CHAIN_VERSION='v0.45.4'
 UPGRADE_NAME=test
 UPGRADE_VERSION='v0.46.0'
+NUM_TXS=50
 NUM_MSGS=30
 RPC="http://localhost:16657"
 ```
