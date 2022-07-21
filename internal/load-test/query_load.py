@@ -10,7 +10,7 @@ from internal.core.keys import keys_show
 from internal.modules.bank.query import query_balances
 from internal.modules.staking.query import (
     query_delegator_delegation,
-    query_staking_validators,
+    query_validator_set,
 )
 from internal.stats.stats import print_stats, clear_data_by_type, QUERY_TYPE
 
@@ -42,7 +42,7 @@ for i in range(0, num_txs):
         balance = balance_query_response["balances"][0]
         logging.info("Balance :: %s", balance)
     # Fetch staking validators
-    status, validators_response = query_staking_validators()
+    status, validators_response = query_validator_set()
     if not status:
         logging.error(validators_response)
 
