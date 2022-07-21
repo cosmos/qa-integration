@@ -20,7 +20,8 @@ def keys_add(account: str, multisig=False, home: str = f"{DAEMON_HOME}-1"):
     command = f"""{DAEMON} keys add {account} --home {home} --keyring-backend test --output json"""
     if multisig:
         return exec_command(
-            command, extra_args="--multisig=account1,account2 --multisig-threshold 2"
+            command,
+            extra_args="--multisig=account1,account2,account3 --multisig-threshold 2",
         )
     return exec_command(command)
 

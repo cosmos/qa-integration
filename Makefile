@@ -7,7 +7,7 @@ lint: install-deps
 	PYTHONPATH=./internal pylint ./internal
 
 setup-chain: install-deps stop-chain
-	@bash ./scripts/chain/start_chain.sh 2
+	@bash ./scripts/chain/start_chain.sh 3
 	@echo "Waiting for chain to start..."
 	@sleep 7
 
