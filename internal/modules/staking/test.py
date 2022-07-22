@@ -1,8 +1,8 @@
-import os, sys, time, logging
-from core.keys import keys_show
-from internal.utils import exec_command, env
+import time
+import logging
 import tempfile
 import unittest
+from core.keys import keys_show
 from modules.staking.tx import (
     tx_delegate,
     tx_redelegate,
@@ -14,6 +14,7 @@ from modules.staking.query import (
     query_unbonding_delegation,
     query_validator,
 )
+from internal.utils import exec_command, env
 
 HOME = env.HOME
 DAEMON = env.DAEMON
@@ -34,7 +35,7 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
 
     # delegate tx
     def test_delegate_tx(self):
-        status, delegate_tx = tx_delegate("account1", val_addr, amount)
+        status, _ = tx_delegate("account1", val_addr, amount)
         self.assertTrue(status)
         time.sleep(3)
 
@@ -43,7 +44,7 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
             "balance"
         ]["amount"]
 
-        status, delegateTx = tx_delegate("account1", val_addr, amount)
+        status, _ = tx_delegate("account1", val_addr, amount)
         self.assertTrue(status)
         time.sleep(3)
 
@@ -56,7 +57,7 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
 
     # redelegation tx
     def test_redelegate_tx(self):
-        status, delegate_tx = tx_delegate("account1", dst_val_address, amount)
+        status, _ = tx_delegate("account1", dst_val_address, amount)
         self.assertTrue(status)
         time.sleep(3)
 
@@ -66,9 +67,7 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         ]["balance"]["amount"]
 
         # redelegation tx
-        status, redelegate_tx = tx_redelegate(
-            "account1", val_addr, dst_val_address, amount
-        )
+        status, _ = tx_redelegate("account1", val_addr, dst_val_address, amount)
         self.assertTrue(status)
         time.sleep(3)
 
@@ -80,7 +79,7 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
 
     # unbond tx
     def test_unbond_tx(self):
-        status, unbond_tx = tx_unbond("account1", val_addr, amount)
+        status, _ = tx_unbond("account1", val_addr, amount)
         self.assertTrue(status)
         time.sleep(3)
 
@@ -91,17 +90,15 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
 
     # create validator
     def test_create_validator(self):
-        temp_dir = tempfile.TemporaryDirectory()
+        temp_dir = tempfile.TemporaryDirectory()  # pylint: disable=R1732
         temp_dir_name = temp_dir.name
         TEMP_VAL = "validator-10000"
 
         command = f"{DAEMON} init testvalidator --home {temp_dir_name}"
-        tx, tx_err = exec_command(command)
-        assert len(tx_err), f"node init failed :: {tx_err}"
+        _, tx_err = exec_command(command)
+        assert len(tx_err) != 0, f"node init failed :: {tx_err}"
 
-        status, create_val_tx = tx_create_validator(
-            "account1", amount, TEMP_VAL, temp_dir_name
-        )
+        status, _ = tx_create_validator("account1", amount, TEMP_VAL, temp_dir_name)
         self.assertTrue(status)
         time.sleep(3)
 

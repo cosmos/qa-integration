@@ -39,30 +39,37 @@ def query_delegator_delegations(delegator, validator):
 
 
 # `query_delegator_redelegations` takes delegator address ad params and
-# internally calls the `staking redelegations` and returns response of an individual delegator in json format.
+# internally calls the `staking redelegations` and
+# returns response of an individual delegator in json format.
 def query_delegator_redelegations(delegator_addr):
-    command = f"{DAEMON} q staking redelegations {delegator_addr} --node {RPC} --chain-id {CHAINID} --output json"
+    command = f"""{DAEMON} q staking redelegations {delegator_addr} \
+--node {RPC} --chain-id {CHAINID} --output json"""
     return exec_command(command)
 
 
-# `query_delegator_redelegation` queries single redelegation record for an individual delegator between a source and destination validator.
+# `query_delegator_redelegation` queries single redelegation record
+# for an individual delegator between a source and destination validator.
 def query_delegator_redelegation(
     delegator_addr, src_validator_addr, dst_validator_addr
 ):
-
-    command = f"{DAEMON} q staking redelegation {delegator_addr} {src_validator_addr} {dst_validator_addr} --node {RPC} --chain-id {CHAINID} --output json"
+    command = f"""{DAEMON} q staking redelegation {delegator_addr} {src_validator_addr} \
+{dst_validator_addr} --node {RPC} --chain-id {CHAINID} --output json"""
     return exec_command(command)
 
 
-# `query_unbonding_delegation` queries unbonding delegations for an individual delegator on an individual validator.
+# `query_unbonding_delegation` queries unbonding delegations
+# for an individual delegator on an individual validator.
 def query_unbonding_delegation(delegator_addr, validator_addr):
-    command = f"{DAEMON} q staking unbonding-delegation {delegator_addr} {validator_addr} --node {RPC} --chain-id {CHAINID} --output json"
+    command = f"""{DAEMON} q staking unbonding-delegation {delegator_addr} \
+{validator_addr} --node {RPC} --chain-id {CHAINID} --output json"""
     return exec_command(command)
 
 
-# `query_validator` queries details about an individual validator and return response in json format.
+# `query_validator` queries details about an individual validator
+# and return response in json format.
 def query_validator(validator_addr):
-    command = f"{DAEMON} q staking validator {validator_addr} --node {RPC} --chain-id {CHAINID} --output json"
+    command = f"""{DAEMON} q staking validator {validator_addr} \
+--node {RPC} --chain-id {CHAINID} --output json"""
     return exec_command(command)
 
 
