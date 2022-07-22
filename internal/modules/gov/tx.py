@@ -16,15 +16,9 @@ def tx_submit_proposal(
     gas=DEFAULT_GAS,
     extra_args="",
 ):
-    try:
-        command = f"""{DAEMON} tx gov submit-proposal {proposal_type} {proposal_file_or_name} --chain-id {CHAINID} --keyring-backend test \
+    command = f"""{DAEMON} tx gov submit-proposal {proposal_type} {proposal_file_or_name} --chain-id {CHAINID} --keyring-backend test \
  --home {DAEMON_HOME}-1 --from {from_key} --node {RPC} --output json -y --gas {gas}"""
-        status, tx = exec_command(command, extra_args)
-        if status and tx["code"] != 0:
-            return False, tx
-        return status, tx
-    except Exception as e:
-        return False, e
+    return exec_command(command, extra_args)
 
 
 # tx_cancel_software_upgrade internally calls the cancel software upgrade tx command
@@ -34,15 +28,9 @@ def tx_cancel_software_upgrade(
     gas=DEFAULT_GAS,
     extra_args="",
 ):
-    try:
-        command = f"""{DAEMON} tx gov submit-proposal cancel-software-upgrade --chain-id {CHAINID} --keyring-backend test \
+    command = f"""{DAEMON} tx gov submit-proposal cancel-software-upgrade --chain-id {CHAINID} --keyring-backend test \
  --home {DAEMON_HOME}-1 --from {from_key} --node {RPC} --output json -y --gas {gas}"""
-        status, tx = exec_command(command, extra_args)
-        if status and tx["code"] != 0:
-            return False, tx
-        return status, tx
-    except Exception as e:
-        return False, e
+    return exec_command(command, extra_args)
 
 
 # tx_deposit internally calls the 'gov deposit' tx command and return the response in json format
@@ -53,15 +41,9 @@ def tx_deposit(
     gas=DEFAULT_GAS,
     extra_args="",
 ):
-    try:
-        command = f"""{DAEMON} tx gov deposit {proposal_id} {deposit} --chain-id {CHAINID} --keyring-backend test \
+    command = f"""{DAEMON} tx gov deposit {proposal_id} {deposit} --chain-id {CHAINID} --keyring-backend test \
  --home {DAEMON_HOME}-1 --from {from_key} --node {RPC} --output json -y --gas {gas}"""
-        status, tx = exec_command(command, extra_args)
-        if status and tx["code"] != 0:
-            return False, tx
-        return status, tx
-    except Exception as e:
-        return False, e
+    return exec_command(command, extra_args)
 
 
 # tx_vote internally calls the 'gov vote' tx command and return the response in json format
@@ -73,15 +55,9 @@ def tx_vote(
     home=f"{DAEMON_HOME}-1",
     extra_args="",
 ):
-    try:
-        command = f"""{DAEMON} tx gov vote {proposal_id} {option} --chain-id {CHAINID} --keyring-backend test \
+    command = f"""{DAEMON} tx gov vote {proposal_id} {option} --chain-id {CHAINID} --keyring-backend test \
  --home {home} --from {from_key} --node {RPC} --output json -y --gas {gas}"""
-        status, tx = exec_command(command, extra_args)
-        if status and tx["code"] != 0:
-            return False, tx
-        return status, tx
-    except Exception as e:
-        return False, e
+    return exec_command(command, extra_args)
 
 
 # tx_weighted_vote internally calls the 'gov weighted_vote' tx command and return the response in json format
@@ -93,12 +69,6 @@ def tx_weighted_vote(
     home=f"{DAEMON_HOME}-1",
     extra_args="",
 ):
-    try:
-        command = f"""{DAEMON} tx gov weighted-vote {proposal_id} {options} --chain-id {CHAINID} --keyring-backend test \
+    command = f"""{DAEMON} tx gov weighted-vote {proposal_id} {options} --chain-id {CHAINID} --keyring-backend test \
  --home {home} --from {from_key} --node {RPC} --output json -y --gas {gas}"""
-        status, tx = exec_command(command, extra_args)
-        if status and tx["code"] != 0:
-            return False, tx
-        return status, tx
-    except Exception as e:
-        return False, e
+    return exec_command(command, extra_args)
