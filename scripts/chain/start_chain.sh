@@ -5,9 +5,11 @@
 
 
 GOV_DEFAULT_PERIOD="60s"
-DOWNTIME_JAIL_DURATION="60s"
+DOWNTIME_JAIL_DURATION="10s"
 UNBONDING_PERIOD="60s"
 EVIDENCE_AGE="60000000000"
+SIGNED_BLOCKS_WINDOW="5"
+
 
 set -e
 
@@ -122,7 +124,12 @@ fi
 echo "INFO: Generating gentxs for validator accounts"
 for (( a=1; a<=$NUM_VALS; a++ ))
 do
-    $DAEMON gentx validator$a 90000000000$DENOM --chain-id $CHAINID  --keyring-backend test --home $DAEMON_HOME-$a
+    VALUE="90000000000$DENOM"
+    if [ $a == 1 ]
+    then
+        VALUE="100000000000$DENOM"
+    fi
+    $DAEMON gentx validator$a $VALUE --chain-id $CHAINID  --keyring-backend test --home $DAEMON_HOME-$a
 done
 echo "INFO: Copying all gentxs to $DAEMON_HOME-1"
 for (( a=2; a<=$NUM_VALS; a++ ))
@@ -135,6 +142,7 @@ echo "INFO: Updating genesis values"
 sed -i "s/172800000000000/${EVIDENCE_AGE}/g" $DAEMON_HOME-1/config/genesis.json
 sed -i "s/172800s/${GOV_DEFAULT_PERIOD}/g" $DAEMON_HOME-1/config/genesis.json
 sed -i "s/stake/$DENOM/g" $DAEMON_HOME-1/config/genesis.json
+sed -i 's/"signed_blocks_window": "100"/"signed_blocks_window": "'${SIGNED_BLOCKS_WINDOW}'"/' $DAEMON_HOME-1/config/genesis.json
 sed -i 's/"downtime_jail_duration": "600s"/"downtime_jail_duration": "'${DOWNTIME_JAIL_DURATION}'"/' $DAEMON_HOME-1/config/genesis.json
 sed -i 's/"unbonding_time": "1814400s"/"unbonding_time": "'${UNBONDING_PERIOD}'"/' $DAEMON_HOME-1/config/genesis.json
 echo "INFO: Distribute genesis.json of validator-1 to remaining nodes"
