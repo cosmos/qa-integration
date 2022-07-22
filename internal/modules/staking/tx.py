@@ -1,4 +1,4 @@
-import json, os
+import json
 from utils import exec_command, env
 from modules.staking.query import (
     fetch_validator_pubkey_from_node,
@@ -45,7 +45,7 @@ def tx_unbond(
     return exec_command(command)
 
 
-# tx_create_validator takes from key, amount moniker and noded ir as params and
+# tx_create_validator takes from key, amount moniker and noded id as params and
 # internally calls `create-validator` to create a new validator initialized with a self-delegation to it and returns json response.
 def tx_create_validator(
     from_key,
@@ -60,4 +60,14 @@ def tx_create_validator(
     public_key = json.dumps(public_key, separators=(",", ":"))
 
     command = f"{DAEMON} tx staking create-validator --amount {amount}{DENOM} --commission-max-change-rate 0.1 --commission-max-rate 0.2 --commission-rate 0.1 --from {from_key} --min-self-delegation 1 --moniker {moniker} --pubkey {public_key}  --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}"
+    return exec_command(command)
+
+
+# tx_edit_validator edit an existing validator account.
+def tx_edit_validator(
+    from_key,
+    moniker,
+    gas=DEFAULT_GAS,
+):
+    command = f"{DAEMON} tx staking edit-validator --moniker {moniker} --from {from_key} --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} --output json -y --gas {gas}"
     return exec_command(command)
