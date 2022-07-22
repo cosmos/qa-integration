@@ -9,6 +9,7 @@ DAEMON = env.DAEMON
 DAEMON_HOME = env.DAEMON_HOME
 HOME = env.HOME
 RPC = env.RPC
+DEFAULT_GAS = env.DEFAULT_GAS
 
 
 def tx_sign(
@@ -38,6 +39,22 @@ def tx_sign(
 --home {DAEMON_HOME}-1 --node {RPC} --signature-only=false \
 --gas {gas} --output json"""
 
+    return exec_command(command)
+
+
+def tx_multi_sign(
+    unsigned_file: str,
+    multisig_address: str,
+    signer: str,
+    home: str = f"{DAEMON_HOME}-1",
+    broadcast_mode: str = "sync",
+):
+    """
+    The function `tx_multi_sign` does the multisig transaction.
+    """
+    command = f"""{DAEMON} tx sign {HOME}/{unsigned_file} --multisig {multisig_address} \
+--from {signer} --keyring-backend test --home {home} --chain-id {CHAINID} \
+--broadcast-mode {broadcast_mode} --fees {DEFAULT_GAS}stake --node {RPC}"""
     return exec_command(command)
 
 

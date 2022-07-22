@@ -1,6 +1,7 @@
 """
 This module contains all auth test functions.
 """
+import logging
 import unittest
 import os
 import json
@@ -11,7 +12,7 @@ from modules.auth.query import (
     query_accounts,
     query_params,
 )
-from internal.core.tx import tx_sign
+from internal.core.tx import tx_multi_sign, tx_sign
 from internal.modules.auth.tx import tx_decode, tx_encode
 from internal.modules.bank.tx import create_unsigned_txs, tx_send
 
@@ -119,6 +120,67 @@ class TestAuthModuleTxsQueries(unittest.TestCase):
         self.assertTrue(status, decoded_json)
         self.assertEqual(str(signed_tx), str(decoded_json))
 
+    def test_tx_multisig_send(self):
+        """
+        test_tx_multisig_send
+        """
+        status, multisigaccount = keys_show("multisigaccount")
+        self.assertTrue(status, multisigaccount)
+        multisig_address = multisigaccount["address"]
+
+        status, account1 = keys_show("account1")
+        self.assertTrue(status, account1)
+        account1_address = account1["address"]
+
+        status, account2 = keys_show("account2")
+        self.assertTrue(status, account2)
+        account2_address = account2["address"]
+
+        status, account3 = keys_show("account3")
+        self.assertTrue(status, account3)
+        account3_address = account3["address"]
+
+        status, multisig_send_tx = tx_send(
+            from_address=multisig_address,
+            to_address=account1_address,
+            amount=5,
+            unsigned=True,
+        )
+        self.assertTrue(status, multisig_send_tx)
+        with open(f"{HOME}/unsigned_multisig_tx.json", "w") as outfile:
+            json.dump(multisig_send_tx, outfile)
+
+        status, acc1_signed_tx = tx_multi_sign(
+            "unsigned_multisig_tx.json",
+            multisig_address,
+            account1_address,
+            broadcast_mode="block",
+        )
+        self.assertTrue(status, acc1_signed_tx)
+        with open(f"{HOME}/acc1_signed_tx.json", "w") as outfile:
+            json.dump(acc1_signed_tx, outfile)
+
+        status, acc2_signed_tx = tx_multi_sign(
+            "unsigned_multisig_tx.json",
+            multisig_address,
+            account2_address,
+            broadcast_mode="block",
+        )
+        self.assertTrue(status, acc2_signed_tx)
+        with open(f"{HOME}/acc2_signed_tx.json", "w") as outfile:
+            json.dump(acc2_signed_tx, outfile)
+
+        status, acc3_signed_tx = tx_multi_sign(
+            "unsigned_multisig_tx.json",
+            multisig_address,
+            account3_address,
+            broadcast_mode="block",
+        )
+        self.assertTrue(status, acc3_signed_tx)
+        with open(f"{HOME}/acc3_signed_tx.json", "w") as outfile:
+            json.dump(acc3_signed_tx, outfile)
+
 
 if __name__ == "__main__":
+    logging.info("INFO: running auth module tests")
     unittest.main()
