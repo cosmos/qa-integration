@@ -97,3 +97,17 @@ def query_validator_set():
 def fetch_validator_pubkey_from_node(val_home_dir):
     command = f"{DAEMON} tendermint show-validator --home {val_home_dir}"
     return exec_command(command)
+
+
+# `query_staking_pool` queries values for amounts stored in the staking pool.
+def query_staking_pool():
+    command = f"{DAEMON} q staking pool --node {RPC} --chain-id {CHAINID} --output json"
+    return exec_command(command)
+
+
+# `query_staking_params` queries values set as staking parameters.
+def query_staking_params():
+    command = (
+        f"{DAEMON} q staking params --node {RPC} --chain-id {CHAINID} --output json"
+    )
+    return exec_command(command)

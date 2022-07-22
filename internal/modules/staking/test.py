@@ -208,6 +208,18 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         # clean tmp dir
         temp_dir.cleanup()
 
+    def test_staking_params(self):
+        status, staking_params = query_staking_params()
+        self.assertTrue(status)
+        bond_denom = staking_params["bond_denom"]
+        self.assertIsNotNone(bond_denom)
+
+    def test_staking_pool(self):
+        status, staking_pool = query_staking_pool()
+        self.assertTrue(status)
+        bonded_tokens = staking_pool["bonded_tokens"]
+        self.assertIsNotNone(bonded_tokens)
+
 
 if __name__ == "__main__":
     logging.info("INFO: running staking module tests")
