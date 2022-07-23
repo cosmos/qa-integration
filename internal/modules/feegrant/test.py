@@ -1,4 +1,4 @@
-import sys, time, logging
+import time, logging
 import unittest
 from utils import exec_command, env
 from core.keys import keys_show
@@ -13,13 +13,13 @@ from modules.bank.query import (
 )
 
 DAEMON_HOME = env.DAEMON_HOME
-DAEMON2_HOME = f"{DAEMON_HOME}-2"
+NODE2_HOME = env.get("NODE2_HOME")
 
 # get account addresses
 granter = keys_show("validator1")[1]["address"]
 grantee_1 = keys_show("account1")[1]["address"]
 grantee_2 = keys_show("account2")[1]["address"]
-receiver = keys_show("validator2", "acc", DAEMON2_HOME)[1]["address"]
+receiver = keys_show("validator2", "acc", NODE2_HOME)[1]["address"]
 
 amount = 5
 fees = 2
@@ -28,17 +28,16 @@ fees = 2
 class TestFeegrantModuleTxsQueries(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        # grant tx
-        status, response = tx_grant("validator1", grantee_1)
-        assert status
-        time.sleep(3)
-
         # set periodic grant by passing granter key and grantee address
         status, response = set_periodic_grant("validator1", grantee_2)
         assert status
         time.sleep(3)
 
-    def test_grant_tx(self):
+    def test_granter_as_fee_payer(self):
+        # grant tx
+        status, response = tx_grant("validator1", grantee_1)
+        assert status
+        time.sleep(3)
 
         # query old balances of granter, grantee and reciver
         status, granter_bal_old = query_balances(granter)
@@ -88,9 +87,8 @@ class TestFeegrantModuleTxsQueries(unittest.TestCase):
         self.assertEqual(count, 0)
 
     def test_periodic_grant(self):
-
         # query grants to check if the periodic time is set or not
-        status, periodic_grant = query_feegrant_grant(granter, grantee_2)
+        status, periodic_grant = query_grant(granter, grantee_2)
         self.assertTrue(status)
         spend_limit_before = int(
             periodic_grant["allowance"]["basic"]["spend_limit"][0]["amount"]
@@ -103,7 +101,7 @@ class TestFeegrantModuleTxsQueries(unittest.TestCase):
         time.sleep(3)
 
         # query grants to check if the spend limti has changed or not.
-        status, periodic_grant = query_feegrant_grant(granter, grantee_2)
+        status, periodic_grant = query_grant(granter, grantee_2)
         self.assertTrue(status)
 
         spend_limit_after = int(
@@ -112,7 +110,6 @@ class TestFeegrantModuleTxsQueries(unittest.TestCase):
         self.assertEqual((spend_limit_before - fees), spend_limit_after)
 
     def test_query_feegrants(self):
-
         # test grants of grantee
         status, grantee_grants = query_greantee_grants(grantee_2)
         self.assertTrue(status)

@@ -4,8 +4,8 @@ DAEMON = env.DAEMON
 RPC = env.RPC
 CHAINID = env.CHAINID
 
-# `query_feegrant_grant` queries details of a single grant.
-def query_feegrant_grant(granter, grantee):
+# `query_grant` queries details of a single grant.
+def query_grant(granter, grantee):
     command = f"{DAEMON} q feegrant grant {granter} {grantee} --node {RPC} --chain-id {CHAINID} --output json"
     return exec_command(command)
 
