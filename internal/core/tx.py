@@ -42,7 +42,7 @@ def tx_sign(
     return exec_command(command)
 
 
-def tx_multi_sign(
+def tx_partner_sign(
     unsigned_file: str,
     multisig_address: str,
     signer: str,
@@ -55,6 +55,26 @@ def tx_multi_sign(
     command = f"""{DAEMON} tx sign {HOME}/{unsigned_file} --multisig {multisig_address} \
 --from {signer} --keyring-backend test --home {home} --chain-id {CHAINID} \
 --broadcast-mode {broadcast_mode} --fees {DEFAULT_GAS}stake --node {RPC}"""
+    return exec_command(command)
+
+
+def tx_multi_sign(
+    unsigned_file: str,
+    multisig_account: str,
+    signatures: list,
+    home: str = f"{DAEMON_HOME}-1",
+):
+    """
+    tx_multi_sign
+    """
+    signs = ""
+    for signtaure in signatures:
+        signs += f"{HOME}/{signtaure} "
+
+    command = f"""simd tx multisign {HOME}/{unsigned_file} {multisig_account} \
+{signs} --home {home} --keyring-backend test --chain-id {CHAINID} \
+--fees {DEFAULT_GAS}stake --node {RPC}"""
+    print(f"command : {command}")
     return exec_command(command)
 
 

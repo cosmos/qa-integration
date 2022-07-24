@@ -12,7 +12,7 @@ from modules.auth.query import (
     query_accounts,
     query_params,
 )
-from internal.core.tx import tx_multi_sign, tx_sign
+from internal.core.tx import tx_multi_sign, tx_partner_sign, tx_sign
 from internal.modules.auth.tx import tx_decode, tx_encode
 from internal.modules.bank.tx import create_unsigned_txs, tx_send
 
@@ -90,10 +90,9 @@ class TestAuthModuleTxsQueries(unittest.TestCase):
         """
         status, from_account = keys_show("account1", "acc")
         self.assertTrue(status, from_account)
-
         from_address = from_account["address"]
-        status, account_resp = query_account(from_address)
 
+        status, account_resp = query_account(from_address)
         self.assertTrue(status, account_resp)
         from_address_sequence = account_resp["sequence"]
 
@@ -136,10 +135,6 @@ class TestAuthModuleTxsQueries(unittest.TestCase):
         self.assertTrue(status, account2)
         account2_address = account2["address"]
 
-        status, account3 = keys_show("account3")
-        self.assertTrue(status, account3)
-        account3_address = account3["address"]
-
         status, multisig_send_tx = tx_send(
             from_address=multisig_address,
             to_address=account1_address,
@@ -150,35 +145,33 @@ class TestAuthModuleTxsQueries(unittest.TestCase):
         with open(f"{HOME}/unsigned_multisig_tx.json", "w") as outfile:
             json.dump(multisig_send_tx, outfile)
 
-        status, acc1_signed_tx = tx_multi_sign(
+        status, acc1_signed_tx = tx_partner_sign(
             "unsigned_multisig_tx.json",
             multisig_address,
             account1_address,
             broadcast_mode="block",
         )
         self.assertTrue(status, acc1_signed_tx)
-        with open(f"{HOME}/acc1_signed_tx.json", "w") as outfile:
+        with open(f"{HOME}/acc1_signature.json", "w") as outfile:
             json.dump(acc1_signed_tx, outfile)
 
-        status, acc2_signed_tx = tx_multi_sign(
+        status, acc2_signed_tx = tx_partner_sign(
             "unsigned_multisig_tx.json",
             multisig_address,
             account2_address,
             broadcast_mode="block",
         )
         self.assertTrue(status, acc2_signed_tx)
-        with open(f"{HOME}/acc2_signed_tx.json", "w") as outfile:
+        with open(f"{HOME}/acc2_signature.json", "w") as outfile:
             json.dump(acc2_signed_tx, outfile)
 
-        status, acc3_signed_tx = tx_multi_sign(
-            "unsigned_multisig_tx.json",
-            multisig_address,
-            account3_address,
-            broadcast_mode="block",
+        signatures_list = ["acc1_signature.json", "acc2_signature.json"]
+        status, multisig_signed_tx = tx_multi_sign(
+            "unsigned_multisig_tx.json", "multisigaccount", signatures_list
         )
-        self.assertTrue(status, acc3_signed_tx)
-        with open(f"{HOME}/acc3_signed_tx.json", "w") as outfile:
-            json.dump(acc3_signed_tx, outfile)
+        self.assertTrue(status, multisig_signed_tx)
+        with open(f"{HOME}/multisigned_tx.json", "w") as outfile:
+            json.dump(multisig_signed_tx, outfile)
 
 
 if __name__ == "__main__":
