@@ -43,3 +43,8 @@ if [[ -z $NUM_TXS || $(( $NUM_TXS )) -le 0 ]]
 then
     export NUM_TXS=50
 fi
+
+# export the docker node envs 
+export IMAGE=${DAEMON}${CHAIN_VERSION}
+export NODE_HOME=${PWD}/localnet/qa${IMAGE}-1
+export CONTAINER_NAME="qa${IMAGE}node1"

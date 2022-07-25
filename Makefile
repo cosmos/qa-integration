@@ -1,13 +1,13 @@
-NUM_VALS = 3
+NUM_VALS=3
 
 docker-build:
 	@bash ./scripts/build_binary.sh
 
+init-testnet:
+	@bash ./scripts/init_chain.sh 
+
 start-docker-chain:
 	docker-compose up -d
-
-pause-docker-chain:
-	docker-compose pause
 
 stop-docker-chain:
 	docker-compose stop 
@@ -29,32 +29,17 @@ setup-chain: install-deps stop-chain
 	@echo "Waiting for chain to start..."
 	@sleep 7
 
-pause-chain:
-	@bash ./scripts/chain/pause_nodes.sh
-
-resume-chain:
-	@bash ./scripts/chain/resume_nodes.sh
-
-stop-chain:
-	@bash ./scripts/chain/shutdown_nodes.sh
-
-test-all:
-	# @bash ./scripts/chain/node_status.sh $(NUM_VALS)
-	# @bash ./scripts/chain/pause_nodes.sh $(NUM_VALS)
-	# @bash ./scripts/chain/resume_nodes.sh $(NUM_VALS)
-
-	# @echo "Waiting for chain to resume..."
-	# @sleep 7
-	# @export NODE_HOME=${PWD}/localnet/${IMAGE}-1
-	# @export CONTAINER_NAME=${IMAGE}node1
-	# @echo ${CONTAINER_NAME}
-	# @echo ${NODE_HOME}
-	# $(MAKE) start-docker-chain
-	# @sleep 5
-	TEST_TYPE=multi-msg-load bash ./scripts/tests/multi_msg_load.sh -n 50
-	TEST_TYPE=query-load bash ./scripts/tests/query_load.sh -n 50
-	TEST_TYPE=send-load bash ./scripts/tests/send_load.sh -n 50
-	TEST_TYPE=single-msg-load bash ./scripts/tests/single_msg_load.sh -n 50
+test-all: start-docker-chain
+	@sleep 5
+	@bash ./scripts/chain/node_status.sh $(NUM_VALS)
+	$(MAKE) stop-docker-chain
+	@echo "Waiting for chain to restart..."
+	$(MAKE) restart-docker-chain
+	@sleep 7
+	TEST_TYPE=multi-msg-load bash ./scripts/tests/multi_msg_load.sh
+	TEST_TYPE=query-load bash ./scripts/tests/query_load.sh
+	TEST_TYPE=send-load bash ./scripts/tests/send_load.sh
+	TEST_TYPE=single-msg-load bash ./scripts/tests/single_msg_load.sh
 	$(MAKE) stop-docker-chain
 
 test-all-modules: start-docker-chain
@@ -62,14 +47,9 @@ test-all-modules: start-docker-chain
 	TEST_TYPE=module bash ./scripts/tests/all_modules.sh
 	$(MAKE) stop-docker-chain
 
-test-multi-msg:
-
-test-multi-msg:
+test-multi-msg: start-docker-chain
 	@echo "Running multi msg load test..."
-	# @IMAGE=${DAEMON}${CHAIN_VERSION}
-	# export NODE_HOME=${PWD}/localnet/${IMAGE}-1
-	# export CONTAINER_NAME=qa${IMAGE}node1
-	TEST_TYPE=multi-msg-load bash ./scripts/tests/multi_msg_load.sh -n 50
+	TEST_TYPE=multi-msg-load bash ./scripts/tests/multi_msg_load.sh
 	$(MAKE) stop-docker-chain
 
 test-query-load: start-docker-chain

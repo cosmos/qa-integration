@@ -12,61 +12,44 @@ CURPATH=`dirname $(realpath "$0")`
 cd $CURPATH
 source ../../env
 
-if command_exists go && [ "$(go version | { read _ _ v _; echo ${v#go}; })" = "$goversion" ] ; then
-  echo "Golang is already installed"
+if command_exists docker ; then
+  echo "[+] docker is already installed"
 else
-  echo "Install dependencies"
-  sudo apt update
-  sudo apt install build-essential jq -y
-  wget -q https://dl.google.com/go/go$goversion.linux-amd64.tar.gz
-  tar -xf go$goversion.linux-amd64.tar.gz
-  sudo cp -R go /usr/local
-  go_path=`which go`
-  if [ ! -z "$go_path" ]; then
-    sudo cp go/bin/go $go_path
-  fi
-  rm -rf go$goversion.linux-amd64.tar.gz go
+  echo "[!] Please check https://docs.docker.com/desktop/install/linux-install/ , how to install docker"
+  exit 
 fi
-export GOPATH=$HOME/go
-echo "" >> ~/.bashrc
-echo 'export GOROOT=/usr/local/go' >> ~/.bashrc
-source ~/.bashrc
-mkdir -p $GOPATH/src/github.com
-go version
+
+if command_exists docker-compose ; then
+  echo "[+] docker-compose is already installed"
+else
+  echo "[!] Installing docker-compose  > Check (https://docs.docker.com/compose/install/compose-plugin/#install-the-plugin-manually)"
+  curl -SL https://github.com/docker/compose/releases/download/v2.7.0/docker-compose-linux-x86_64 -o /usr/local/bin/docker-compose
+  sudo chmod +x /usr/local/bin/docker-compose
+  sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
+fi
 
 if command_exists python3 ; then
-  echo "python3-dev is already installed"
+  echo "[+] python3-dev is already installed"
 else
-  echo "Installing python3-dev"
+  echo "[!] Installing python3-dev"
   sudo apt update
   sudo apt install python3-dev -y
 fi
 
 if command_exists pylint ; then
-  echo "pylint is already installed"
+  echo "[+] pylint is already installed"
 else
-  echo "Installing pylint"
+  echo "[!] Installing pylint"
   sudo apt update
   sudo apt install pylint -y
 fi
 
 if command_exists pip ; then
-  echo "pip is already installed"
+  echo "[+] pip is already installed"
 else
-  echo "Installing pip"
+  echo "[!] Installing pip"
   sudo apt update
   sudo apt install python3-pip -y
 fi
 
 pip install -r ../../internal/requirements.txt
-
-if command_exists mongod ; then
-  echo "mongo db is already installed"
-else
-  sudo apt-get install gnupg
-  wget -qO - https://www.mongodb.org/static/pgp/server-5.0.asc | sudo apt-key add -
-  echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/5.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-5.0.list
-  sudo apt-get update -y
-  sudo apt-get install mongodb-org -y
-fi
-sudo systemctl start mongod

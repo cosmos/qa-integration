@@ -3,6 +3,7 @@ This module contains all util functions.
 """
 import json
 import logging
+import os 
 import subprocess
 from shutil import which
 from utils import env
