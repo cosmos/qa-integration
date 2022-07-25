@@ -127,15 +127,12 @@ class TestDistributionModuleTxsQueries(unittest.TestCase):
         time.sleep(3)
 
     def test_params_query(self):
-        # query params
-        path = f"{HOME}/.simd-1/config/"
-        with open(path + "genesis.json") as file:
-            data = json.load(file)
-        query_param = query_params()[1]
-
-        assert (
-            data["app_state"]["distribution"]["params"] == query_param
-        ), "missmatch in params"
+        status,distribution_params = query_params()
+        self.assertTrue(status)
+        base_prposer_reward = distribution_params["base_proposer_reward"]
+        self.assertIsNotNone(base_prposer_reward)
+        community_tax = distribution_params["community_tax"]
+        self.assertIsNotNone(community_tax)
         time.sleep(5)
 
     def test_commission_rewards_tx(self):
