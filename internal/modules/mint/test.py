@@ -1,12 +1,7 @@
 import logging
 import time
-import json
 import unittest
-from modules.mint.query import(
-    query_annual_provision, 
-    query_inflation, 
-    query_params
-)
+from modules.mint.query import query_annual_provision, query_inflation, query_params
 from internal.utils import env
 
 HOME = env.HOME
@@ -18,14 +13,12 @@ logging.info("INFO :: Running mint module test scripts")
 
 class TestMintModuleQueries(unittest.TestCase):
     def test_params_query(self):
-        # query params
-        path = f"{HOME}/.simd-1/config/"
-        with open(path + "genesis.json",encoding="utf8") as file:
-            data = json.load(file)
-
-        query_param = query_params()[1]
-
-        assert data["app_state"]["mint"]["params"] == query_param, "missmatch in params"
+        status, mint_params = query_params()
+        self.assertTrue(status)
+        inflation_min = mint_params["inflation_min"]
+        self.assertIsNotNone(inflation_min)
+        goal_bonded = mint_params["goal_bonded"]
+        self.assertIsNotNone(goal_bonded)
         time.sleep(3)
 
     def test_inflation_query(self):
