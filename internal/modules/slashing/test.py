@@ -4,10 +4,7 @@ import json
 import unittest
 from utils import exec_command, env
 from core.keys import keys_show
-from modules.staking.query import(
-      query_validator, 
-      fetch_validator_pubkey_from_node
-)
+from modules.staking.query import query_validator, fetch_validator_pubkey_from_node
 from modules.slashing.query import *
 from modules.slashing.tx import (
     tx_unjail,
@@ -28,11 +25,6 @@ logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
 
 class TestStakingModuleTxsQueries(unittest.TestCase):
-    """
-    The class `TestStakingModuleTxsQueries` contains test functions
-    which test txs and queries of slashing module
-    """
-    
     def test_unjail_tx(self):
         time.sleep(5)
         status = query_validator(validator)[1]["jailed"]
