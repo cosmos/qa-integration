@@ -120,7 +120,8 @@ def query_validator_set():
     """
     The function `query_validator_set` fetches the validator set information.
     """
-    command = f"{DAEMON} q staking validators --node {RPC} --chain-id {CHAINID} --output json --count-total"
+    command = f"{DAEMON} q staking validators --node {RPC} \
+--chain-id {CHAINID} --output json --count-total"
     return exec_command(command)
 
 
