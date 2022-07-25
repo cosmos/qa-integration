@@ -6,7 +6,7 @@ from modules.bank.tx import (
 )
 from modules.bank.query import (
     query_balances,
-    query_total_suuply,
+    query_total_suply,
 )
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
@@ -57,7 +57,7 @@ class TestBankModuleTxsQueries(unittest.TestCase):
 
     def test_query_total_supply(self):
         # test total supply
-        status, res = query_total_suuply()
+        status, res = query_total_suply()
         self.assertTrue(status)
         toatl_supply = res["amount"]
         self.assertIsNotNone(toatl_supply)

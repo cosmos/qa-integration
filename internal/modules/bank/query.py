@@ -51,6 +51,6 @@ def calculate_balance_deductions(
     print_balance_deductions("receiver", receiver_diff)
 
 
-def query_total_suuply():
+def query_total_suply():
     command = f"{DAEMON} q bank total --denom={DENOM} --node {RPC} --output json"
     return exec_command(command)
