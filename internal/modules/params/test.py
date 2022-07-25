@@ -1,3 +1,4 @@
+from importlib.metadata import distribution
 import logging
 import json
 import unittest
@@ -12,43 +13,27 @@ logging.info("INFO :: Running params module tests")
 
 class TestParamsModuleQUeries(unittest.TestCase):
     def test_subspace_query(self):
-        path = f"{HOME}/.simd-1/config/"
-        with open(path + "genesis.json",encoding="utf8") as file:
-            data = json.load(file)
+        status, auth_param = query_subspace("auth", "MaxMemoCharacters")
+        self.assertTrue(status)
+        max_memo_characters = auth_param["value"]
+        self.assertIsNotNone(max_memo_characters)
 
-        # query auth param key
-        subspace_auth = query_subspace("auth", "MaxMemoCharacters")[1]["value"]
-        self.assertEqual(
-            eval(subspace_auth),
-            (data["app_state"]["auth"]["params"]["max_memo_characters"]),
-            "missmatch in auth pramas",
+        status, distribution_param = query_subspace(
+            "distribution", "bonusproposerreward"
         )
+        self.assertTrue(status)
+        bonus_proposer_reward = distribution_param["value"]
+        self.assertIsNotNone(bonus_proposer_reward)
 
-        # query distribution param key
-        subspace_distribution = query_subspace("distribution", "bonusproposerreward")[
-            1
-        ]["value"]
-        self.assertEqual(
-            eval(subspace_distribution),
-            (data["app_state"]["distribution"]["params"]["bonus_proposer_reward"]),
-            "missmatch in distribution pramas",
-        )
+        status, staking_param = query_subspace("staking", "MaxValidators")
+        self.assertTrue(status)
+        max_validators = staking_param["value"]
+        self.assertIsNotNone(max_validators)
 
-        # query staking param key
-        subspace_staking = query_subspace("staking", "MaxValidators")[1]["value"]
-        self.assertEqual(
-            eval(subspace_staking),
-            (data["app_state"]["staking"]["params"]["max_validators"]),
-            "missmatch in staking pramas",
-        )
-
-        # query slashing param key
-        subspace_slashing = query_subspace("slashing", "SignedBlocksWindow")[1]["value"]
-        self.assertEqual(
-            eval(subspace_slashing),
-            (data["app_state"]["slashing"]["params"]["signed_blocks_window"]),
-            "missmatch in slashing pramas",
-        )
+        status, slashing_param = query_subspace("slashing", "SignedBlocksWindow")
+        self.assertTrue(status)
+        signed_blocks_window = slashing_param["value"]
+        self.assertIsNotNone(signed_blocks_window)
 
 
 if __name__ == "__main__":
