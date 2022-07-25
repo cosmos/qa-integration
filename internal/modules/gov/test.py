@@ -1,7 +1,11 @@
-import tempfile, time, os, logging
+import tempfile
+import time
+import logging
+import unittest
 from internal.core.keys import keys_show
 from modules.gov.tx import *
 from modules.gov.query import *
+from modules.bank.query import query_balances
 from utils import env
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
@@ -13,166 +17,214 @@ NO_VOTE = "VOTE_OPTION_NO"
 
 validator1_acc = keys_show("validator1", "acc")[1]
 validator2_acc = keys_show("validator2", "acc", f"{DAEMON_HOME}-2")[1]
-account1 = keys_show("account1", "acc")[1]
+account1 = keys_show("account1", "acc")[1]["address"]
 
-param_change_file = tempfile.NamedTemporaryFile()
-param_change_file.write(
-    b"""{
-  "title": "Staking Param Change",
-  "description": "Update max validators",
-  "changes": [
+community_spend_amount = f"1000{DENOM}"
+new_tally_quorom = "0.330000000000000000"
+upgrade_proposal_name = "upgrade-proposal"
+upgrade_proposal_flags = "--title=upgrade --description=upgrade"
+
+
+class TestGovModule(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.param_change_file = tempfile.NamedTemporaryFile(mode="w+t")
+        cls.param_change_file.writelines(
+            """{
+"title": "Staking Param Change",
+"description": "Update max validators",
+"changes": [
     {
-      "subspace": "staking",
-      "key": "MaxValidators",
-      "value": 105
+    "subspace": "gov",
+    "key": "tallyparams",
+    "value": {"quorum":\""""
+            + new_tally_quorom
+            + """"}
     }
-  ]
+]
 }
-"""
-)
-param_change_file.seek(0)
+        """
+        )
+        cls.param_change_file.seek(0)
 
-community_spend_file = tempfile.NamedTemporaryFile(mode="w+t")
-community_spend_file.writelines(
-    """{
-  "title": "Community Pool Spend",
-  "description": "Pay me some Atoms!",
-  "recipient": "cosmos1s5afhd6gxevu37mkqcvvsj8qeylhn0rz46zdlq",
-  "amount": "1000"""
-    + DENOM
-    + """"
+        cls.community_spend_file = tempfile.NamedTemporaryFile(mode="w+t")
+        cls.community_spend_file.writelines(
+            """{
+"title": "Community Pool Spend",
+"description": "Pay me some Atoms!",
+"recipient": \""""
+            + account1
+            + """",
+"amount": \""""
+            + community_spend_amount
+            + """"
 }
-"""
-)
-community_spend_file.seek(0)
+        """
+        )
+        cls.community_spend_file.seek(0)
 
-# submit_and_pass_proposal submits proposal and pass it with deposit, vote txs
-def submit_and_pass_proposal(
-    proposal_file_or_name, proposal_type="software-upgrade", extra_args=""
-):
-    # submit community pool spend proposal
-    status, proposal = tx_submit_proposal(
-        validator1_acc["name"],
-        proposal_file_or_name,
-        proposal_type,
-        extra_args=extra_args,
-    )
-    assert status, f"error when executing {proposal_type} proposal"
-    time.sleep(4)
+    def test_software_upgrade_proposal(self):
+        self.submit_and_pass_proposal(
+            upgrade_proposal_name,
+            "software-upgrade",
+            extra_args=f"--upgrade-height=12345 {upgrade_proposal_flags}",
+        )
+        # waiting for proposal to pass
+        time.sleep(60)
+        status, plan = query_upgrade_plan()
+        self.assertTrue(
+            status, "error when fetching upgrade plan after software-upgrade proposal"
+        )
+        self.assertIsNotNone(plan["name"])
+        self.assertEqual(plan["name"], upgrade_proposal_name)
 
-    # query all proposals
-    status, out = query_proposals()
-    assert status, f"error when fetching proposals after {proposal_type} proposal"
-    proposals = out["proposals"]
-    proposals_len = len(proposals)
-    assert proposals_len >= 1
+    def test_community_spend_proposal(self):
+        status, balance = query_balances(account1, f"--denom {DENOM}")
+        self.assertTrue(status, "error when fetching account balance")
+        self.submit_and_pass_proposal(
+            self.__class__.community_spend_file.name, "community-pool-spend"
+        )
 
-    # query single proposal
-    proposal_id = int(proposals[proposals_len - 1]["proposal_id"])
-    status, proposal = query_proposal(proposal_id)
-    assert status, "error when fetching single proposal"
-    assert proposal == proposals[proposals_len - 1]
+    def test_param_change_proposal(self):
+        status, params = query_params()
+        self.assertTrue(status, "error when fetching governance params")
+        self.assertIsNotNone(params["tally_params"])
+        self.assertIsNotNone(params["tally_params"]["quorum"])
+        self.assertNotEqual(params["tally_params"]["quorum"], new_tally_quorom)
+        # submitting tally quorum param change proposal
+        self.submit_and_pass_proposal(
+            self.__class__.param_change_file.name, "param-change"
+        )
+        # waiting for proposal to pass
+        time.sleep(60)
+        status, tally_param = query_param("tallying")
+        self.assertTrue(status, "error when fetching governance tally params")
+        self.assertIsNotNone(tally_param["quorum"])
+        self.assertEqual(tally_param["quorum"], new_tally_quorom)
 
-    status, out = query_proposer(proposal_id)
-    assert status, "error when fetching proposer of a proposal"
-    assert out["proposer"] == validator1_acc["address"]
+    @classmethod
+    def tearDownClass(cls):
+        cls.param_change_file.close()
+        cls.community_spend_file.close()
 
-    # add deposit to a proposal
-    deposit_amount = "10000000"
-    status, _ = tx_deposit(
-        validator1_acc["name"],
-        proposal_id,
-        deposit_amount + DENOM,
-    )
-    assert status, "error when depositing to a proposal"
-    time.sleep(4)
+    # submit_and_pass_proposal submits proposal and pass it with deposit, vote txs
+    def submit_and_pass_proposal(
+        self, proposal_file_or_name, proposal_type="software-upgrade", extra_args=""
+    ):
+        # submit proposal
+        status, proposal = tx_submit_proposal(
+            validator1_acc["name"],
+            proposal_file_or_name,
+            proposal_type,
+            extra_args=extra_args,
+        )
+        self.assertTrue(status, f"error when executing {proposal_type} proposal")
+        time.sleep(4)
 
-    # query deposits of a proposal
-    status, out = query_deposits(proposal_id)
-    assert status, "error when querying deposits of a proposal"
-    deposits = out["deposits"]
-    assert len(deposits) != 0
-    assert deposits[0]["depositor"] == validator1_acc["address"]
-    assert len(deposits[0]["amount"]) != 0
-    assert deposits[0]["amount"][0]["amount"] == deposit_amount
+        # query all proposals
+        status, out = query_proposals()
+        self.assertTrue(
+            status, f"error when fetching proposals after {proposal_type} proposal"
+        )
+        proposals = out["proposals"]
+        proposals_len = len(proposals)
+        self.assertGreaterEqual(proposals_len, 1)
 
-    # query single deposit
-    status, deposit = query_deposit(proposal_id, validator1_acc["address"])
-    assert status, "error when querying single deposit of a proposal"
-    assert deposit == deposits[0]
+        # query single proposal
+        proposal_id = int(proposals[proposals_len - 1]["proposal_id"])
+        status, proposal = query_proposal(proposal_id)
+        self.assertTrue(status, "error when fetching single proposal")
+        self.assertEqual(proposal, proposals[proposals_len - 1])
 
-    # vote to a proposal
-    vote_option = YES_VOTE
-    status, out = tx_vote(
-        validator1_acc["name"],
-        proposal_id,
-        vote_option,
-    )
-    assert status, "error when voting to a proposal"
-    time.sleep(4)
+        status, out = query_proposer(proposal_id)
+        self.assertTrue(status, "error when fetching proposer of a proposal")
+        self.assertEqual(out["proposer"], validator1_acc["address"])
 
-    status, out = query_votes(proposal_id)
-    assert status, "error when querying votes of a proposal"
-    votes = out["votes"]
-    assert len(votes) == 1
-    assert votes[0]["voter"] == validator1_acc["address"]
-    assert votes[0]["option"] == vote_option
+        # add deposit to a proposal
+        deposit_amount = "10000000"
+        status, _ = tx_deposit(
+            validator1_acc["name"],
+            proposal_id,
+            deposit_amount + DENOM,
+        )
+        self.assertTrue(status, "error when depositing to a proposal")
+        time.sleep(4)
 
-    # query single vote
-    status, vote = query_vote(proposal_id, validator1_acc["address"])
-    assert status, "error when querying single vote of a proposal"
-    assert vote == votes[0]
+        # query deposits of a proposal
+        status, out = query_deposits(proposal_id)
+        self.assertTrue(status, "error when querying deposits of a proposal")
+        deposits = out["deposits"]
+        self.assertNotEqual(len(deposits), 0)
+        self.assertEqual(deposits[0]["depositor"], validator1_acc["address"])
+        self.assertNotEqual(deposits[0]["amount"], 0)
+        self.assertEqual(deposits[0]["amount"][0]["amount"], deposit_amount)
 
-    # add weighted-vote to a proposal
-    weight_vote_option = f"{YES_VOTE}=0.5,{NO_VOTE}=0.5"
-    status, out = tx_weighted_vote(
-        validator2_acc["name"], proposal_id, weight_vote_option, home=f"{DAEMON_HOME}-2"
-    )
-    assert status, "error when weight voting to a proposal"
-    time.sleep(4)
+        # query single deposit
+        status, deposit = query_deposit(proposal_id, validator1_acc["address"])
+        self.assertTrue(status, "error when querying single deposit of a proposal")
+        self.assertEqual(deposit, deposits[0])
 
-    status, out = query_votes(proposal_id)
-    assert status, "error when querying votes of a proposal"
-    votes = out["votes"]
-    assert len(votes) == 2
-    assert votes[1]["voter"] == validator2_acc["address"]
-    assert len(votes[1]["options"]) == 2
-    assert votes[1]["options"][0]["option"] == YES_VOTE
-    assert votes[1]["options"][1]["option"] == NO_VOTE
+        # vote to a proposal
+        vote_option = YES_VOTE
+        status, out = tx_vote(
+            validator1_acc["name"],
+            proposal_id,
+            vote_option,
+        )
+        self.assertTrue(status, "error when voting to a proposal")
+        time.sleep(4)
 
-    # query single vote
-    status, vote = query_vote(proposal_id, validator2_acc["address"])
-    assert status, "error when querying single weight vote of a proposal"
-    assert vote == votes[1]
+        status, out = query_votes(proposal_id)
+        self.assertTrue(status, "error when querying votes of a proposal")
+        votes = out["votes"]
+        self.assertEqual(len(votes), 1)
 
-    # query tally
-    status, tally = query_tally(proposal_id)
-    assert status, "error when querying tally of a proposal"
-    yes_tally = int(tally["yes"])
-    no_tally = int(tally["no"])
-    # here we convert tally to weights
-    # and check whether yes votes weight is 1.5 and no votes weight is 0.5
-    # and remaining options weight is 0
-    # as we voted same before
-    assert int(tally["abstain"]) == 0
-    assert int(tally["no_with_veto"]) == 0
-    assert yes_tally * 2 / (yes_tally + no_tally) == 1.5
-    assert no_tally * 2 / (yes_tally + no_tally) == 0.5
+        # query single vote
+        status, vote = query_vote(proposal_id, validator1_acc["address"])
+        self.assertTrue(status, "error when querying single vote of a proposal")
+        self.assertEqual(vote["voter"], validator1_acc["address"])
+        self.assertEqual(vote["option"], vote_option)
+
+        # add weighted-vote to a proposal
+        weight_vote_option = f"{YES_VOTE}=0.5,{NO_VOTE}=0.5"
+        status, out = tx_weighted_vote(
+            validator2_acc["name"],
+            proposal_id,
+            weight_vote_option,
+            home=f"{DAEMON_HOME}-2",
+        )
+        self.assertTrue(status, "error when weight voting to a proposal")
+        time.sleep(4)
+
+        status, out = query_votes(proposal_id)
+        self.assertTrue(status, "error when querying votes of a proposal")
+        votes = out["votes"]
+        self.assertEqual(len(votes), 2)
+
+        # query single vote
+        status, vote = query_vote(proposal_id, validator2_acc["address"])
+        self.assertTrue(status, "error when querying single weight vote of a proposal")
+        self.assertEqual(vote["voter"], validator2_acc["address"])
+        self.assertEqual(len(vote["options"]), 2)
+        self.assertEqual(vote["options"][0]["option"], YES_VOTE)
+        self.assertEqual(vote["options"][1]["option"], NO_VOTE)
+
+        # query tally
+        status, tally = query_tally(proposal_id)
+        self.assertTrue(status, "error when querying tally of a proposal")
+        yes_tally = int(tally["yes"])
+        no_tally = int(tally["no"])
+
+        # here we convert tally to weights
+        # and check whether yes votes weight is 1.5 and no votes weight is 0.5
+        # and remaining options weight is 0
+        # as we voted same before
+        self.assertEqual(int(tally["abstain"]), 0)
+        self.assertEqual(int(tally["no_with_veto"]), 0)
+        self.assertEqual(yes_tally * 2 / (yes_tally + no_tally), 1.5)
+        self.assertEqual(no_tally * 2 / (yes_tally + no_tally), 0.5)
 
 
-logging.info("INFO: running governance module tests")
-try:
-    submit_and_pass_proposal(
-        "upgrade-proposal",
-        "software-upgrade",
-        extra_args="--upgrade-height=12345 --title=upgrade --description=upgrade",
-    )
-
-    submit_and_pass_proposal(community_spend_file.name, "community-pool-spend")
-
-    submit_and_pass_proposal(param_change_file.name, "param-change")
-
-    logging.info("PASS: all governance module tests")
-finally:
-    param_change_file.close()
-    community_spend_file.close()
+if __name__ == "__main__":
+    logging.info("INFO: running governance module tests")
+    unittest.main()
