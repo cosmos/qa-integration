@@ -1,6 +1,3 @@
-"""
-This module contains all params module test functions.
-"""
 import logging
 import json
 import unittest
@@ -14,16 +11,7 @@ logging.info("INFO :: Running params module tests")
 
 
 class TestParamsModuleQUeries(unittest.TestCase):
-    """
-    The class `TestParamsModuleQUeries` contains test functions
-    which test queries of param module
-    """
-    
     def test_subspace_query(self):
-        """
-        The function `test_subspace_query` will query raw
-        parameters by subspace and key
-        """
         path = f"{HOME}/.simd-1/config/"
         with open(path + "genesis.json",encoding="utf8") as file:
             data = json.load(file)
