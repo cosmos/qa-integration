@@ -14,7 +14,7 @@ NODE3_HOME = env.get("NODE3_HOME")
 
 cmd = f"sudo -S systemctl stop simd-3"
 exec_command(cmd)
-time.sleep(5)
+time.sleep(20)
 
 validator = keys_show("validator3", "val", NODE3_HOME)[1]["address"]
 consensus_pubkey = fetch_validator_pubkey_from_node(NODE2_HOME)[1]
@@ -23,16 +23,18 @@ logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
 
 class TestStakingModuleTxsQueries(unittest.TestCase):
-    def test_unjain_tx(self):
-
+    def test_unjail_tx(self):
+        time.sleep(5)
+        status = query_validator(validator)[1]["jailed"]
+        self.assertTrue(status)
         cmd = f"sudo -S systemctl start simd-3"
         exec_command(cmd)
-        time.sleep(5)
+        time.sleep(20)
 
         # unjain tx
         status, send_tx = tx_unjail("validator3")
         self.assertTrue(status)
-        time.sleep(15)
+        time.sleep(20)
 
         status = query_validator(validator)[1]["jailed"]
         self.assertFalse(status, "validator unjail tx falied")
@@ -62,6 +64,7 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         status, signing_info = query_signing_info(public_key)
         self.assertTrue(status)
         self.assertIsNotNone(signing_info, "validator signing-info query failed")
+        time.sleep(3)
 
 
 if __name__ == "__main__":
