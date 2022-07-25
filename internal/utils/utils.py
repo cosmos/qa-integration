@@ -13,11 +13,11 @@ from stats import record_stat, TX_TYPE, QUERY_TYPE
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
-DAEMON = os.getenv("DAEMON")
-NODE_HOME = os.getenv("NODE_HOME")
-HOME = os.getenv("HOME")
-DAEMON_HOME = os.getenv("DAEMON_HOME")
-DEFAULT_GAS = os.getenv("DEFAULT_GAS")
+DAEMON = env.DAEMON
+NODE_HOME = env.NODE_HOME
+HOME = env.HOME
+DAEMON_HOME = env.DAEMON_HOME
+DEFAULT_GAS = env.DEFAULT_GAS
 
 
 def print_balance_deductions(wallet, diff):

@@ -13,6 +13,7 @@ HOME = env.HOME
 DAEMON_HOME = env.DAEMON_HOME
 RPC = env.RPC
 DEFAULT_GAS = env.DEFAULT_GAS
+NODE_HOME = env.NODE_HOME
 
 def create_unsigned_txs(from_address, to_address, amount, file_name):
     """
