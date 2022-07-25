@@ -1,11 +1,51 @@
-import unittest
+import unittest, time
 import logging
 from modules.upgrade.query import *
+from modules.upgrade.tx import *
+from utils import exec_command, env
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
 
+upgrade_name = "test_upgrade_tx"
+from_key = "validator1"
+upgrade_height = ""
+num_vals=env.NUM_VALS
+
 class TestUpgradeModuleQueries(unittest.TestCase):
+    def test_tx_upgrade_proposal(self):
+        status, block = query_block()
+        self.assertTrue(status)
+        # b = block["block"]["header"]
+        block_height = int(block["block"]["header"]["height"])
+        print(f"block height.........{block_height}")
+        upgrade_height = block_height + 80
+
+        status, res = tx_submit_proposal(from_key, upgrade_name, upgrade_height)
+        self.assertTrue(status)
+        time.sleep(3)
+        # print(f"status and res...........{status} {res}")
+
+        status, proposals = query_proposals()
+        self.assertTrue(status)
+        print(f"proposalsssssss........{proposals}")
+        proposal_id = proposals["proposals"][0]["proposal_id"]
+
+        for i in range(num_vals):
+            print(f"iiiiiiiii.............{i} ")
+            status, res = tx_vote("validaor{i}",proposal_id,"yes")
+            self.assertTrue(status)
+            time.sleep(3)
+
+        time.sleep(60)
+
+        print(f"waiting for upgrade.....")
+        time.sleep(10)
+
+        status, proposals = query_proposals()
+        self.assertTrue(status)
+        print(f"proposalsssssss status after upgrade........{proposals}")
+
     # query module versions
     def test_query_module_version(self):
         status, modules_versions = query_module_versions()
