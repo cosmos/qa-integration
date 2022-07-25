@@ -71,14 +71,32 @@ def tx_multi_sign(
     for signtaure in signatures:
         signs += f"{HOME}/{signtaure} "
 
-    command = f"""simd tx multisign {HOME}/{unsigned_file} {multisig_account} \
+    command = f"""{DAEMON} tx multisign {HOME}/{unsigned_file} {multisig_account} \
 {signs} --home {home} --keyring-backend test --chain-id {CHAINID} \
 --fees {DEFAULT_GAS}stake --node {RPC}"""
+    return exec_command(command)
+
+
+def tx_multisign_batch(
+    transactions_file: str,
+    multisigaccount: str,
+    signatures: list,
+    home: str = f"{DAEMON_HOME}-1",
+):
+    signs = ""
+    for signtaure in signatures:
+        signs += f"{HOME}/{signtaure} "
+
+    command = f"{DAEMON} tx multisign-batch {HOME}/{transactions_file} \
+{multisigaccount} {signs} --home {home} --keyring-backend test \
+--chain-id {CHAINID} --fees {DEFAULT_GAS}stake --node {RPC}"
     print(f"command : {command}")
     return exec_command(command)
 
 
-def tx_broadcast(signed_file, gas, broadcast_mode="sync"):
+def tx_broadcast(
+    signed_file: str, gas: int = DEFAULT_GAS, broadcast_mode: str = "sync"
+):
     """
     Broadcast transactions created with the --generate-only
     flag and signed with the sign command. Read a transaction from [file_path] and
@@ -98,5 +116,5 @@ def tx_broadcast(signed_file, gas, broadcast_mode="sync"):
     if broadcast_mode == "block":
         logging.info("Waiting for transaction for being broadcasted")
     command = f"""{DAEMON} tx broadcast {HOME}/{signed_file} --output json \
---chain-id {CHAINID} --gas {gas} --node {RPC} --broadcast-mode {broadcast_mode}"""
+--chain-id {CHAINID} --gas {gas}stake --node {RPC} --broadcast-mode {broadcast_mode}"""
     return exec_command(command)
