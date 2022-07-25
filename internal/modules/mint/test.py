@@ -28,7 +28,7 @@ class TestMintModuleQueries(unittest.TestCase):
         """
         # query params
         path = f"{HOME}/.simd-1/config/"
-        with open(path + "genesis.json") as file:
+        with open(path + "genesis.json",encoding="utf8") as file:
             data = json.load(file)
 
         query_param = query_params()[1]
