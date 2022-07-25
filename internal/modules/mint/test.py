@@ -5,7 +5,11 @@ import logging
 import time
 import json
 import unittest
-from modules.mint.query import query_annual_provision, query_inflation, query_params
+from modules.mint.query import(
+    query_annual_provision, 
+    query_inflation, 
+    query_params
+)
 from internal.utils import env
 
 HOME = env.HOME
