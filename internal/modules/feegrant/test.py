@@ -30,13 +30,13 @@ class TestFeegrantModuleTxsQueries(unittest.TestCase):
     def setUpClass(cls):
         # set periodic grant by passing granter key and grantee address
         status, response = set_periodic_grant("validator1", grantee_2)
-        assert status
+        assert status, "error in set periodic tx !!!"
         time.sleep(3)
 
     def test_granter_as_fee_payer(self):
         # grant tx
         status, response = tx_grant("validator1", grantee_1)
-        assert status
+        assert status, "error in grant tx !!!"
         time.sleep(3)
 
         # query old balances of granter, grantee and reciver
