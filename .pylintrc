@@ -1,3 +1,9 @@
 [MESSAGES CONTROL]
-disable=invalid-name, bad-option-value, C0330, 
+disable=
+    invalid-name, 
+    bad-option-value, 
+    C0330,
+    missing-class-docstring,
+    missing-module-docstring,
+    missing-function-docstring
 min-similarity-lines=8
