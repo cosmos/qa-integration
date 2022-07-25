@@ -11,8 +11,7 @@ CHAINID = env.CHAINID
 HOME = env.HOME
 DAEMON_HOME = env.DAEMON_HOME
 RPC = env.RPC
-DEFAULT_GAS = 2000000
-
+DEFAULT_GAS = env.DEFAULT_GAS
 
 def create_unsigned_txs(from_address, to_address, amount, file_name):
     """
@@ -71,6 +70,8 @@ def sign_and_broadcast_txs(unsigned_file, signed_file, from_address, sequence):
         return False, error
 
 
+# tx_send takes from_address, to_address and amount as paramaters and
+# internally calls the 'tx send' command and return the response in json format.
 def tx_send(  # pylint: disable=C0330, R0913
     from_address,
     to_address,
