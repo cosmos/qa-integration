@@ -11,7 +11,7 @@ CHAINID = env.CHAINID
 HOME = env.HOME
 DAEMON_HOME = env.DAEMON_HOME
 RPC = env.RPC
-DEFAULT_GAS = 2000000
+DEFAULT_GAS = env.DEFAULT_GAS
 
 
 def create_unsigned_txs(
@@ -73,10 +73,13 @@ def sign_and_broadcast_txs(unsigned_file, signed_file, from_address, sequence):
         return False, error
 
 
+# tx_send takes from_address, to_address and amount as paramaters and
+# internally calls the 'tx send' command and return the response in json format.
 def tx_send(  # pylint: disable=C0330, R0913
     from_address: str,
     to_address: str,
     amount: int,
+    extra_args="",
     gas: int = DEFAULT_GAS,
     unsigned: bool = False,
     sequence: int = None,
@@ -110,4 +113,6 @@ def tx_send(  # pylint: disable=C0330, R0913
             command = f"""{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} \
                 --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} \
                     --output json -y --gas {gas}"""
+            if extra_args != "":
+                command = f"""{command} {extra_args}"""
     return exec_command(command)
