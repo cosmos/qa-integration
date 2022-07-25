@@ -142,7 +142,7 @@ class TestAuthModuleTxsQueries(unittest.TestCase):
             unsigned=True,
         )
         self.assertTrue(status, multisig_send_tx)
-        with open(f"{HOME}/unsigned_multisig_tx.json", "w") as outfile:
+        with open(f"{HOME}/unsigned_multisig_tx.json", "w", encoding="utf8") as outfile:
             json.dump(multisig_send_tx, outfile)
 
         status, acc1_signed_tx = tx_partner_sign(
@@ -152,7 +152,7 @@ class TestAuthModuleTxsQueries(unittest.TestCase):
             broadcast_mode="block",
         )
         self.assertTrue(status, acc1_signed_tx)
-        with open(f"{HOME}/acc1_signature.json", "w") as outfile:
+        with open(f"{HOME}/acc1_signature.json", "w", encoding="utf8") as outfile:
             json.dump(acc1_signed_tx, outfile)
 
         status, acc2_signed_tx = tx_partner_sign(
@@ -162,7 +162,7 @@ class TestAuthModuleTxsQueries(unittest.TestCase):
             broadcast_mode="block",
         )
         self.assertTrue(status, acc2_signed_tx)
-        with open(f"{HOME}/acc2_signature.json", "w") as outfile:
+        with open(f"{HOME}/acc2_signature.json", "w", encoding="utf8") as outfile:
             json.dump(acc2_signed_tx, outfile)
 
         signatures_list = ["acc1_signature.json", "acc2_signature.json"]
@@ -170,7 +170,7 @@ class TestAuthModuleTxsQueries(unittest.TestCase):
             "unsigned_multisig_tx.json", "multisigaccount", signatures_list
         )
         self.assertTrue(status, multisig_signed_tx)
-        with open(f"{HOME}/multisigned_tx.json", "w") as outfile:
+        with open(f"{HOME}/multisigned_tx.json", "w", encoding="utf8") as outfile:
             json.dump(multisig_signed_tx, outfile)
 
 
