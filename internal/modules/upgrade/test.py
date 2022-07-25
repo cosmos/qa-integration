@@ -10,7 +10,8 @@ logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 upgrade_name = "test_upgrade_tx"
 from_key = "validator1"
 upgrade_height = ""
-num_vals=env.NUM_VALS
+num_vals = env.NUM_VALS
+
 
 class TestUpgradeModuleQueries(unittest.TestCase):
     def test_tx_upgrade_proposal(self):
@@ -31,20 +32,24 @@ class TestUpgradeModuleQueries(unittest.TestCase):
         print(f"proposalsssssss........{proposals}")
         proposal_id = proposals["proposals"][0]["proposal_id"]
 
-        for i in range(num_vals):
-            print(f"iiiiiiiii.............{i} ")
-            status, res = tx_vote("validaor{i}",proposal_id,"yes")
+        print(f"iiiiiiiii.............{num_vals} ")
+        for i in range(1, int(num_vals)):
+            print(f"iiiiiiiii.............validator{i} ")
+            val = f"validator{i}"
+            home=f"{DAEMON_HOME}-{i}"
+            print(f"home...............{home}")
+            status, res = tx_vote(val, proposal_id, "yes", home)
             self.assertTrue(status)
             time.sleep(3)
 
         time.sleep(60)
 
         print(f"waiting for upgrade.....")
-        time.sleep(10)
+        # time.sleep(10)
 
         status, proposals = query_proposals()
         self.assertTrue(status)
-        print(f"proposalsssssss status after upgrade........{proposals}")
+        print(f"proposalsssssss status after upgrade........{proposals}, {proposals}")
 
     # query module versions
     def test_query_module_version(self):
