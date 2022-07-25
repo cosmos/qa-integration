@@ -1,4 +1,4 @@
-import logging 
+import logging
 import time
 import json
 import unittest
@@ -38,11 +38,6 @@ time.sleep(10)
 
 
 class TestDistributionModuleTxsQueries(unittest.TestCase):
-    """
-    The class `TestDistributionModuleTxsQueries` contains test functions
-    which test txs and queries of distribution module
-    """
-    
     def test_withdraw_rewards_tx(self):
         # query balance
         before_balance = query_balances(delegator1)[1]["balances"][0]["amount"]
