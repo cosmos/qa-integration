@@ -75,8 +75,8 @@ def query_vote(proposal_id, vote_addr, extra_args=""):
     return exec_command(command, extra_args)
 
 
-# TODO(fixme): use instead query plan from upgrade module when method is added
-# query_upgrade_plan queries upgrade plan
+# TODO: use instead query plan from upgrade module  # pylint: disable=fixme
+# when method is added, query_upgrade_plan queries upgrade plan
 def query_upgrade_plan(extra_args=""):
     command = f"{DAEMON} q upgrade plan --node {RPC} --chain-id {CHAINID} --output json"
     return exec_command(command, extra_args)
