@@ -8,6 +8,7 @@ init-testnet:
 
 start-docker-chain: docker-build init-testnet clean-docker-chain
 	docker-compose up -d
+	@sleep 6
 
 stop-docker-chain:
 	docker-compose stop
@@ -47,7 +48,7 @@ test-all-modules: start-docker-chain
 	TEST_TYPE=module bash ./scripts/tests/all_modules.sh
 	$(MAKE) clean-docker-chain
 
-test-multi-msg: start-docker-chain
+test-multi-msg:
 	@echo "Running multi msg load test..."
 	TEST_TYPE=multi-msg-load bash ./scripts/tests/multi_msg_load.sh
 	$(MAKE) clean-docker-chain

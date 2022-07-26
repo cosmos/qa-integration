@@ -28,13 +28,13 @@ echo "INFO: Initializing the chain ($CHAINID)"
 for (( a=1; a<=$NUM_VALS; a++ ))
 do
     echo "INFO: Initializing validator-${a} configuration files"
-    docker run -it -v $PWD/localnet/$IMAGE-$a:/node$a --rm $IMAGE sh -c "$DAEMON init --chain-id $CHAINID --home /node${a} moniker-${a}" > /dev/null 
+    docker run -i -v $PWD/localnet/$IMAGE-$a:/node$a --rm $IMAGE sh -c "$DAEMON init --chain-id $CHAINID --home /node${a} moniker-${a}" > /dev/null 
 done
 
 echo "INFO: Creating $NUM_VALS keys"
 for (( a=1; a<=$NUM_VALS; a++ ))
 do
-    docker run -it -v $PWD/localnet/$IMAGE-$a:/node$a --rm $IMAGE sh -c "$DAEMON keys add validator${a} --keyring-backend test --home /node${a}" > /dev/null 
+    docker run -i -v $PWD/localnet/$IMAGE-$a:/node$a --rm $IMAGE sh -c "$DAEMON keys add validator${a} --keyring-backend test --home /node${a}" > /dev/null 
 done
 
 # create accounts if second argument is passed
@@ -45,7 +45,7 @@ else
     echo "INFO: Creating $NUM_ACCOUNTS additional accounts"
     for (( a=1; a<=$NUM_ACCOUNTS; a++ ))
     do
-        docker run -it -v $PWD/localnet/$IMAGE-1:/node1 --rm $IMAGE sh -c "$DAEMON keys add account${a} --keyring-backend test --home /node1" > /dev/null 
+        docker run -i -v $PWD/localnet/$IMAGE-1:/node1 --rm $IMAGE sh -c "$DAEMON keys add account${a} --keyring-backend test --home /node1" > /dev/null 
     done
 fi
 
@@ -55,14 +55,14 @@ for (( a=1; a<=$NUM_VALS; a++ ))
 do
     if [ $a == 1 ]
     then
-        docker run -it -v $PWD/localnet/$IMAGE-$a:/node$a --rm $IMAGE sh -c "$DAEMON add-genesis-account validator$a 1000000000000$DENOM --keyring-backend test --home /node${a}"
+        docker run -i -v $PWD/localnet/$IMAGE-$a:/node$a --rm $IMAGE sh -c "$DAEMON add-genesis-account validator$a 1000000000000$DENOM --keyring-backend test --home /node${a}"
         echo "INFO: Done $PWD/localnet/$IMAGE-$a genesis creation "
         continue
     fi
-    docker run -it -v $PWD/localnet/$IMAGE-$a:/node$a --rm $IMAGE sh -c "$DAEMON add-genesis-account validator${a} 1000000000000$DENOM --keyring-backend test --home /node${a}"
+    docker run -i -v $PWD/localnet/$IMAGE-$a:/node$a --rm $IMAGE sh -c "$DAEMON add-genesis-account validator${a} 1000000000000$DENOM --keyring-backend test --home /node${a}"
     chmod +x ./scripts/add_genesis.sh
     cp ./scripts/add_genesis.sh $PWD/localnet/$IMAGE-1/run.sh
-    docker run -it -e VALADDR="validator$a" -e DENOM="$DENOM" -e DAEMON="$DAEMON" -v $PWD/localnet/$IMAGE-1:/node1 -v $PWD/localnet/$IMAGE-$a:/node2 --rm $IMAGE sh -c "/node1/run.sh"
+    docker run -i -e VALADDR="validator$a" -e DENOM="$DENOM" -e DAEMON="$DAEMON" -v $PWD/localnet/$IMAGE-1:/node1 -v $PWD/localnet/$IMAGE-$a:/node2 --rm $IMAGE sh -c "/node1/run.sh"
 done
 
 echo "INFO: Adding additional accounts to genesis"
@@ -72,7 +72,7 @@ then
 else
     for (( a=1; a<=$NUM_ACCOUNTS; a++ ))
     do
-        docker run -it -v $PWD/localnet/$IMAGE-1:/node1 --rm $IMAGE sh -c "$DAEMON add-genesis-account account$a 1000000000000$DENOM --keyring-backend test --home /node1"
+        docker run -i -v $PWD/localnet/$IMAGE-1:/node1 --rm $IMAGE sh -c "$DAEMON add-genesis-account account$a 1000000000000$DENOM --keyring-backend test --home /node1"
     done
 fi
 
@@ -80,7 +80,7 @@ fi
 echo "INFO: Generating gentxs for validator accounts"
 for (( a=1; a<=$NUM_VALS; a++ ))
 do
-    docker run -it -v $PWD/localnet/$IMAGE-$a:/node$a --rm $IMAGE sh -c "$DAEMON gentx validator$a 90000000000$DENOM --chain-id $CHAINID --keyring-backend test --home /node${a}"
+    docker run -i -v $PWD/localnet/$IMAGE-$a:/node$a --rm $IMAGE sh -c "$DAEMON gentx validator$a 90000000000$DENOM --chain-id $CHAINID --keyring-backend test --home /node${a}"
 done
 
 echo "INFO: Copying all gentxs to $PWD/localnet/$IMAGE-1"
@@ -90,7 +90,7 @@ do
 done
 
 echo "INFO: Collecting gentxs into $PWD/localnet/$IMAGE-1"
-docker run -it -v $PWD/localnet/$IMAGE-1:/node1 --rm $IMAGE sh -c "$DAEMON collect-gentxs --home /node1"  > /dev/null 
+docker run -i -v $PWD/localnet/$IMAGE-1:/node1 --rm $IMAGE sh -c "$DAEMON collect-gentxs --home /node1"  > /dev/null 
 
 DAEMON_HOME=$PWD/localnet/$IMAGE
 
@@ -133,7 +133,7 @@ chmod +x ./scripts/update_peers.sh
 cp ./scripts/update_peers.sh ./localnet
 chmod +x ./localnet/update_peers.sh
 
-docker run -it -e DAEMON="$DAEMON" -e NUM_VALS=$NUM_VALS -e IMAGE="$IMAGE" -v $PWD/localnet:/localnet --rm $IMAGE bash -c "/localnet/update_peers.sh"
+docker run -i -e DAEMON="$DAEMON" -e NUM_VALS=$NUM_VALS -e IMAGE="$IMAGE" -v $PWD/localnet:/localnet --rm $IMAGE bash -c "/localnet/update_peers.sh"
 
 ## Creating the docker-compose with yq 
 DEFAULT_DC_IP="192.168.10"
