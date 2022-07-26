@@ -6,6 +6,15 @@ from internal.modules.auth.query import account_type
 from internal.core.keys import keys_show
 
 
+def get_accounts(sender,receiver,sender_account="validator1"):
+    sent_acc, recv_acc = None, None 
+    if sender:
+        sent_acc = keys_show(sender_account)[1]["address"]
+    if receiver:
+        recv_acc = keys_show("account2")[1]["address"]
+    return sent_acc, recv_acc
+
+
 class ParseTestsDefaultFlags:  # pylint: disable=R0903
     """
     The ParseTestsDefaultFlags class is used for argument parser operations.

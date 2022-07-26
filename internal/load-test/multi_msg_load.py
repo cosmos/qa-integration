@@ -4,7 +4,7 @@ It takes two optional arguments namely -s(sender) and -r(receiver)
 """
 import sys
 import logging
-from internal.core.parser import ParseTestsDefaultFlags
+from internal.core.parser import get_accounts 
 from internal.stats.stats import clear_data_by_type, print_stats
 from internal.modules.auth.query import query_account
 from internal.modules.bank.query import calculate_balance_deductions, query_balances
@@ -16,12 +16,7 @@ NUM_MSGS = env.NUM_MSGS
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
-p = ParseTestsDefaultFlags(
-    desc="This program takes inputs for intializing multi messages load test.",
-    sender=True,
-    receiver=True,
-)
-sender, receiver = p.get_args()
+sender, receiver = get_accounts(True,True)
 amount_to_be_sent = 1000000
 
 if sender == receiver:

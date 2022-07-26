@@ -1,4 +1,23 @@
-NUM_VALS = 3
+NUM_VALS=3
+
+docker-build:
+	@bash ./scripts/build_binary.sh
+
+init-testnet:
+	@bash ./scripts/init_chain.sh 
+
+start-docker-chain: docker-build init-testnet clean-docker-chain
+	docker-compose up -d
+	@sleep 6
+
+stop-docker-chain:
+	docker-compose stop
+
+clean-docker-chain:
+	docker-compose down -v
+
+restart-docker-chain:
+	docker-compose restart 
 
 install-deps:
 	@bash ./scripts/deps/prereq.sh
@@ -11,55 +30,40 @@ setup-chain: install-deps stop-chain
 	@echo "Waiting for chain to start..."
 	@sleep 7
 
-pause-chain:
-	@bash ./scripts/chain/pause_nodes.sh
-
-resume-chain:
-	@bash ./scripts/chain/resume_nodes.sh
-
-stop-chain:
-	@bash ./scripts/chain/shutdown_nodes.sh
-
-test-all: setup-chain
-	@bash ./scripts/chain/node_status.sh
-	@bash ./scripts/chain/pause_nodes.sh
-	@bash ./scripts/chain/resume_nodes.sh
-
-	@echo "Waiting for chain to resume..."
+test-all: start-docker-chain
+	@sleep 5
+	@bash ./scripts/chain/node_status.sh $(NUM_VALS)
+	$(MAKE) stop-docker-chain
+	@echo "Waiting for chain to restart..."
+	$(MAKE) restart-docker-chain
 	@sleep 7
-
 	TEST_TYPE=multi-msg-load bash ./scripts/tests/multi_msg_load.sh
 	TEST_TYPE=query-load bash ./scripts/tests/query_load.sh
 	TEST_TYPE=send-load bash ./scripts/tests/send_load.sh
 	TEST_TYPE=single-msg-load bash ./scripts/tests/single_msg_load.sh
-	$(MAKE) stop-chain
+	$(MAKE) clean-docker-chain
 
-test-all-modules: setup-chain
+test-all-modules: start-docker-chain
 	@echo "Running all individual module tests..."
 	TEST_TYPE=module bash ./scripts/tests/all_modules.sh
-	$(MAKE) stop-chain
+	$(MAKE) clean-docker-chain
 
-test-multi-msg: setup-chain
+test-multi-msg:
 	@echo "Running multi msg load test..."
 	TEST_TYPE=multi-msg-load bash ./scripts/tests/multi_msg_load.sh
-	$(MAKE) stop-chain
+	$(MAKE) clean-docker-chain
 
-test-query-load: setup-chain
+test-query-load: start-docker-chain
 	@echo "Running query load test..."
 	TEST_TYPE=query-load bash ./scripts/tests/query_load.sh
-	$(MAKE) stop-chain
+	$(MAKE) clean-docker-chain
 
-test-send-load: setup-chain
+test-send-load: start-docker-chain
 	@echo "Running send msg load test..."
 	TEST_TYPE=send-load bash ./scripts/tests/send_load.sh
-	$(MAKE) stop-chain
+	$(MAKE) clean-docker-chain
 
-test-single-msg: setup-chain
+test-single-msg: start-docker-chain
 	@echo "Running single msg load test..."
 	TEST_TYPE=single-msg-load bash ./scripts/tests/single_msg_load.sh
-	$(MAKE) stop-chain
-
-test-upgrade: setup-chain
-	@echo "Running upgrade test..."
-	bash ./scripts/tests/test_upgrade.sh $(NUM_VALS)
-	$(MAKE) stop-chain
+	$(MAKE) clean-docker-chain
