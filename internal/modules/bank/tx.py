@@ -13,6 +13,7 @@ DAEMON_HOME = env.DAEMON_HOME
 RPC = env.RPC
 DEFAULT_GAS = env.DEFAULT_GAS
 
+
 def create_unsigned_txs(from_address, to_address, amount, file_name):
     """
     The function 'create_unsigned_txs' takes sender(from_address), receiver(to_address), amount
@@ -76,10 +77,10 @@ def tx_send(  # pylint: disable=C0330, R0913
     from_address,
     to_address,
     amount,
-    extra_args="",
     gas=DEFAULT_GAS,
     unsigned=False,
     sequence=None,
+    extra_args="",
 ):
     """
     The function tx_send internally calls the 'tx send' command

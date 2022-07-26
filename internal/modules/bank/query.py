@@ -10,7 +10,7 @@ RPC = env.RPC
 DENOM = env.DENOM
 
 
-def query_balances(address):
+def query_balances(address, extra_args=""):
     """
     query_balances returns the balance json by taking bech32 address as parameter.
     Args:
@@ -20,7 +20,7 @@ def query_balances(address):
         _tuple_: (boolean,str|json)
     """
     command = f"{DAEMON} q bank balances {address} --node {RPC} --output json"
-    return exec_command(command)
+    return exec_command(command, extra_args)
 
 
 def calculate_balance_deductions(

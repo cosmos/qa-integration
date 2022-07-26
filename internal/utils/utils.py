@@ -38,16 +38,19 @@ def print_balance_deductions(wallet, diff):
         )
 
 
-def exec_command(command):
+def exec_command(command, extra_args=""):
     """
     The utility function `exec_command` is used to execute the cosmos-sdk based commands.
     Args:
         command (_str_): Command to be executed.
+        extra_args (_str_): Extra arguments append to command.
 
     Returns:
         _tuple_: str, str
     """
     try:
+        if extra_args != "":
+            command = f"{command} {extra_args}"
         test_type = env.TEST_TYPE
         # getting command type
         sub_commands = command.split()

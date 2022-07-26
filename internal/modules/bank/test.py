@@ -1,4 +1,5 @@
-import time, logging
+import time
+import logging
 import unittest
 from core.keys import keys_show
 from modules.bank.tx import (
@@ -19,7 +20,8 @@ amount = 5
 
 if sender == receiver:
     logging.error(
-        f"Error: The values of arguments sender and receiver are equal make sure to set different values"
+        "Error: The values of arguments sender and receiver are equal \
+        make sure to set different values"
     )
 
 
@@ -36,7 +38,7 @@ class TestBankModuleTxsQueries(unittest.TestCase):
         receiver_balance_old = int(receiver_balance_old["balances"][0]["amount"])
 
         # send tx
-        status, send_tx = tx_send(sender, receiver, amount)
+        status, _ = tx_send(sender, receiver, amount)
         self.assertTrue(status)
         time.sleep(3)
 
@@ -51,9 +53,7 @@ class TestBankModuleTxsQueries(unittest.TestCase):
         receiver_balance_new = int(receiver_balance_new["balances"][0]["amount"])
 
         self.assertEqual((sender_balance_old - amount), sender_balance_new)
-        self.assertEqual(
-            (receiver_balance_old + amount), receiver_balance_new
-        )
+        self.assertEqual((receiver_balance_old + amount), receiver_balance_new)
 
     def test_query_total_supply(self):
         # test total supply

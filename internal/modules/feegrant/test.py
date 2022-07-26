@@ -54,7 +54,7 @@ class TestFeegrantModuleTxsQueries(unittest.TestCase):
 
         # send tx
         extra_args = f"--fee-account {granter} --fees {fees}stake"
-        status, response = tx_send(grantee_1, receiver, amount, extra_args)
+        status, response = tx_send(grantee_1, receiver, amount, extra_args=extra_args)
         self.assertTrue(status)
         time.sleep(3)
 
@@ -96,7 +96,7 @@ class TestFeegrantModuleTxsQueries(unittest.TestCase):
 
         # send tx
         extra_args = f"--fee-account {granter} --fees {fees}stake"
-        status, response = tx_send(grantee_2, receiver, amount, extra_args)
+        status, response = tx_send(grantee_2, receiver, amount, extra_args=extra_args)
         self.assertTrue(status)
         time.sleep(3)
 
