@@ -2,6 +2,7 @@ import tempfile
 import time
 import logging
 import unittest
+import inspect
 from internal.core.keys import keys_show
 from modules.gov.tx import *
 from modules.gov.query import *
@@ -19,7 +20,8 @@ validator1_acc = keys_show("validator1", "acc")[1]
 validator2_acc = keys_show("validator2", "acc", f"{DAEMON_HOME}-2")[1]
 account1 = keys_show("account1", "acc")[1]["address"]
 
-community_spend_amount = f"1000{DENOM}"
+community_spend_amount = 1000
+community_spend = f"{community_spend_amount}{DENOM}"
 new_tally_quorom = "0.330000000000000000"
 upgrade_proposal_name = "upgrade-proposal"
 upgrade_proposal_flags = "--title=upgrade --description=upgrade"
@@ -56,7 +58,7 @@ class TestGovModule(unittest.TestCase):
             + account1
             + """",
 "amount": \""""
-            + community_spend_amount
+            + community_spend
             + """"
 }
         """
@@ -71,18 +73,21 @@ class TestGovModule(unittest.TestCase):
         )
         # waiting for proposal to pass
         time.sleep(60)
-        status, plan = query_upgrade_plan()
-        self.assertTrue(
-            status, "error when fetching upgrade plan after software-upgrade proposal"
-        )
-        self.assertIsNotNone(plan["name"])
-        self.assertEqual(plan["name"], upgrade_proposal_name)
+        self.check_upgrade_plan()
 
     def test_community_spend_proposal(self):
-        status, balance = query_balances(account1, f"--denom {DENOM}")
+        status, initial_balance = query_balances(account1, f"--denom {DENOM}")
         self.assertTrue(status, "error when fetching account balance")
         self.submit_and_pass_proposal(
             self.__class__.community_spend_file.name, "community-pool-spend"
+        )
+        # waiting for proposal to pass
+        time.sleep(60)
+        status, updated_balance = query_balances(account1, f"--denom {DENOM}")
+        self.assertTrue(status, "error when fetching account balance")
+        self.assertEqual(
+            int(initial_balance["amount"]) + community_spend_amount,
+            int(updated_balance["amount"]),
         )
 
     def test_param_change_proposal(self):
@@ -102,6 +107,21 @@ class TestGovModule(unittest.TestCase):
         self.assertIsNotNone(tally_param["quorum"])
         self.assertEqual(tally_param["quorum"], new_tally_quorom)
 
+    def test_cancel_software_upgrade(self):
+        self.check_upgrade_plan()
+        # test cancel software upgrade
+        self.submit_and_pass_proposal(
+            "", "cancel-software-upgrade", extra_args=f"{upgrade_proposal_flags}"
+        )
+        # waiting for proposal to pass
+        time.sleep(60)
+        status, plan = query_upgrade_plan()
+        if status is False:
+            self.assertTrue("no upgrade scheduled" in plan)
+        else:
+            self.assertIsNotNone(plan["name"])
+            self.assertNotEqual(plan["name"], upgrade_proposal_name)
+
     @classmethod
     def tearDownClass(cls):
         cls.param_change_file.close()
@@ -111,13 +131,20 @@ class TestGovModule(unittest.TestCase):
     def submit_and_pass_proposal(
         self, proposal_file_or_name, proposal_type="software-upgrade", extra_args=""
     ):
+        status = True
         # submit proposal
-        status, proposal = tx_submit_proposal(
-            validator1_acc["name"],
-            proposal_file_or_name,
-            proposal_type,
-            extra_args=extra_args,
-        )
+        if proposal_type == "cancel-software-upgrade":
+            status, _ = tx_cancel_software_upgrade(
+                validator1_acc["name"],
+                extra_args=extra_args,
+            )
+        else:
+            status, _ = tx_submit_proposal(
+                validator1_acc["name"],
+                proposal_file_or_name,
+                proposal_type,
+                extra_args=extra_args,
+            )
         self.assertTrue(status, f"error when executing {proposal_type} proposal")
         time.sleep(4)
 
@@ -224,7 +251,17 @@ class TestGovModule(unittest.TestCase):
         self.assertEqual(yes_tally * 2 / (yes_tally + no_tally), 1.5)
         self.assertEqual(no_tally * 2 / (yes_tally + no_tally), 0.5)
 
+    def check_upgrade_plan(self):
+        status, plan = query_upgrade_plan()
+        self.assertTrue(status, "error when fetching upgrade plan")
+        self.assertIsNotNone(plan["name"])
+        self.assertEqual(plan["name"], upgrade_proposal_name)
+
 
 if __name__ == "__main__":
     logging.info("INFO: running governance module tests")
-    unittest.main()
+    test_src = inspect.getsource(TestGovModule)
+    unittest.TestLoader.sortTestMethodsUsing = lambda _, x, y: (
+        test_src.index(f"def {x}") - test_src.index(f"def {y}")
+    )
+    unittest.main(verbosity=2)
