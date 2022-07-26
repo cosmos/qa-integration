@@ -36,3 +36,24 @@ def query_proposals():
         f"{DAEMON} q gov proposals --node {RPC} --output json"
     )
     return exec_command(command)
+
+# 'query_upgrade' quereis details of the header for the block at which it was applied.
+def query_upgrade(upgrade_name):
+    command = (
+        f"{DAEMON} q upgrade applied {upgrade_name} --node {RPC} --chain-id {CHAINID}  --output json"
+    )
+    return exec_command(command)
+
+# 'query_upgrade_plan' quereis the currently scheduled upgrade plan, if one exists.
+def query_upgrade_plan():
+    command = (
+        f"{DAEMON} q upgrade plan --node {RPC} --chain-id {CHAINID}  --output json"
+    )
+    return exec_command(command)
+
+# 'query_proposal' quereis proposal details.
+def query_proposal(porposal_id):
+    command = (
+        f"{DAEMON} q gov proposal {porposal_id} --node {RPC} --chain-id {CHAINID} --output json"
+    )
+    return exec_command(command)

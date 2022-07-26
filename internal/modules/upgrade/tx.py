@@ -12,13 +12,9 @@ DEFAULT_GAS = env.DEFAULT_GAS
 # tx_submit_proposal internally calls the submit proposal transaction with given proposal type
 # and return the response in json format.
 def tx_submit_proposal(from_key, UPGRADE_NAME, UPGRADE_HEIGHT, home=f"{DAEMON_HOME}-1"):
-    # tx gov submit-proposal software-upgrade $UPGRADE_NAME --title $UPGRADE_NAME \
-    #    --description upgrade --upgrade-height $((CURRENT_BLOCK_HEIGHT + 80)) --deposit 10000000$DENOM \
-    #    --from validator1 --yes --keyring-backend test --home $DAEMON_HOME-1 --node $RPC --chain-id $CHAINID
     command = f"""{DAEMON} tx gov submit-proposal software-upgrade {UPGRADE_NAME} --title {UPGRADE_NAME}
     --description upgrade --upgrade-height {UPGRADE_HEIGHT} --deposit 10000000{DENOM} --from {from_key}
     --chain-id {CHAINID} --keyring-backend test --home {home} --node {RPC} --output json -y"""
-    print(f"command..............{command}")
     return exec_command(command)
 
 
@@ -32,5 +28,4 @@ def tx_vote(
 ):
     command = f"""{DAEMON} tx gov vote {proposal_id} {option} --chain-id {CHAINID} --keyring-backend test
  --home {home} --from {from_key} --node {RPC} --output json -y --gas {gas}"""
-    print(f"commandddddddddddd.......{command}")
     return exec_command(command)
