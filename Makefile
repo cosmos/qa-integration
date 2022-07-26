@@ -6,7 +6,7 @@ docker-build:
 init-testnet:
 	@bash ./scripts/init_chain.sh 
 
-start-docker-chain: clean-docker-chain docker-build init-testnet
+start-docker-chain: docker-build init-testnet clean-docker-chain
 	docker-compose up -d
 
 stop-docker-chain:
