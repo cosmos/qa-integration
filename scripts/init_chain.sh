@@ -82,8 +82,8 @@ for (( a=1; a<=$NUM_VALS; a++ ))
 do
     docker run -i -v $PWD/localnet/$IMAGE-$a:/node$a --rm $IMAGE sh -c "$DAEMON gentx validator$a 90000000000$DENOM --chain-id $CHAINID --keyring-backend test --home /node${a}"
 done
-
 echo "INFO: Copying all gentxs to $PWD/localnet/$IMAGE-1"
+chmod -R 777 $PWD/localnet
 for (( a=2; a<=$NUM_VALS; a++ ))
 do
     cp $PWD/localnet/$IMAGE-$a/config/gentx/*.json $PWD/localnet/$IMAGE-1/config/gentx/
@@ -93,6 +93,8 @@ echo "INFO: Collecting gentxs into $PWD/localnet/$IMAGE-1"
 docker run -i -v $PWD/localnet/$IMAGE-1:/node1 --rm $IMAGE sh -c "$DAEMON collect-gentxs --home /node1"  > /dev/null 
 
 DAEMON_HOME=$PWD/localnet/$IMAGE
+
+chmod -R 777 $PWD/localnet
 
 echo "INFO: Updating genesis values"
 sed -i "s/172800000000000/${EVIDENCE_AGE}/g" $DAEMON_HOME-1/config/genesis.json
@@ -134,6 +136,8 @@ cp ./scripts/update_peers.sh ./localnet
 chmod +x ./localnet/update_peers.sh
 
 docker run -i -e DAEMON="$DAEMON" -e NUM_VALS=$NUM_VALS -e IMAGE="$IMAGE" -v $PWD/localnet:/localnet --rm $IMAGE bash -c "/localnet/update_peers.sh"
+
+chmod -R 777 $PWD/localnet
 
 ## Creating the docker-compose with yq 
 DEFAULT_DC_IP="192.168.10"
