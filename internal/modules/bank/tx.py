@@ -71,6 +71,8 @@ def sign_and_broadcast_txs(unsigned_file, signed_file, from_address, sequence):
         return False, error
 
 
+# tx_send takes from_address, to_address and amount as paramaters and
+# internally calls the 'tx send' command and return the response in json format.
 def tx_send(  # pylint: disable=C0330, R0913
     from_address,
     to_address,
@@ -78,6 +80,7 @@ def tx_send(  # pylint: disable=C0330, R0913
     gas=DEFAULT_GAS,
     unsigned=False,
     sequence=None,
+    extra_args="",
 ):
     """
     The function tx_send internally calls the 'tx send' command
@@ -108,4 +111,6 @@ def tx_send(  # pylint: disable=C0330, R0913
             command = f"""{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} \
                 --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} \
                     --output json -y --gas {gas}"""
+            if extra_args != "":
+                command = f"""{command} {extra_args}"""
     return exec_command(command)
