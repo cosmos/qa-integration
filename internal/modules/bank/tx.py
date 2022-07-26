@@ -79,10 +79,10 @@ def tx_send(  # pylint: disable=C0330, R0913
     from_address: str,
     to_address: str,
     amount: int,
-    extra_args="",
     gas: int = DEFAULT_GAS,
     unsigned: bool = False,
     sequence: int = None,
+    extra_args: str = "",
 ):
     """
     The function tx_send internally calls the 'tx send' command
@@ -102,7 +102,7 @@ def tx_send(  # pylint: disable=C0330, R0913
     """
     if unsigned:
         command = f"""{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} \
-            --chain-id {CHAINID} --output json --node {RPC} --generate-only --gas {gas}"""
+            --chain-id {CHAINID} --node {RPC} --generate-only"""
     else:
         if sequence is not None:
             command = f"""{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} \

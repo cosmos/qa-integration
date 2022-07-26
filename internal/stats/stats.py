@@ -1,6 +1,7 @@
 """
 This module has functions to store stats in mongodb
 """
+import json
 import logging
 import utils
 from internal.db import db
@@ -42,8 +43,11 @@ def record_stat(test_type, cmd_type, output, err):
         }
         insert_stat(stat)
         return
-
-    out = output
+    out = (
+        json.loads(output)
+        if output[0] == "{" or output[0] == "["
+        else {"code": 0, "txhash": output}
+    )
     if isinstance(out, dict) and "code" in out:
         if out["code"] != 0:
             logging.error("ERROR: %s", out)
@@ -99,19 +103,27 @@ def print_stats(cmd_type=TX_TYPE):
         num_txs = db[COL_NAME].count_documents(
             {"test_type": test_type, "cmd_type": cmd_type}
         )
+
         num_success_txs = db[COL_NAME].count_documents(
             {"test_type": test_type, "cmd_type": cmd_type, "success": True}
         )
+
         num_failed_txs = db[COL_NAME].count_documents(
             {"test_type": test_type, "cmd_type": cmd_type, "success": False}
         )
 
+        num_success_txs_percentage = (
+            f"({(num_success_txs/num_txs)*100}%)" if num_txs != 0 else ""
+        )
+        num_failed_txs_percentage = (
+            f"({(num_failed_txs/num_txs)*100}%)" if num_txs != 0 else ""
+        )
         stats_log = f"""
 Testing stats of {test_type} tests:
 -----------------------------
 Number of {log_text} executed: {num_txs}
-Number of successful {log_text}: {num_success_txs} ({(num_success_txs/num_txs)*100}%)
-Number of failed {log_text}: {num_failed_txs} ({(num_failed_txs/num_txs)*100}%)\n
+Number of successful {log_text}: {num_success_txs} {num_success_txs_percentage}
+Number of failed {log_text}: {num_failed_txs} {num_failed_txs_percentage}\n
 """
         if num_failed_txs and cmd_type == TX_TYPE:
             stats_log += "Failures:\n"

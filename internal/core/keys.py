@@ -7,7 +7,7 @@ DAEMON = env.DAEMON
 DAEMON_HOME = env.DAEMON_HOME
 
 
-def keys_add(account: str, multisig=False, home: str = f"{DAEMON_HOME}-1"):
+def keys_add(account: str, multisig: bool = False, home: str = f"{DAEMON_HOME}-1"):
     """The function `keys_add` will add a new key to the keyring.
 
     Args:
@@ -17,7 +17,7 @@ def keys_add(account: str, multisig=False, home: str = f"{DAEMON_HOME}-1"):
     Returns:
         _type_: _description_
     """
-    command = f"""{DAEMON} keys add {account} --home {home} --keyring-backend test --output json"""
+    command = f"{DAEMON} keys add {account} --home {home} --keyring-backend test --output json"
     if multisig:
         return exec_command(
             command,

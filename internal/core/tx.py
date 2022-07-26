@@ -48,11 +48,13 @@ def tx_partner_sign(
     signer: str,
     home: str = f"{DAEMON_HOME}-1",
     broadcast_mode: str = "sync",
+    batch: bool = False,
 ):
     """
     The function `tx_multi_sign` does the multisig transaction.
     """
-    command = f"""{DAEMON} tx sign {HOME}/{unsigned_file} --multisig {multisig_address} \
+    sub_command = "sign-batch" if batch else "sign"
+    command = f"""{DAEMON} tx {sub_command} {HOME}/{unsigned_file} --multisig {multisig_address} \
 --from {signer} --keyring-backend test --home {home} --chain-id {CHAINID} \
 --broadcast-mode {broadcast_mode} --fees {DEFAULT_GAS}stake --node {RPC}"""
     return exec_command(command)
@@ -63,6 +65,7 @@ def tx_multi_sign(
     multisig_account: str,
     signatures: list,
     home: str = f"{DAEMON_HOME}-1",
+    batch: bool = False,
 ):
     """
     tx_multi_sign
@@ -70,27 +73,10 @@ def tx_multi_sign(
     signs = ""
     for signtaure in signatures:
         signs += f"{HOME}/{signtaure} "
-
-    command = f"""{DAEMON} tx multisign {HOME}/{unsigned_file} {multisig_account} \
+    sub_command = "multisign-batch" if batch else "multisign"
+    command = f"""{DAEMON} tx {sub_command} {HOME}/{unsigned_file} {multisig_account} \
 {signs} --home {home} --keyring-backend test --chain-id {CHAINID} \
 --fees {DEFAULT_GAS}stake --node {RPC}"""
-    return exec_command(command)
-
-
-def tx_multisign_batch(
-    transactions_file: str,
-    multisigaccount: str,
-    signatures: list,
-    home: str = f"{DAEMON_HOME}-1",
-):
-    signs = ""
-    for signtaure in signatures:
-        signs += f"{HOME}/{signtaure} "
-
-    command = f"{DAEMON} tx multisign-batch {HOME}/{transactions_file} \
-{multisigaccount} {signs} --home {home} --keyring-backend test \
---chain-id {CHAINID} --fees {DEFAULT_GAS}stake --node {RPC}"
-    print(f"command : {command}")
     return exec_command(command)
 
 
