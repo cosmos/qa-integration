@@ -62,11 +62,9 @@ def exec_command(command):
         elif len(sub_commands) > 1 and (sub_commands[1] == "tx"):
             cmd_type = TX_TYPE
 
-       
-        container_name = os.getenv("CONTAINER_NAME")
-        a = "docker exec -it {} sh -c \"{}\"".format(container_name,command)
+
         stdout, stderr = subprocess.Popen(  # pylint: disable=R1732
-            a,  shell=True, 
+            command,  shell=True, 
             stdout=subprocess.PIPE, stderr=subprocess.PIPE
         ).communicate()
         out, error = stdout.strip().decode(), stderr.strip().decode()

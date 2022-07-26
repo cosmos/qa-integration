@@ -14,6 +14,7 @@ services:
       - "9090:9090"
     volumes:
       - ./.testnets:/data:Z
+      - ./internal:/internal:Z
     networks:
       localnet:
         ipv4_address: 192.168.10.2

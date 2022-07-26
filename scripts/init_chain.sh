@@ -153,6 +153,10 @@ do
     IP_INCR=$(($a + 1))
     yq e -i ".services.node.networks.localnet.ipv4_address = \"$DEFAULT_DC_IP.$IP_INCR\"" /tmp/$IMAGE-$a.yaml
     yq e -i ".services.node.volumes[0] = \"./localnet/${IMAGE}-${a}:/app:Z\"" /tmp/$IMAGE-$a.yaml
+    if [ $a == 1 ]
+    then
+        yq e -i ".services.node.volumes[1] = \"./internal:/internal:Z\"" /tmp/$IMAGE-$a.yaml
+    fi
     ## PORTS 
     yq e -i ".services.node.ports[0] = \"${LADDR}:${LADDR}\"" /tmp/$IMAGE-$a.yaml
     yq e -i ".services.node.ports[1] = \"${LCD}:${LCD}\"" /tmp/$IMAGE-$a.yaml

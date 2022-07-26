@@ -15,4 +15,5 @@ cd $CURPATH
 # we can pass optional arguments when running this script
 # available arguments are -s/--sender, -h/--help
 # example: ./query_load.sh -s cosmos1f2838advrjl3c8h4kjfvfmhkh0gs0wf6cyzwu8
-python3 ./internal/load-test/query_load.py $1 $2
+# python3 ./internal/load-test/query_load.py $1 $2
+docker exec -e PYTHONPATH=/:/internal --env-file ./env  -it $CONTAINER_NAME sh -c "python3 /internal/load-test/query_load.py"

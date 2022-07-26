@@ -33,8 +33,10 @@ RUN make build
 FROM alpine:edge
 
 # Install deps 
-RUN apk add --update ca-certificates python3 jq bash 
+RUN apk add --update ca-certificates python3 jq bash py-pip py3-setuptools
+RUN pip install pymongo
 WORKDIR /root
+
 
 COPY --from=build-env /project/build/$DAEMON /usr/bin/$DAEMON
 COPY --from=build-env /go/bin/cosmovisor /usr/bin/cosmovisor
