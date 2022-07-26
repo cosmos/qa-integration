@@ -32,6 +32,8 @@ class TestAuthzModuleTxsQueries(unittest.TestCase):
     def test_authz_grant(self):
         status, grants = query_authz_grants(granter, grantee)
         self.assertTrue(status)
+        l = len(grants)
+        self.assertNotEqual(l, 0)
         spend_limit = grants["grants"][0]["authorization"]["spend_limit"][0]["amount"]
         self.assertIsNotNone(spend_limit)
 
@@ -39,6 +41,8 @@ class TestAuthzModuleTxsQueries(unittest.TestCase):
         # test grants granted to a grantee
         status, grantee_grants = query_authz_grantee_grants(grantee)
         self.assertTrue(status)
+        l = len(grantee_grants)
+        self.assertNotEqual(l, 0)
         count = int(grantee_grants["pagination"]["total"])
         self.assertNotEqual(count, 0)
         granter_addr = grantee_grants["grants"][0]["granter"]
