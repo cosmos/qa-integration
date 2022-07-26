@@ -6,11 +6,11 @@ docker-build:
 init-testnet:
 	@bash ./scripts/init_chain.sh 
 
-start-docker-chain:
+start-docker-chain: clean-docker-chain docker-build init-testnet
 	docker-compose up -d
 
 stop-docker-chain:
-	docker-compose stop 
+	docker-compose stop
 
 clean-docker-chain:
 	docker-compose down -v
@@ -40,29 +40,29 @@ test-all: start-docker-chain
 	TEST_TYPE=query-load bash ./scripts/tests/query_load.sh
 	TEST_TYPE=send-load bash ./scripts/tests/send_load.sh
 	TEST_TYPE=single-msg-load bash ./scripts/tests/single_msg_load.sh
-	$(MAKE) stop-docker-chain
+	$(MAKE) clean-docker-chain
 
 test-all-modules: start-docker-chain
 	@echo "Running all individual module tests..."
 	TEST_TYPE=module bash ./scripts/tests/all_modules.sh
-	$(MAKE) stop-docker-chain
+	$(MAKE) clean-docker-chain
 
 test-multi-msg: start-docker-chain
 	@echo "Running multi msg load test..."
 	TEST_TYPE=multi-msg-load bash ./scripts/tests/multi_msg_load.sh
-	$(MAKE) stop-docker-chain
+	$(MAKE) clean-docker-chain
 
 test-query-load: start-docker-chain
 	@echo "Running query load test..."
 	TEST_TYPE=query-load bash ./scripts/tests/query_load.sh
-	$(MAKE) stop-docker-chain
+	$(MAKE) clean-docker-chain
 
 test-send-load: start-docker-chain
 	@echo "Running send msg load test..."
 	TEST_TYPE=send-load bash ./scripts/tests/send_load.sh
-	$(MAKE) stop-docker-chain
+	$(MAKE) clean-docker-chain
 
 test-single-msg: start-docker-chain
 	@echo "Running single msg load test..."
 	TEST_TYPE=single-msg-load bash ./scripts/tests/single_msg_load.sh
-	$(MAKE) stop-docker-chain
+	$(MAKE) clean-docker-chain
