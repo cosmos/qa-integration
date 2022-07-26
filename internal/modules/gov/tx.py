@@ -1,4 +1,3 @@
-import os
 from utils import exec_command, env
 
 DAEMON = env.DAEMON
@@ -16,8 +15,9 @@ def tx_submit_proposal(
     gas=DEFAULT_GAS,
     extra_args="",
 ):
-    command = f"""{DAEMON} tx gov submit-proposal {proposal_type} {proposal_file_or_name} --chain-id {CHAINID} --keyring-backend test \
- --home {DAEMON_HOME}-1 --from {from_key} --node {RPC} --output json -y --gas {gas}"""
+    command = f"""{DAEMON} tx gov submit-proposal {proposal_type} {proposal_file_or_name} \
+--chain-id {CHAINID} --keyring-backend test \
+--home {DAEMON_HOME}-1 --from {from_key} --node {RPC} --output json -y --gas {gas}"""
     return exec_command(command, extra_args)
 
 
@@ -28,8 +28,9 @@ def tx_cancel_software_upgrade(
     gas=DEFAULT_GAS,
     extra_args="",
 ):
-    command = f"""{DAEMON} tx gov submit-proposal cancel-software-upgrade --chain-id {CHAINID} --keyring-backend test \
- --home {DAEMON_HOME}-1 --from {from_key} --node {RPC} --output json -y --gas {gas}"""
+    command = f"""{DAEMON} tx gov submit-proposal cancel-software-upgrade \
+--chain-id {CHAINID} --keyring-backend test \
+--home {DAEMON_HOME}-1 --from {from_key} --node {RPC} --output json -y --gas {gas}"""
     return exec_command(command, extra_args)
 
 
@@ -41,8 +42,9 @@ def tx_deposit(
     gas=DEFAULT_GAS,
     extra_args="",
 ):
-    command = f"""{DAEMON} tx gov deposit {proposal_id} {deposit} --chain-id {CHAINID} --keyring-backend test \
- --home {DAEMON_HOME}-1 --from {from_key} --node {RPC} --output json -y --gas {gas}"""
+    command = f"""{DAEMON} tx gov deposit {proposal_id} {deposit} \
+--chain-id {CHAINID} --keyring-backend test \
+--home {DAEMON_HOME}-1 --from {from_key} --node {RPC} --output json -y --gas {gas}"""
     return exec_command(command, extra_args)
 
 
@@ -55,12 +57,14 @@ def tx_vote(
     home=f"{DAEMON_HOME}-1",
     extra_args="",
 ):
-    command = f"""{DAEMON} tx gov vote {proposal_id} {option} --chain-id {CHAINID} --keyring-backend test \
- --home {home} --from {from_key} --node {RPC} --output json -y --gas {gas}"""
+    command = f"""{DAEMON} tx gov vote {proposal_id} {option} \
+--chain-id {CHAINID} --keyring-backend test \
+--home {home} --from {from_key} --node {RPC} --output json -y --gas {gas}"""
     return exec_command(command, extra_args)
 
 
-# tx_weighted_vote internally calls the 'gov weighted_vote' tx command and return the response in json format
+# tx_weighted_vote internally calls the 'gov weighted_vote' tx command
+# and return the response in json format
 def tx_weighted_vote(
     from_key,
     proposal_id,
@@ -69,6 +73,7 @@ def tx_weighted_vote(
     home=f"{DAEMON_HOME}-1",
     extra_args="",
 ):
-    command = f"""{DAEMON} tx gov weighted-vote {proposal_id} {options} --chain-id {CHAINID} --keyring-backend test \
- --home {home} --from {from_key} --node {RPC} --output json -y --gas {gas}"""
+    command = f"""{DAEMON} tx gov weighted-vote {proposal_id} {options} \
+--chain-id {CHAINID} --keyring-backend test \
+--home {home} --from {from_key} --node {RPC} --output json -y --gas {gas}"""
     return exec_command(command, extra_args)

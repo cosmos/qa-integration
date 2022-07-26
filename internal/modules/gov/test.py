@@ -3,11 +3,11 @@ import time
 import logging
 import unittest
 import inspect
-from internal.core.keys import keys_show
-from modules.gov.tx import *
-from modules.gov.query import *
+from modules.gov.tx import *  # pylint: disable=W0401,W0614
+from modules.gov.query import *  # pylint: disable=W0401
 from modules.bank.query import query_balances
 from utils import env
+from internal.core.keys import keys_show
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
@@ -30,7 +30,9 @@ upgrade_proposal_flags = "--title=upgrade --description=upgrade"
 class TestGovModule(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls.param_change_file = tempfile.NamedTemporaryFile(mode="w+t")
+        cls.param_change_file = tempfile.NamedTemporaryFile(  # pylint: disable=R1732
+            mode="w+t"
+        )
         cls.param_change_file.writelines(
             """{
 "title": "Staking Param Change",
@@ -49,7 +51,9 @@ class TestGovModule(unittest.TestCase):
         )
         cls.param_change_file.seek(0)
 
-        cls.community_spend_file = tempfile.NamedTemporaryFile(mode="w+t")
+        cls.community_spend_file = tempfile.NamedTemporaryFile(  # pylint: disable=R1732
+            mode="w+t"
+        )
         cls.community_spend_file.writelines(
             """{
 "title": "Community Pool Spend",
@@ -130,7 +134,7 @@ class TestGovModule(unittest.TestCase):
     # submit_and_pass_proposal submits proposal and pass it with deposit, vote txs
     def submit_and_pass_proposal(
         self, proposal_file_or_name, proposal_type="software-upgrade", extra_args=""
-    ):
+    ):  # pylint: disable=R0915
         status = True
         # submit proposal
         if proposal_type == "cancel-software-upgrade":
