@@ -76,6 +76,7 @@ def tx_send(  # pylint: disable=C0330, R0913
     from_address,
     to_address,
     amount,
+    extra_args="",
     gas=DEFAULT_GAS,
     unsigned=False,
     sequence=None,
@@ -109,4 +110,6 @@ def tx_send(  # pylint: disable=C0330, R0913
             command = f"""{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} \
                 --chain-id {CHAINID} --keyring-backend test --home {DAEMON_HOME}-1 --node {RPC} \
                     --output json -y --gas {gas}"""
+            if extra_args != "":
+                command = f"""{command} {extra_args}"""
     return exec_command(command)
