@@ -1,6 +1,5 @@
 import logging
 import time
-import json
 import unittest
 from core.keys import keys_show
 from internal.utils import exec_command, env
