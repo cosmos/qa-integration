@@ -1,10 +1,11 @@
-import time, logging
-from core.keys import keys_show
-from internal.utils import exec_command, env
+import time
+import logging
 import tempfile
 import unittest
-from modules.staking.tx import *
-from modules.staking.query import *
+from core.keys import keys_show
+from modules.staking.tx import *  # pylint: disable=W0401,W0614
+from modules.staking.query import *  # pylint: disable=W0401
+from internal.utils import exec_command, env
 
 HOME = env.HOME
 DAEMON = env.DAEMON
@@ -22,7 +23,7 @@ delegate_amount = 10
 redelegation_amount = 6
 unbond_amount = 2
 
-temp_dir = tempfile.TemporaryDirectory()
+temp_dir = tempfile.TemporaryDirectory()  # pylint: disable=R1732
 temp_dir_name = temp_dir.name
 TEMP_VAL = "validator-10000"
 
@@ -32,31 +33,31 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
     def setUpClass(cls):
 
         # delegate tx
-        status, delegate_tx = tx_delegate("account1", val_addr, delegate_amount)
+        status, _ = tx_delegate("account1", val_addr, delegate_amount)
         assert status, "error in delegate tx!!!"
         time.sleep(3)
 
         # # redelegation tx
-        status, redelegate_tx = tx_redelegate(
+        status, _ = tx_redelegate(
             "account1", val_addr, dst_val_address, redelegation_amount
         )
         assert status, "error in redelegate tx!!!"
         time.sleep(3)
 
         # unbond tx
-        status, unbond_tx = tx_unbond("account1", val_addr, unbond_amount)
+        status, _ = tx_unbond("account1", val_addr, unbond_amount)
         assert status, "error in unbond tx!!!"
         time.sleep(3)
 
         # create validator
         command = f"{DAEMON} init testvalidator --home {temp_dir_name}"
-        tx, tx_err = exec_command(command)
-        assert len(tx_err), f"node init failed :: {tx_err}"
+        _, tx_err = exec_command(command)
+        assert len(tx_err) != 0, f"node init failed :: {tx_err}"
 
-        status, create_val_tx = tx_create_validator(
+        status, _ = tx_create_validator(
             "account1", delegate_amount, TEMP_VAL, temp_dir_name
         )
-        assert status, f"error in create validator tx!!!"
+        assert status, "error in create validator tx!!!"
         time.sleep(3)
 
     def test_delegate_tx(self):
@@ -66,7 +67,7 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
             "balance"
         ]["amount"]
 
-        status, delegateTx = tx_delegate("account1", val_addr, delegate_amount)
+        status, _ = tx_delegate("account1", val_addr, delegate_amount)
         self.assertTrue(status)
         time.sleep(3)
 
@@ -107,7 +108,7 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
         ]["amount"]
 
         # redelegation tx
-        status, redelegate_tx = tx_redelegate(
+        status, _ = tx_redelegate(
             "account1", val_addr, dst_val_address, delegate_amount
         )
         self.assertTrue(status)
@@ -123,9 +124,7 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
 
     def test_query_delegator_redelegations(self):
 
-        status, redelegation = query_delegator_redelegation(
-            delegator, val_addr, dst_val_address
-        )
+        status, _ = query_delegator_redelegation(delegator, val_addr, dst_val_address)
         self.assertTrue(status)
 
         # query delegator redelegations
@@ -150,9 +149,9 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
     def test_unbond_tx(self):
 
         # query unbond tx and check the unbonded amount
-        status, unbond_amount = query_unbonding_delegation(delegator, val_addr)
+        status, unbond_tx = query_unbonding_delegation(delegator, val_addr)
         self.assertTrue(status)
-        unbond_balance = int(unbond_amount["entries"][0]["balance"])
+        unbond_balance = int(unbond_tx["entries"][0]["balance"])
         self.assertEqual(unbond_balance, unbond_balance)
 
     def test_query_unbondings(self):
@@ -196,7 +195,7 @@ class TestStakingModuleTxsQueries(unittest.TestCase):
 
         (_, validator) = keys_show("account1", "val")
         # edit validator
-        status, edit_val_tx = tx_edit_validator("account1", "temp_val")
+        status, _ = tx_edit_validator("account1", "temp_val")
         self.assertTrue(status)
         time.sleep(3)
 
