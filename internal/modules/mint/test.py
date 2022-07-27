@@ -1,8 +1,9 @@
 import logging
 import time
 import unittest
-from modules.mint.query import query_annual_provision, query_inflation, query_params
 from internal.utils import env
+from modules.mint.query import query_annual_provision, query_inflation, query_params
+
 
 HOME = env.HOME
 DAEMON_HOME = env.DAEMON_HOME
