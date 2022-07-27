@@ -71,6 +71,6 @@ def query_validator_outstanding_rewards(validator_addr):
     """`query_validator_outstanding_rewards` fetches validator's outstanding rewards
     and returns response in json formate
     """
-    
-    command = f"{DAEMON} q distribution validator-outstanding-rewards {validator_addr} --node {RPC} --chain-id {CHAINID} --output json"
+    command = f"{DAEMON} q distribution validator-outstanding-rewards {validator_addr} \
+        --node {RPC} --chain-id {CHAINID} --output json"
     return exec_command(command)

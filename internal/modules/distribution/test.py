@@ -3,8 +3,22 @@ import time
 import unittest
 from core.keys import keys_show
 from internal.utils import exec_command, env
-from modules.distribution.tx import *
-from modules.distribution.query import *
+from modules.distribution.tx import (
+    tx_fund_communitypool,
+    tx_set_withdraw_addr,
+    tx_withdraw_allrewards,
+    tx_withdraw_commision_rewards,
+    tx_withdraw_rewards,
+)
+from modules.distribution.query import (
+    query_commission_rewards,
+    query_community_pool,
+    query_params,
+    query_rewards,
+    query_rewards_singleval,
+    query_slashes,
+    query_validator_outstanding_rewards,
+)
 from modules.bank.query import query_balances
 from modules.staking.tx import tx_delegate
 
@@ -22,17 +36,17 @@ delegator2 = keys_show("account2", "acc")[1]["address"]
 
 amount_to_be_sent = 100
 
-cmd = f"sudo -S systemctl stop simd-3"
+cmd = "sudo -S systemctl stop simd-3"
 exec_command(cmd)
 
 logging.info("INFO :: Running distribution module tests")
 
-status, delegate_tx = tx_delegate("account1", validator1, amount_to_be_sent)
-assert status, f"error in delegate tx: {delegate_tx}"
+tx_status, delegate_tx = tx_delegate("account1", validator1, amount_to_be_sent)
+assert tx_status, f"error in delegate tx: {delegate_tx}"
 time.sleep(10)
 
-status, delegate_tx = tx_delegate("account1", validator2, amount_to_be_sent)
-assert status, f"error in delegate tx: {delegate_tx}"
+tx_status, delegate_tx = tx_delegate("account1", validator2, amount_to_be_sent)
+assert tx_status, f"error in delegate tx: {delegate_tx}"
 time.sleep(10)
 
 
@@ -55,7 +69,7 @@ class TestDistributionModuleTxsQueries(unittest.TestCase):
         after_balance = query_balances(delegator1)[1]["balances"][0]["amount"]
 
         self.assertEqual(
-            int(before_balance) + int(float(rewards)), int(after_balance)
+            (int(before_balance) + int(float(rewards))), int(after_balance)
         ), "missmatch in rewards"
         time.sleep(5)
 
@@ -76,7 +90,7 @@ class TestDistributionModuleTxsQueries(unittest.TestCase):
 
         after_balance = query_balances(delegator1)[1]["balances"][0]["amount"]
         self.assertEqual(
-            int(before_balance) + int(total), int(after_balance)
+            (int(before_balance) + int(total)), int(after_balance)
         ), "missmatch in rewards"
         time.sleep(3)
 
@@ -126,7 +140,7 @@ class TestDistributionModuleTxsQueries(unittest.TestCase):
         time.sleep(3)
 
     def test_params_query(self):
-        status,distribution_params = query_params()
+        status, distribution_params = query_params()
         self.assertTrue(status)
         base_prposer_reward = distribution_params["base_proposer_reward"]
         self.assertIsNotNone(base_prposer_reward)
@@ -141,23 +155,22 @@ class TestDistributionModuleTxsQueries(unittest.TestCase):
         )
         self.assertTrue(status)
         self.assertTrue(commission_rewards)
-        time.sleep(5)
+        time.sleep(10)
 
         # query commission rewards
         rewards = query_commission_rewards(validator1)[1]["commission"][0]["amount"]
 
-        time.sleep(5)
+        #time.sleep(3)
         status, commission_rewards = tx_withdraw_commision_rewards(
             "validator1", validator1
         )
         self.assertTrue(status)
         self.assertTrue(commission_rewards)
-        time.sleep(7)
+        time.sleep(3)
 
         after_rewards = query_commission_rewards(validator1)[1]["commission"][0][
             "amount"
         ]
-
         self.assertLess(
             float(after_rewards), float(rewards)
         ), "missmatch in validator commission rewards"
