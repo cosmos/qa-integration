@@ -7,13 +7,13 @@ import unittest
 import json
 
 from core.keys import keys_add, keys_show
-from internal.modules.bank.query import query_balances
-from internal.utils import env
 from modules.auth.query import (
     query_account,
     query_accounts,
     query_params,
 )
+from internal.modules.bank.query import query_balances
+from internal.utils import env
 from internal.core.tx import (
     tx_broadcast,
     tx_multi_sign,
