@@ -27,7 +27,7 @@ def account_type(address):
     return address
 
 
-def query_account(address):
+def query_account(address: str):
     """query account function will take the bech32 address
     as input and output the information of account.
 

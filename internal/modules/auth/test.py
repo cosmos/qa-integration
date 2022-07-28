@@ -2,11 +2,13 @@
 This module contains all auth test functions.
 """
 import logging
+import time
 import unittest
-import os
 import json
 
 from core.keys import keys_add, keys_show
+from internal.modules.bank.query import query_balances
+from internal.utils import env
 from modules.auth.query import (
     query_account,
     query_accounts,
@@ -18,12 +20,13 @@ from internal.core.tx import (
     tx_partner_sign,
     tx_sign,
 )
-from internal.modules.auth.tx import tx_decode, tx_encode
+from internal.modules.auth.tx import tx_create_vesting_account, tx_decode, tx_encode
 from internal.modules.bank.tx import create_unsigned_txs, tx_send
 
 
-HOME = os.getenv("HOME")
-DEFAULT_GAS = 2000000
+HOME = env.HOME
+DEFAULT_GAS = env.DEFAULT_GAS
+DENOM = env.DENOM
 
 
 class TestAuthModuleTxsQueries(unittest.TestCase):
@@ -51,6 +54,9 @@ class TestAuthModuleTxsQueries(unittest.TestCase):
             amount="1000000",
         )
         assert status, "Failed to send coins to multisig account"
+
+        status, _ = keys_add("vestingaccount")
+        assert status, "Failed to add vesting account"
 
     def test_query_account(self):
         """
@@ -247,6 +253,40 @@ class TestAuthModuleTxsQueries(unittest.TestCase):
             "signedmulti_txs_batch.json", broadcast_mode="block"
         )
         self.assertTrue(status, broadcast_resp)
+
+    def test_vesting(self):
+        status, vesting_account = keys_show("vestingaccount")
+        self.assertTrue(status, vesting_account)
+
+        vesting_address = vesting_account["address"]
+        vesting_amount = 10000
+        status, create_resp = tx_create_vesting_account(vesting_address, vesting_amount)
+        self.assertTrue(status, create_resp)
+        logging.info("Creating Vesting Account")
+        time.sleep(10)
+        status, vesting_account = query_account(vesting_address)
+        self.assertTrue(status, vesting_account)
+        self.assertEqual(
+            vesting_account["@type"],
+            "/cosmos.vesting.v1beta1.ContinuousVestingAccount",
+            "Error while creating vesting account",
+        )
+        status, bal_resp = query_balances(vesting_address)
+        self.assertTrue(status, bal_resp)
+        self.assertEqual(
+            str(vesting_amount),
+            bal_resp["balances"][0]["amount"],
+            "Error while creating vesting account, Mismatched balance",
+        )
+        # logging.info("Waiting for VestingAccount to become BaseAccount")
+        # time.sleep(90)
+        # status, vesting_account = query_account(vesting_address)
+        # self.assertTrue(status, vesting_account)
+        # self.assertEqual(
+        #     vesting_account["@type"],
+        #     "/cosmos.auth.v1beta1.BaseAccount",
+        #     "Error in the Vesting to Base Conversion",
+        # )
 
 
 if __name__ == "__main__":

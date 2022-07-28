@@ -4,6 +4,7 @@ disable=
     bad-option-value, 
     C0330,
     R0913,
+    C0412,
     missing-class-docstring,
     missing-module-docstring,
     missing-function-docstring

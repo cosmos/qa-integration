@@ -1,9 +1,13 @@
 """This module covers the tx commands of auth CosmosSDK module"""
-import os
-from internal.utils import exec_command
+from datetime import datetime, timedelta
+from internal.utils import exec_command, env
 
-DAEMON = os.getenv("DAEMON")
-HOME = os.getenv("HOME")
+DAEMON = env.DAEMON
+HOME = env.HOME
+DENOM = env.DENOM
+CHAIN_ID = env.CHAINID
+DAEMON_HOME = env.DAEMON_HOME
+RPC = env.RPC
 
 
 def tx_encode(signed_file: str):
@@ -15,3 +19,16 @@ def tx_encode(signed_file: str):
 def tx_decode(encoded_tx):
     """This function decodes an encoded transaction"""
     return exec_command(f"{DAEMON} tx decode {encoded_tx}")
+
+
+def tx_create_vesting_account(
+    address: str,
+    amount: int,
+    from_account: str = "account1",
+    home: str = f"{DAEMON_HOME}-1",
+    end_time: str = (datetime.now() + timedelta(minutes=1)).strftime("%s"),
+):
+    command = f"{DAEMON} tx vesting create-vesting-account {address} \
+{amount}{DENOM} {end_time} --from {from_account} --home {home} \
+--keyring-backend test --node {RPC} --chain-id {CHAIN_ID} --output json -y"
+    return exec_command(command)
