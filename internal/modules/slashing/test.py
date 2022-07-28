@@ -19,7 +19,7 @@ consensus_pubkey = fetch_validator_pubkey_from_node(NODE2_HOME)[1]
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
 if NUM_VALS < 3:
-    logging.error(f"{NUM_VALS} nodes are not enough to test slashing module tests")
+    logging.error(f"""{NUM_VALS} nodes are not enough to test slashing module tests""")
 else:
     NODE3_HOME = env.get("NODE3_HOME")
     validator = keys_show("validator3", "val", NODE3_HOME)[1]["address"]
