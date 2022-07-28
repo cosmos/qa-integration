@@ -28,10 +28,9 @@ def query_signing_info(consensus_pubkey):
 
 
 def query_signing_infos():
-    """`query_signing_infos` fetches signing information of all validators 
+    """`query_signing_infos` fetches signing information of all validators
     and returns response in json format
     """
-    
     command = f"{DAEMON} q slashing signing-infos --node {RPC} \
             --chain-id {CHAINID} --output json"
     return exec_command(command)
