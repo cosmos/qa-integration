@@ -160,7 +160,7 @@ class TestDistributionModuleTxsQueries(unittest.TestCase):
         # query commission rewards
         rewards = query_commission_rewards(validator1)[1]["commission"][0]["amount"]
 
-        #time.sleep(3)
+        time.sleep(3)
         status, commission_rewards = tx_withdraw_commision_rewards(
             "validator1", validator1
         )
