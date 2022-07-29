@@ -27,8 +27,11 @@ def tx_create_vesting_account(
     from_account: str = "account1",
     home: str = f"{DAEMON_HOME}-1",
     end_time: str = (datetime.now() + timedelta(minutes=1)).strftime("%s"),
+    delayed: bool = False,
 ):
     command = f"{DAEMON} tx vesting create-vesting-account {address} \
 {amount}{DENOM} {end_time} --from {from_account} --home {home} \
 --keyring-backend test --node {RPC} --chain-id {CHAIN_ID} --output json -y"
+    if delayed:
+        command = command + " --delayed"
     return exec_command(command)
