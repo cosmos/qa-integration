@@ -268,7 +268,8 @@ class TestAuthModuleTxsQueries(unittest.TestCase):
         flag = bool(
             vesting_account["@type"]
             == "/cosmos.vesting.v1beta1.ContinuousVestingAccount"
-            or "/cosmos.vesting.v1beta1.DelayedVestingAccount"
+            or vesting_account["@type"]
+            == "/cosmos.vesting.v1beta1.DelayedVestingAccount"
         )
         self.assertTrue(flag, "Error while creating vesting account")
 
