@@ -1,3 +1,4 @@
+"""This module contains all tx commands for staking module."""
 import json
 from utils import exec_command, env
 from modules.staking.query import (
@@ -15,9 +16,10 @@ DEFAULT_GAS = env.DEFAULT_GAS
 # tx_delegate takes from_key, validator address and amount as paramaters and
 # internally executes the 'delegate tx' command and return the response in json format.
 def tx_delegate(from_key, validator_addr, amount, gas=DEFAULT_GAS):
-    command = f"""{DAEMON} tx staking delegate {validator_addr} {amount}{DENOM} \
+    """Delegate tokens to a validator."""
+    command = f"{DAEMON} tx staking delegate {validator_addr} {amount}{DENOM} \
 --from {from_key} --chain-id {CHAINID} --output json --node {RPC} --gas {gas} \
---keyring-backend test --home {DAEMON_HOME}-1 -y"""
+--keyring-backend test --home {DAEMON_HOME}-1 -y"
     return exec_command(command)
 
 
@@ -30,10 +32,11 @@ def tx_redelegate(
     amount,
     gas=DEFAULT_GAS,
 ):
-
-    command = f"""{DAEMON} tx staking redelegate {src_validator_addr} {dst_validator_addr} \
-{amount}{DENOM} --from {from_key} --chain-id {CHAINID} --output json --node {RPC} \
---gas {gas} --keyring-backend test --home {DAEMON_HOME}-1 -y"""
+    """Redelegate tokens from one validator to another."""
+    command = f"{DAEMON} tx staking redelegate \
+{src_validator_addr} {dst_validator_addr} {amount}{DENOM} \
+--from {from_key} --chain-id {CHAINID} --output json --node {RPC} --gas {gas} --keyring-backend test \
+--home {DAEMON_HOME}-1 -y"
     return exec_command(command)
 
 
@@ -45,15 +48,17 @@ def tx_unbond(
     amount,
     gas=DEFAULT_GAS,
 ):
-    command = f"""{DAEMON} tx staking unbond {validator_addr} {amount}{DENOM} \
+    """Unbond tokens from a validator."""
+    command = f"{DAEMON} tx staking unbond {validator_addr} {amount}{DENOM} \
 --from {from_key} --chain-id {CHAINID} --output json --node {RPC} --gas {gas} \
---keyring-backend test --home {DAEMON_HOME}-1 -y"""
+--keyring-backend test --home {DAEMON_HOME}-1 -y"
     return exec_command(command)
 
 
-# tx_create_validator takes from key, amount moniker and noded id as params and
-# internally calls `create-validator` to create a new validator initialized with
-# a self-delegation to it and returns json response.
+# tx_create_validator takes from key, amount moniker and
+# noded ir as params and
+# internally calls `create-validator` to create a new validator
+# initialized with a self-delegation to it and returns json response.
 def tx_create_validator(
     from_key,
     amount,
@@ -61,6 +66,7 @@ def tx_create_validator(
     node_dir,
     gas=DEFAULT_GAS,
 ):
+    """Create a new validator."""
     status, public_key = fetch_validator_pubkey_from_node(node_dir)
     if not status:
         return False, public_key

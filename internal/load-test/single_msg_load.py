@@ -54,7 +54,7 @@ for i in range(num_txs):
         receiver, sender, amount_to_be_sent, 100000, False, seqfrom
     )
 
-time.sleep(1)
+time.sleep(3)
 
 #### Print Balances ####
 calculate_balance_deductions(sender, receiver, sender_balance_old, receiver_balance_old)

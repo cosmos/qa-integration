@@ -13,7 +13,10 @@ DAEMON_HOME = env.DAEMON_HOME
 RPC = env.RPC
 DEFAULT_GAS = env.DEFAULT_GAS
 
-def create_unsigned_txs(from_address, to_address, amount, file_name):
+
+def create_unsigned_txs(
+    from_address: str, to_address: str, amount: str, file_name: str
+):
     """
     The function 'create_unsigned_txs' takes sender(from_address), receiver(to_address), amount
     and file_name as parameters and call the function tx_send internally and stores the json to
@@ -73,13 +76,13 @@ def sign_and_broadcast_txs(unsigned_file, signed_file, from_address, sequence):
 # tx_send takes from_address, to_address and amount as paramaters and
 # internally calls the 'tx send' command and return the response in json format.
 def tx_send(  # pylint: disable=C0330, R0913
-    from_address,
-    to_address,
-    amount,
-    extra_args="",
-    gas=DEFAULT_GAS,
-    unsigned=False,
-    sequence=None,
+    from_address: str,
+    to_address: str,
+    amount: int,
+    gas: int = DEFAULT_GAS,
+    unsigned: bool = False,
+    sequence: int = None,
+    extra_args: str = "",
 ):
     """
     The function tx_send internally calls the 'tx send' command
@@ -99,7 +102,7 @@ def tx_send(  # pylint: disable=C0330, R0913
     """
     if unsigned:
         command = f"""{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} \
-            --chain-id {CHAINID} --output json --node {RPC} --generate-only --gas {gas}"""
+            --chain-id {CHAINID} --node {RPC} --generate-only"""
     else:
         if sequence is not None:
             command = f"""{DAEMON} tx bank send {from_address} {to_address} {amount}{DENOM} \
