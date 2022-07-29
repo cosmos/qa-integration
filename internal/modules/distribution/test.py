@@ -2,7 +2,6 @@ import logging
 import time
 import unittest
 from core.keys import keys_show
-from internal.utils import exec_command, env
 from modules.distribution.tx import (
     tx_fund_communitypool,
     tx_set_withdraw_addr,
@@ -21,6 +20,7 @@ from modules.distribution.query import (
 )
 from modules.bank.query import query_balances
 from modules.staking.tx import tx_delegate
+from internal.utils import exec_command, env
 
 HOME = env.HOME
 DAEMON_HOME = env.DAEMON_HOME
@@ -70,7 +70,7 @@ class TestDistributionModuleTxsQueries(unittest.TestCase):
 
         self.assertEqual(
             (int(before_balance) + int(float(rewards))), int(after_balance)
-        ), "missmatch in rewards"
+        )
         time.sleep(5)
 
     def test_withdraw_all_rewards_tx(self):
@@ -91,7 +91,7 @@ class TestDistributionModuleTxsQueries(unittest.TestCase):
         after_balance = query_balances(delegator1)[1]["balances"][0]["amount"]
         self.assertEqual(
             (int(before_balance) + int(total)), int(after_balance)
-        ), "missmatch in rewards"
+        )
         time.sleep(3)
 
     def test_fund_community_pool_tx(self):
@@ -173,13 +173,13 @@ class TestDistributionModuleTxsQueries(unittest.TestCase):
         ]
         self.assertLess(
             float(after_rewards), float(rewards)
-        ), "missmatch in validator commission rewards"
+        )
         time.sleep(3)
 
     def test_validator_slashes_query(self):
         # query validator slashes
         slash_count = query_slashes(validator3, 1, 1000)[1]["slashes"]
-        self.assertNotEqual(slash_count, 0, "missmatch in slashes")
+        self.assertNotEqual(slash_count, 0)
         time.sleep(3)
 
     def test_validator_outstanding_rewards_query(self):
