@@ -5,5 +5,7 @@ disable=
     C0330,
     missing-class-docstring,
     missing-module-docstring,
-    missing-function-docstring
+    missing-function-docstring,
+    too-many-locals,
+    too-many-arguments
 min-similarity-lines=8
