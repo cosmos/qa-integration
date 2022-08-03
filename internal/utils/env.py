@@ -16,5 +16,9 @@ DB_NAME = os.getenv("DB_NAME", "qa_test")
 TEST_TYPE = os.getenv("TEST_TYPE", None)
 DEFAULT_GAS = int(os.getenv("DEFAULT_GAS", "2000000"))
 
+
 def get(env_var):
+    """
+    Get the value of an environment variable.
+    """
     return os.getenv(env_var)

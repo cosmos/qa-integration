@@ -1,3 +1,6 @@
+"""
+This module queries staking sub commands.
+"""
 import time
 import logging
 import tempfile
@@ -29,6 +32,10 @@ TEMP_VAL = "validator-10000"
 
 
 class TestStakingModuleTxsQueries(unittest.TestCase):
+    """
+    This test case is to test the staking module txs and queries.
+    """
+
     @classmethod
     def setUpClass(cls):
 
