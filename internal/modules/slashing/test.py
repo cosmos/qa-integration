@@ -19,12 +19,12 @@ consensus_pubkey = fetch_validator_pubkey_from_node(NODE2_HOME)[1]
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
 if NUM_VALS < 3:
-    logging.error(f"""{NUM_VALS} nodes are not enough to test slashing module tests""")
+    logging.error("%d nodes are not enough to test slashing module tests",NUM_VALS)
 else:
     NODE3_HOME = env.get("NODE3_HOME")
-    validator = keys_show("validator3", "val", NODE3_HOME)[1]["address"]
-    cmd = "sudo -S systemctl stop simd-3"
-    exec_command(cmd)
+    validator_3 = keys_show("validator3", "val", NODE3_HOME)[1]["address"]
+    stop_node_3 = "sudo -S systemctl stop simd-3"
+    exec_command(stop_node_3)
     time.sleep(20)
 
     class TestStakingModuleTxsQueries(unittest.TestCase):
@@ -53,10 +53,10 @@ else:
 
         def test_unjail_tx(self):
             time.sleep(5)
-            status = query_validator(validator)[1]["jailed"]
+            status = query_validator(validator_3)[1]["jailed"]
             self.assertTrue(status)
-            start_chain_cmd = "sudo -S systemctl start simd-3"
-            exec_command(start_chain_cmd)
+            start_node_3 = "sudo -S systemctl start simd-3"
+            exec_command(start_node_3)
             time.sleep(20)
 
             # unjain tx
@@ -64,7 +64,7 @@ else:
             self.assertTrue(status)
             time.sleep(20)
 
-            status = query_validator(validator)[1]["jailed"]
+            status = query_validator(validator_3)[1]["jailed"]
             self.assertFalse(status, "validator unjail tx has falied")
 
     if __name__ == "__main__":
