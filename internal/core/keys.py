@@ -11,7 +11,7 @@ def keys_add(account: str, multisig: bool = False, home: str = f"{DAEMON_HOME}-1
     """The function `keys_add` will add a new key to the keyring.
 
     Args:
-        account (_string_): wallet name or bech32 address.
+        account (_string_): wallet name
         home (_string_, optional): home directory of the node (default "{DAEMON_HOME}-1").
 
     Returns:
