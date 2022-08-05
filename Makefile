@@ -54,6 +54,11 @@ test-send-load: setup-chain
 	TEST_TYPE=send-load bash ./scripts/tests/send_load.sh
 	$(MAKE) stop-chain
 
+test-leverage-module: setup-chain
+	@echo "Running send msg load test..."
+	TEST_TYPE=leverage-module bash ./scripts/tests/leverage_module.sh
+	$(MAKE) stop-chain
+
 test-single-msg: setup-chain
 	@echo "Running single msg load test..."
 	TEST_TYPE=single-msg-load bash ./scripts/tests/single_msg_load.sh
