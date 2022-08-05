@@ -31,7 +31,7 @@ class TestAuthModuleTxsQueries(unittest.TestCase):
         The function `test_query_account_fail` will query wrong account
         and assert fail condition
         """
-        status, _ = query_account("cosmos1xpcfd7pxfmv6gd50y9mwjq50kwqpqrh5mmw72h")
+        status, _ = query_account("umee1xpcfd7pxfmv6gd50y9mwjq50kwqpqrh5mmw72h")
         self.assertFalse(status)
 
 
