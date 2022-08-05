@@ -6,7 +6,7 @@
 
 # set environment with env config.
 set -a
-source ../../env
+source ../../env-umee
 set +a
 
 # set pythonpath environment with absolute path of internal directory
