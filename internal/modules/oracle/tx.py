@@ -11,10 +11,9 @@ DEFAULT_GAS = env.DEFAULT_GAS
 def tx_submit_prevote(
     from_key,
     hash,
-    feeder_addr,
     gas=DEFAULT_GAS,
 ):
-    command = f"""{DAEMON} tx oracle exchange-rate-prevote {hash} {feeder_addr} \
+    command = f"""{DAEMON} tx oracle exchange-rate-prevote {hash} \
 --chain-id {CHAINID} --keyring-backend test \
 --home {DAEMON_HOME}-1 --from {from_key} --node {RPC} --output json -y --gas {gas}"""
     return exec_command(command)
@@ -25,10 +24,9 @@ def tx_submit_vote(
     from_key,
     salt,
     exchange_rates,
-    feeder_addr,
     gas=DEFAULT_GAS,
 ):
-    command = f"""{DAEMON} tx oracle exchange-rate-vote {salt} {exchange_rates} {feeder_addr} \
+    command = f"""{DAEMON} tx oracle exchange-rate-vote {salt} {exchange_rates} \
 --chain-id {CHAINID} --keyring-backend test \
 --home {DAEMON_HOME}-1 --from {from_key} --node {RPC} --output json -y --gas {gas}"""
     return exec_command(command)
