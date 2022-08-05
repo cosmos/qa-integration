@@ -12,7 +12,8 @@ from modules.leverage.query import (
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
 class TestLeverageModuleTxsQueries(unittest.TestCase):
-    def update_leverage_registry(self):
+    @classmethod
+    def setUpClass(cls):
         update_registry_path = pathlib.Path().resolve().joinpath("./internal/modules/leverage/update-registry-only-umee.json")
         submit_and_pass_proposal(
             proposal_file_or_name=update_registry_path,
@@ -22,12 +23,6 @@ class TestLeverageModuleTxsQueries(unittest.TestCase):
         time.sleep(10)
 
     def test_query_total_supply(self):
-        status, res = query_registered_tokens()
-        self.assertTrue(status)
-
-        if len(res['registry']) == 0:
-            self.update_leverage_registry()
-
         status, res = query_registered_tokens()
         self.assertTrue(status)
         self.assertTrue(len(res['registry']) >= 1, "It should have at least one token registered")

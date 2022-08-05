@@ -1,0 +1,27 @@
+{
+    "title":"Set up oracle params.",
+    "description":"If successful, this gov param will set up oracle params for testing.",
+    "changes":[
+       {
+          "subspace":"oracle",
+          "key":"AcceptList",
+          "value":[
+            {
+              "base_denom": "uumee",
+              "symbol_denom": "umee",
+              "exponent": 6
+            },
+            {
+              "base_denom": "ibc/atom",
+              "symbol_denom": "ATOM",
+              "exponent": 6
+            },
+            {
+              "base_denom": "ibc/juno",
+              "symbol_denom": "JUNO",
+              "exponent": 6
+            }
+          ]
+       }
+    ]
+ }

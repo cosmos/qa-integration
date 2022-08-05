@@ -55,8 +55,13 @@ test-send-load: setup-chain
 	$(MAKE) stop-chain
 
 test-leverage-module: setup-chain
-	@echo "Running send msg load test..."
+	@echo "Running leverage module tests..."
 	TEST_TYPE=leverage-module bash ./scripts/tests/leverage_module.sh
+	$(MAKE) stop-chain
+
+test-oracle-module: setup-chain
+	@echo "Running oracle module tests..."
+	TEST_TYPE=oracle-module bash ./scripts/tests/oracle_module.sh
 	$(MAKE) stop-chain
 
 test-single-msg: setup-chain
