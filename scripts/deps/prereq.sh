@@ -12,7 +12,7 @@ CURPATH=`dirname $(realpath "$0")`
 cd $CURPATH
 source ../../env
 
-if command_exists go && [ "$(go version | { read _ _ v _; echo ${v#go}; })" = "$goversion" ] ; then
+if command_exists go ; then
   echo "Golang is already installed"
 else
   echo "Install dependencies"
