@@ -23,7 +23,7 @@ display_usage() {
 }
 
 if [ -z $DAEMON ] || [ -z $DENOM ] || [ -z $CHAINID ] || [ -z $DAEMON_HOME ] || [ -z $GH_URL ] || [ -z $CHAIN_VERSION ] || [ -z $RPC ] || [ -z $MONGO_URL ]
-then 
+then
     display_usage
 fi
 

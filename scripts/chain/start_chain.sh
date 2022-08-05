@@ -1,6 +1,6 @@
-#/bin/sh
+#/bin/bash -eux
 
-## This script sets up a multinode network and generates multilple addresses with 
+## This script sets up a multinode network and generates multilple addresses with
 ## balance for testing purposes.
 
 
@@ -18,7 +18,7 @@ cd $CURPATH
 # check environment variables are set
 . ../deps/env-check.sh
 
-# NUM_ACCOUNTS represents number of accounts to initialize while bootstropping the chain. 
+# NUM_ACCOUNTS represents number of accounts to initialize while bootstropping the chain.
 # These are the additional accounts along with the validator accounts.
 NUM_ACCOUNTS=$1
 echo "INFO: Setting up $NUM_VALS validator nodes and $NUM_ACCOUNTS accounts"
@@ -46,7 +46,8 @@ then
     fi
     cd $REPO
     git fetch --all && git checkout $CHAIN_VERSION
-    make install
+    echo PWD: $(pwd)
+    make build
 fi
 
 cd $HOME
@@ -120,10 +121,13 @@ else
 fi
 
 echo "INFO: Generating gentxs for validator accounts"
-for (( a=1; a<=$NUM_VALS; a++ ))
+for (( a=2; a<=$NUM_VALS; a++ ))
 do
     $DAEMON gentx validator$a 90000000000$DENOM --chain-id $CHAINID  --keyring-backend test --home $DAEMON_HOME-$a
 done
+
+$DAEMON gentx-gravity validator1 2000000$DENOM 0x0Ca2adaC7e34EF5db8234bE1182070CD980273E8 umee1s9lg2vpjrwmyn93ftzkpkr750xjwzdp7a6e97h --chain-id $CHAINID  --keyring-backend test --home $DAEMON_HOME-1
+
 echo "INFO: Copying all gentxs to $DAEMON_HOME-1"
 for (( a=2; a<=$NUM_VALS; a++ ))
 do
@@ -132,6 +136,13 @@ done
 echo "INFO: Collecting gentxs"
 $DAEMON collect-gentxs --home $DAEMON_HOME-1
 echo "INFO: Updating genesis values"
+jq '.app_state["gravity"]["params"]["bridge_ethereum_address"]="0x93b5122922F9dCd5458Af42Ba69Bd7baEc546B3c"
+    | .app_state["gravity"]["params"]["bridge_chain_id"]="5"
+    | .app_state["gravity"]["params"]["bridge_active"]=false
+    | .app_state["gravity"]["delegate_keys"]=[{"validator":"umeevaloper1y6xz2ggfc0pcsmyjlekh0j9pxh6hk87ymuzzdn","orchestrator":"umee1y6xz2ggfc0pcsmyjlekh0j9pxh6hk87ymc9due","eth_address":"0xfac5EC50BdfbB803f5cFc9BF0A0C2f52aDE5b6dd"},{"validator":"umeevaloper1qjehhqdnc4mevtsumk6nkhm39nqrqtcy2f5k6k","orchestrator":"umee1qjehhqdnc4mevtsumk6nkhm39nqrqtcy2dnetu","eth_address":"0x02fa1b44e2EF8436e6f35D5F56607769c658c225"},{"validator":"umeevaloper1s824eseh42ndyawx702gwcwjqn43u89dhmqdw8","orchestrator":"umee1s824eseh42ndyawx702gwcwjqn43u89dhl8zld","eth_address":"0xd8f468c1B719cc2d50eB1E3A55cFcb60e23758CD"}]
+    | .app_state["gravity"]["gravity_nonces"]["latest_valset_nonce"]="0"
+    | .app_state["gravity"]["gravity_nonces"]["last_observed_nonce"]="0"' \
+    $DAEMON_HOME-1/config/genesis.json > $DAEMON_HOME-1/config/tmp_genesis.json && mv $DAEMON_HOME-1/config/tmp_genesis.json $DAEMON_HOME-1/config/genesis.json
 sed -i "s/172800000000000/${EVIDENCE_AGE}/g" $DAEMON_HOME-1/config/genesis.json
 sed -i "s/172800s/${GOV_DEFAULT_PERIOD}/g" $DAEMON_HOME-1/config/genesis.json
 sed -i "s/stake/$DENOM/g" $DAEMON_HOME-1/config/genesis.json

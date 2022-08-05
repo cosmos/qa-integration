@@ -2,7 +2,7 @@
 
 ## This script installs the basic apt packages and also checks if go is installed on the system or
 ## not. If go is not installed on the system then go1.17.3 is installed by the script. Env variables
-## related to go are also exported to bashrc. 
+## related to go are also exported to bashrc.
 
 command_exists () {
     type "$1" &> /dev/null ;
@@ -12,7 +12,7 @@ CURPATH=`dirname $(realpath "$0")`
 cd $CURPATH
 source ../../env
 
-if command_exists go && [ "$(go version | { read _ _ v _; echo ${v#go}; })" = "$goversion" ] ; then
+if command_exists go ; then
   echo "Golang is already installed"
 else
   echo "Install dependencies"
@@ -26,12 +26,11 @@ else
     sudo cp go/bin/go $go_path
   fi
   rm -rf go$goversion.linux-amd64.tar.gz go
+  export GOPATH=$HOME/go
+  echo "" >> ~/.bashrc
+  echo 'export GOROOT=/usr/local/go' >> ~/.bashrc
+  source ~/.bashrc
 fi
-export GOPATH=$HOME/go
-echo "" >> ~/.bashrc
-echo 'export GOROOT=/usr/local/go' >> ~/.bashrc
-source ~/.bashrc
-mkdir -p $GOPATH/src/github.com
 go version
 
 if command_exists python3 ; then
