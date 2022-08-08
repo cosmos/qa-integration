@@ -46,7 +46,7 @@ for i in range(num_txs):
     seqfrom = receiver_acc_seq + i
     status, sTxto = tx_send(sender, receiver, amount_to_be_sent, 100000, False, seqto)
     status, sTxfrom = tx_send(
-        receiver, sender, amount_to_be_sent, 100000, False, seqfrom
+        receiver, sender, amount_to_be_sent, gas=100000, unsigned=False, sequence=seqfrom
     )
 
 time.sleep(1)
