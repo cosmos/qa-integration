@@ -11,11 +11,12 @@ DEFAULT_GAS = env.DEFAULT_GAS
 def tx_submit_prevote(
     from_key,
     hash,
+    home,
     gas=DEFAULT_GAS,
 ):
     command = f"""{DAEMON} tx oracle exchange-rate-prevote {hash} \
 --chain-id {CHAINID} --keyring-backend test \
---home {DAEMON_HOME}-1 --from {from_key} --node {RPC} --output json -y --gas {gas}"""
+--home {home} --from {from_key} --node {RPC} --output json -y --gas {gas}"""
     return exec_command(command)
 
 # tx_submit_vote submits an aggregate vote tx given a salt, exchange
