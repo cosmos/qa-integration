@@ -1,10 +1,11 @@
+from lib2to3.pgen2.token import EQUAL
 import time
 import logging
 import unittest
 import inspect
 import pathlib
 from internal.modules.gov.tx import submit_and_pass_proposal
-from internal.modules.oracle.query import query_aggregate_prevote
+from internal.modules.oracle.query import query_aggregate_prevote, query_aggregate_vote
 from utils import env
 from internal.core.keys import keys_show
 
@@ -13,16 +14,26 @@ from modules.oracle.query import (
 )
 
 from modules.oracle.tx import (
-    tx_submit_prevote
+    tx_submit_prevote,
+    tx_submit_vote,
 )
 
 from modules.oracle.utils import (
-    get_hash
+    get_hash,
+)
+
+from modules.oracle.rates import (
+    ExchangeRates,
+    ExchangeRate
 )
 
 logging.basicConfig(format="%(message)s", level=logging.DEBUG)
 
-STATIC_EXCHANGE_RATES = "UMEE:0.02,ATOM:1.00,JUNO:0.50"
+EXCHANGE_RATES = ExchangeRates(
+    ExchangeRate("UMEE", "0.02"),
+    ExchangeRate("ATOM", "1.00"),
+    ExchangeRate("JUNO", "0.50"),
+    )
 STATIC_SALT = "af8ed1e1f34ac1ac00014581cbc31f2f24480b09786ac83aabf2765dada87509"
 
 validator1_home = f"{env.DAEMON_HOME}-1"
@@ -30,6 +41,16 @@ validator2_home = f"{env.DAEMON_HOME}-2"
 
 validator1_acc = keys_show("validator1", "val")[1]
 validator2_acc = keys_show("validator2", "val", validator2_home)[1]
+
+def submit_prevotes():
+        # Get Hash
+        vote_hash_1 = get_hash(EXCHANGE_RATES.ToString(), STATIC_SALT, validator1_acc["address"])
+        vote_hash_2 = get_hash(EXCHANGE_RATES.ToString(), STATIC_SALT, validator2_acc["address"])
+        # Submit 1st prevote
+        tx_submit_prevote(validator1_acc["name"], vote_hash_1, validator1_home)
+        time.sleep(0.5)
+        # Submit 2nd prevote
+        tx_submit_prevote(validator2_acc["name"], vote_hash_2, validator2_home)
 
 class TestOracleModule(unittest.TestCase):
     @classmethod
@@ -48,8 +69,8 @@ class TestOracleModule(unittest.TestCase):
     # test_prevotes tests to make sure that we can submit prevotes
     def test_prevotes(self):
         # Get Hash
-        vote_hash_1 = get_hash(STATIC_EXCHANGE_RATES, STATIC_SALT, validator1_acc["address"])
-        vote_hash_2 = get_hash(STATIC_EXCHANGE_RATES, STATIC_SALT, validator2_acc["address"])
+        vote_hash_1 = get_hash(EXCHANGE_RATES.ToString(), STATIC_SALT, validator1_acc["address"])
+        vote_hash_2 = get_hash(EXCHANGE_RATES.ToString(), STATIC_SALT, validator2_acc["address"])
         # Submit 1st prevote
         status = tx_submit_prevote(validator1_acc["name"], vote_hash_1, validator1_home)
         self.assertTrue(status)
@@ -66,6 +87,34 @@ class TestOracleModule(unittest.TestCase):
         status, prevote_2 = query_aggregate_prevote(validator2_acc["address"])
         self.assertTrue(status)
         self.assertEqual(prevote_2["hash"], vote_hash_2)
+
+    # test_votes tests to make sure that we can submit votes
+    def test_votes(self):
+        submit_prevotes()
+        status = query_aggregate_prevote(validator1_acc["address"])
+        self.assertTrue(status)
+        status = query_aggregate_prevote(validator2_acc["address"])
+        self.assertTrue(status)
+        # Wait for the next voting period
+        time.sleep(30)
+        status = tx_submit_vote(validator1_acc["name"], STATIC_SALT, EXCHANGE_RATES.ToString())
+        self.assertTrue(status)
+        time.sleep(1)
+        status = tx_submit_vote(validator2_acc["name"], STATIC_SALT, EXCHANGE_RATES.ToString())
+        self.assertTrue(status)
+
+        # Query votes to make sure they exist, and are correct
+        status, vote_1 = query_aggregate_vote(validator1_acc["address"])
+        self.assertTrue(status)
+        self.assertEqual(len(vote_1["exchange_rates"]), EXCHANGE_RATES.Len)
+        for rate in vote_1["exchange_rates"]:
+            self.assertEqual(rate["amount"], EXCHANGE_RATES.GetRate(rate["denom"]))
+
+        status, vote_2 = query_aggregate_vote(validator2_acc["address"])
+        self.assertEqual(len(vote_2["exchange_rates"]), EXCHANGE_RATES.Len)
+        self.assertTrue(status)
+        for rate in vote_2["exchange_rates"]:
+            self.assertEqual(rate["amount"], EXCHANGE_RATES.GetRate(rate["denom"]))
 
     # test_hash makes sure our hasher is accurate
     def test_hash(self):
