@@ -120,13 +120,16 @@ else
     done
 fi
 
+eth_address=("0x0Ca2adaC7e34EF5db8234bE1182070CD980273E8" "0x17B9E914a10f0b1Cf4684781fBaC9358e56d0282" "0x2986111c8B39e51f4ee20B9e5084fDA54A84672c")
 echo "INFO: Generating gentxs for validator accounts"
-for (( a=2; a<=$NUM_VALS; a++ ))
+for (( a=1; a<=$NUM_VALS; a++ ))
 do
-    $DAEMON gentx validator$a 90000000000$DENOM --chain-id $CHAINID  --keyring-backend test --home $DAEMON_HOME-$a
+
+    eth_addr=${eth_address[($a - 1)]}
+    val_addr=$($DAEMON keys show validator$a -a --home $DAEMON_HOME-$a --keyring-backend test)
+    $DAEMON gentx-gravity validator$a 2000000$DENOM $eth_addr $val_addr --chain-id $CHAINID --keyring-backend test --home $DAEMON_HOME-$a
 done
 
-$DAEMON gentx-gravity validator1 2000000$DENOM 0x0Ca2adaC7e34EF5db8234bE1182070CD980273E8 umee1s9lg2vpjrwmyn93ftzkpkr750xjwzdp7a6e97h --chain-id $CHAINID  --keyring-backend test --home $DAEMON_HOME-1
 
 echo "INFO: Copying all gentxs to $DAEMON_HOME-1"
 for (( a=2; a<=$NUM_VALS; a++ ))
@@ -197,6 +200,7 @@ do
     sed -i '/max_num_inbound_peers =/c\max_num_inbound_peers = 140' $DAEMON_HOME-$a/config/config.toml
     sed -i '/max_num_outbound_peers =/c\max_num_outbound_peers = 110' $DAEMON_HOME-$a/config/config.toml
     sed -i '/skip_timeout_commit = false/c\skip_timeout_commit = true' $DAEMON_HOME-$a/config/config.toml
+    sed -i '/minimum-gas-prices = ""/c\minimum-gas-prices = "0uumee"' $DAEMON_HOME-$a/config/app.toml
 done
 # create systemd service files
 for (( a=1; a<=$NUM_VALS; a++ ))

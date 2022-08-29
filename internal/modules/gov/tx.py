@@ -21,7 +21,7 @@ def tx_submit_proposal(
     gas=DEFAULT_GAS,
     extra_args="",
 ):
-    command = f"""{DAEMON} tx gov submit-proposal {proposal_type} {proposal_file_or_name} \
+    command = f"""{DAEMON} tx gov submit-legacy-proposal {proposal_type} {proposal_file_or_name} \
 --chain-id {CHAINID} --keyring-backend test \
 --home {DAEMON_HOME}-1 --from {from_key} --node {RPC} --output json -y --gas {gas}"""
     print("tx_submit_proposal", command)
@@ -114,7 +114,7 @@ def submit_and_pass_proposal(
     proposals_len = len(proposals)
 
     # query single proposal
-    proposal_id = int(proposals[proposals_len - 1]["proposal_id"])
+    proposal_id = int(proposals[proposals_len - 1]["id"])
 
     # add deposit to a proposal
     deposit_amount = "10000000"
